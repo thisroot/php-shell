@@ -1,0 +1,1 @@
+<a href="<?= APP::Module('Routing')->root ?>admin/crypt">Settings</a>
