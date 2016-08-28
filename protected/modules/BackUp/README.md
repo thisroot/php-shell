@@ -38,4 +38,6 @@ Manage backups for files and databases
 ```
 
 ### API interfaces
+```
 /admin/backup/api/settings/update.json      // Edit settings
+```
