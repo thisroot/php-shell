@@ -155,6 +155,13 @@ class Sessions {
         APP::Module('Registry')->Update(['value' => $_POST['module_sessions_cookie_lifetime']], [['item', '=', 'module_sessions_cookie_lifetime', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_sessions_compress']], [['item', '=', 'module_sessions_compress', PDO::PARAM_STR]]);
 
+        APP::Module('Triggers')->Exec('update_sessions_settings', [
+            'cookie_domain' => $_POST['module_sessions_cookie_domain'],
+            'gc_maxlifetime' => $_POST['module_sessions_gc_maxlifetime'],
+            'cookie_lifetime' => $_POST['module_sessions_cookie_lifetime'],
+            'compress' => $_POST['module_sessions_compress']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');

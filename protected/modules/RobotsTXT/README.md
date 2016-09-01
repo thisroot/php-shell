@@ -19,7 +19,8 @@ Web automatically.
 │       ├── install.php
 │       └── uninstall.php
 └── /render
-    └── robots.txt.php
+    └── /robotstxt
+        └── index.php
 ```
 
 ### WEB interfaces

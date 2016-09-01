@@ -6,6 +6,7 @@ Storing Sessions in a Database
 - [Crypt](https://github.com/evildevel/php-shell/tree/master/protected/modules/Crypt)
 - [DB](https://github.com/evildevel/php-shell/tree/master/protected/modules/DB)
 - [Registry](https://github.com/evildevel/php-shell/tree/master/protected/modules/Registry)
+- [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
 
 ### Files
 ```
@@ -48,6 +49,9 @@ string APP::Module('Sessions')->Serialize(mixed $data[, bool $safe = true])
 // Unserialize session data
 mixed APP::Module('Sessions')->Unserialize(string $data)
 ```
+
+### Triggers
+- Update sessions settings
 
 ### WEB interfaces
 ```

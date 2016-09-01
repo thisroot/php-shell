@@ -1,2 +1,4 @@
 /nbproject/
-/logs/
+/protected/modules/PHPShell
+/protected/render/phpshell
+/public/export

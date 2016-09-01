@@ -1,6 +1,6 @@
 [name]Logs[/name]
 [description]Manage log files[/description]
-[dependencies]Routing Crypt Utils[/dependencies]
+[dependencies]Routing Crypt Utils Triggers[/dependencies]
 
 [file]protected/modules/Logs/MANIFEST[/file]
 [file]protected/modules/Logs/README.md[/file]
@@ -10,5 +10,4 @@
 [file]protected/modules/Logs/uninstall.php[/file]
 [file]protected/render/logs/admin/index.php[/file]
 [file]protected/render/logs/admin/nav.php[/file]
-[file]protected/render/logs/admin/remove.php[/file]
 [file]protected/render/logs/admin/view.php[/file]

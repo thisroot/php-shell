@@ -1,6 +1,6 @@
 [name]SSH[/name]
 [description]Access to resources (shell, remote exec, tunneling, file transfer) on a remote machine using a secure cryptographic transport[/description]
-[dependencies]Routing Registry Crypt DB[/dependencies]
+[dependencies]Routing Registry Crypt DB Triggers[/dependencies]
 
 [file]protected/modules/SSH/MANIFEST[/file]
 [file]protected/modules/SSH/README.md[/file]

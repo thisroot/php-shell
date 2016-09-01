@@ -14,7 +14,7 @@ class DB {
 
     public function Open($id) {
         if (!array_key_exists($id, (array) $this->con)) {
-            APP::Error('db/errors', 'db_connect', $id);
+            throw new Exception('Could not connect to database #' . $id);
         }
 
         return $this->con[$id];

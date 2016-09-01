@@ -12,6 +12,7 @@ You need at least `PHP 5.2.0` with extensions:
 - [Download](http://phpshell.evildevel.com/public/export/core/php-shell.zip) the latest version
 - Upload and unzip the archive to your server
 - Set `install = true` in file `conf.php` to activate the module installation
+- Set `location` in file `conf.php` to according your domain
 - Follow `/import` to import modules via network
 
 Note: You can manually [download](http://phpshell.evildevel.com/downloads) and copy 
@@ -79,16 +80,52 @@ Error code and details are available in the file (var `$data`).
 
 Set `APP::$conf['debug'] = false` to disable verbose error information.
 
+### Console
+Run method `Test` in the module `Console`
+```php
+class Console {
+    public function Test($args) {
+        var_dump($args);
+    }
+}
+```
+```sh
+php /var/www/phpshell/init.php Console Test arg1 arg2 arg3
+```
+```php
+array(4) {
+  [0] =>
+  string(40) "/var/www/phpshell/init.php"
+  [1] =>
+  string(8) "Console"
+  [2] =>
+  string(3) "Test"
+  [3] =>
+  string(3) "arg1"
+  [4] =>
+  string(4) "arg2"
+  [5] =>
+  string(5) "arg3"
+}
+```
+
 ### Files
 ```
-/protected
-├── /import                 # Imported modules
-├── /modules                # Installed modules
-└── /render                 # Views
-    ├── core.php
-    ├── import.php
-    └── install.php
-app.php                     # Application core
-conf.php                    # Core config
-init.php                    # Initialization script
+/
+├── /protected
+│   ├── /import                         # Imported modules
+│   ├── /modules                        # Installed modules
+│   └── /render                         
+│       └── /core
+│           ├── /widgets
+│           │   ├── css.php
+│           │   ├── ie_warning.php
+│           │   ├── js.php
+│           │   └── page_loader.php
+│           ├── error.php
+│           ├── import.php
+│           └── install.php
+├── app.php                             # Core
+├── conf.php                            # Config
+└── init.php                            # Init script
 ```

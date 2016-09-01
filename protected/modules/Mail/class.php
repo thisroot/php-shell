@@ -54,7 +54,18 @@ class Mail {
             . $html_msg
             . "\r\n--" . $boundary . "--\r\n";
 
-        return mail($to, $message_subject, $msg, implode("\r\n", $message_headers), '-fbounce-' . md5($to) . '@' . $_SERVER['SERVER_NAME']) ? ['success', $message_id] : ['error', 0];
+        $res = mail($to, $message_subject, $msg, implode("\r\n", $message_headers), '-fbounce-' . md5($to) . '@' . $_SERVER['SERVER_NAME']) ? ['success', $message_id] : ['error', 0];
+    
+        APP::Module('Triggers')->Exec('mail_send_letter', [
+            'result' => $res,
+            'from' => $from,
+            'to' => $to,
+            'subject' => $subject,
+            'message' => $message,
+            'headers' => $headers
+        ]);
+        
+        return $res;
     }
 
     
@@ -214,11 +225,7 @@ class Mail {
         );
     }
     
-    
-    public function ManageMail() {
-        APP::Render('mail/admin/index');
-    }
-    
+
     public function ManageLetters() {
         $group_sub_id = (int) isset(APP::Module('Routing')->get['group_sub_id_hash']) ? APP::Module('Crypt')->Decode(APP::Module('Routing')->get['group_sub_id_hash']) : 0;
         
@@ -469,6 +476,16 @@ class Mail {
                     'up_date' => 'NOW()'
                 )
             );
+            
+            APP::Module('Triggers')->Exec('mail_add_letter', [
+                'id' => $out['letter_id'],
+                'group_id' => $group_id,
+                'sender_id' => $_POST['sender_id'],
+                'subject' => $_POST['subject'],
+                'html' => $_POST['html'],
+                'plaintext' => $_POST['plaintext'],
+                'list_id' => $_POST['list_id']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -524,6 +541,13 @@ class Mail {
                     'up_date' => 'NOW()'
                 )
             );
+            
+            APP::Module('Triggers')->Exec('mail_add_sender', [
+                'id' => $out['sender_id'],
+                'group_id' => $group_id,
+                'name' => $_POST['name'],
+                'email' => $_POST['email']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -554,6 +578,11 @@ class Mail {
                 $this->conf['connection'], 'letters',
                 [['id', '=', $_POST['id'], PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('mail_remove_letter', [
+                'id' => $_POST['id'],
+                'result' => $out['count']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -584,6 +613,11 @@ class Mail {
                 $this->conf['connection'], 'senders',
                 [['id', '=', $_POST['id'], PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('mail_remove_sender', [
+                'id' => $_POST['id'],
+                'result' => $out['count']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -647,6 +681,15 @@ class Mail {
                 ], 
                 [['id', '=', $letter_id, PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('mail_update_letter', [
+                'id' => $letter_id,
+                'sender_id' => $_POST['sender_id'],
+                'subject' => $_POST['subject'],
+                'html' => $_POST['html'],
+                'plaintext' => $_POST['plaintext'],
+                'list_id' => $_POST['list_id']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -698,6 +741,12 @@ class Mail {
                 ], 
                 [['id', '=', $sender_id, PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('mail_update_sender', [
+                'id' => $sender_id,
+                'name' => $_POST['name'],
+                'email' => $_POST['email']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -742,6 +791,12 @@ class Mail {
                     'up_date' => 'NOW()'
                 )
             );
+            
+            APP::Module('Triggers')->Exec('mail_add_letters_group', [
+                'id' => $out['group_id'],
+                'sub_id' => $sub_id,
+                'name' => $_POST['name']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -786,6 +841,12 @@ class Mail {
                     'up_date' => 'NOW()'
                 )
             );
+            
+            APP::Module('Triggers')->Exec('mail_add_senders_group', [
+                'id' => $out['group_id'],
+                'sub_id' => $sub_id,
+                'name' => $_POST['name']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -813,6 +874,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $this->RemoveLettersGroup($_POST['id']);
+            APP::Module('Triggers')->Exec('mail_remove_letters_group', ['id' => $_POST['id']]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -840,6 +902,7 @@ class Mail {
         
         if ($out['status'] == 'success') {
             $this->RemoveSendersGroup($_POST['id']);
+            APP::Module('Triggers')->Exec('mail_remove_senders_group', ['id' => $_POST['id']]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -878,6 +941,11 @@ class Mail {
                 ['name' => $_POST['name']], 
                 [['id', '=', $group_id, PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('mail_update_letters_group', [
+                'id' => $group_id,
+                'name' => $_POST['name']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -916,6 +984,11 @@ class Mail {
                 ['name' => $_POST['name']], 
                 [['id', '=', $group_id, PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('mail_update_senders_group', [
+                'id' => $group_id,
+                'name' => $_POST['name']
+            ]);
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -930,6 +1003,11 @@ class Mail {
         APP::Module('Registry')->Update(['value' => $_POST['module_mail_x_mailer']], [['item', '=', 'module_mail_x_mailer', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_mail_charset']], [['item', '=', 'module_mail_charset', PDO::PARAM_STR]]);
 
+        APP::Module('Triggers')->Exec('mail_update_settings', [
+            'x_mailer' => $_POST['module_mail_x_mailer'],
+            'charset' => $_POST['module_mail_charset']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');

@@ -1,6 +1,6 @@
 [name]Mail[/name]
 [description]Simple E-Mail sending. Senders and letters management system.[/description]
-[dependencies]Routing Crypt Registry DB[/dependencies]
+[dependencies]Routing Crypt Registry DB Triggers[/dependencies]
 
 [file]protected/modules/Mail/MANIFEST[/file]
 [file]protected/modules/Mail/README.md[/file]
@@ -8,7 +8,6 @@
 [file]protected/modules/Mail/conf.php[/file]
 [file]protected/modules/Mail/install.php[/file]
 [file]protected/modules/Mail/uninstall.php[/file]
-[file]protected/render/mail/admin/index.php[/file]
 [file]protected/render/mail/admin/nav.php[/file]
 [file]protected/render/mail/admin/settings.php[/file]
 [file]protected/render/mail/admin/letters/add.php[/file]

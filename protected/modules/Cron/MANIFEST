@@ -1,6 +1,6 @@
 [name]Cron[/name]
 [description]Manage cron jobs without modifying crontab[/description]
-[dependencies]Routing Registry DB SSH Crypt[/dependencies]
+[dependencies]Routing Registry DB SSH Crypt Triggers[/dependencies]
 
 [file]protected/modules/Cron/MANIFEST[/file]
 [file]protected/modules/Cron/README.md[/file]

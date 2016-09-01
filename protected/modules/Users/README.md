@@ -8,6 +8,7 @@ User management system
 - [DB](https://github.com/evildevel/php-shell/tree/master/protected/modules/DB)
 - [Registry](https://github.com/evildevel/php-shell/tree/master/protected/modules/Registry)
 - [Mail](https://github.com/evildevel/php-shell/tree/master/protected/modules/Mail)
+- [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
 
 ### Files
 ```
@@ -36,18 +37,15 @@ User management system
         │   ├── index.php
         │   ├── nav.php
         │   ├── notifications.php
+        │   ├── oauth_clients.php
         │   ├── passwords.php
         │   ├── services.php
-        │   ├── social.php
         │   └── timeouts.php
+        ├── actions.php
         ├── activate.php
-        ├── change_password.php
         ├── double_login.php
         ├── errors.php
-        ├── login.php
-        ├── profile.php
-        ├── register.php
-        └── reset_password.php
+        └── profile.php
 ```
 
 ### Properties
@@ -71,24 +69,45 @@ array APP::Module('Users')->Auth(int $id[, bool $set_cookie = true[, bool $save_
 string APP::Module('Users')->GeneratePassword(int $number)
 ```
 
+### Triggers
+- Logout
+- Activate user
+- Remove user
+- Add user
+- Login
+- Double login
+- Register new user
+- Reset password
+- Change password
+- Update user
+- Add role
+- Remove role
+- Add rule
+- Remove rule
+- Update rule
+- Update OAuth settings
+- Update notifications settings
+- Update services settings
+- Update auth settings
+- Update passwords settings
+- Update timeouts settings 
+
 ### WEB interfaces
 ```
-/users/login                                                // Login form
+/users/actions/<action>                                     // Actions
 /users/login/vk                                             // Login via VK
 /users/login/fb                                             // Login via Facebook
 /users/login/google                                         // Login via Google
 /users/login/ya                                             // Login via Yandex
 /users/login/double/<return_hash>                           // Double login form
 /users/activate/<user_id_hash>                              // User activation
-/users/register                                             // Register form
 /users/profile                                              // User profile
-/users/reset-password                                       // Reset password form
-/users/change-password                                      // Change password form
+/users/logout                                               // Logout
 
 /admin/users                                                // Manage users
 /admin/users/add                                            // Add user
 /admin/users/edit/<user_id_hash>                            // Edit user
-/admin/users/social                                         // Setup social networks
+/admin/users/oauth/clients                                  // Setup OAuth clients
 /admin/users/notifications                                  // Setup notifications
 /admin/users/services                                       // Setup services
 /admin/users/auth                                           // Setup auth
@@ -110,12 +129,14 @@ string APP::Module('Users')->GeneratePassword(int $number)
 /admin/users/api/add.json                                   // [API] Add user
 /admin/users/api/remove.json                                // [API] Remove user
 /admin/users/api/update.json                                // [API] Update user
+/admin/users/api/roles/list.json                            // [API] List roles
 /admin/users/api/roles/add.json                             // [API] Add role
 /admin/users/api/roles/remove.json                          // [API] Remove role
+/admin/users/api/roles/rules/list.json                      // [API] List rules
 /admin/users/api/roles/rules/add.json                       // [API] Add rule
 /admin/users/api/roles/rules/update.json                    // [API] Update rule
 /admin/users/api/roles/rules/remove.json                    // [API] Remove rule
-/admin/users/api/social/update.json                         // [API] Update social networks settings
+/admin/users/api/oauth/clients/update.json                  // [API] Update OAuth clients settings
 /admin/users/api/notifications/update.json                  // [API] Update notifications settings
 /admin/users/api/services/update.json                       // [API] Update services settings
 /admin/users/api/auth/update.json                           // [API] Update auth settings

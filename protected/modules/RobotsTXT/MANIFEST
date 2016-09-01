@@ -8,4 +8,4 @@
 [file]protected/modules/RobotsTXT/conf.php[/file]
 [file]protected/modules/RobotsTXT/install.php[/file]
 [file]protected/modules/RobotsTXT/uninstall.php[/file]
-[file]protected/render/robots.txt.php[/file]
+[file]protected/render/robotstxt/index.php[/file]

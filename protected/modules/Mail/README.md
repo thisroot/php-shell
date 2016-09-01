@@ -6,6 +6,7 @@ Simple E-Mail sending. Senders and letters management system.
 - [Crypt](https://github.com/evildevel/php-shell/tree/master/protected/modules/Crypt)
 - [Registry](https://github.com/evildevel/php-shell/tree/master/protected/modules/Registry)
 - [DB](https://github.com/evildevel/php-shell/tree/master/protected/modules/DB)
+- [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
 
 ### Files
 ```
@@ -36,7 +37,6 @@ Simple E-Mail sending. Senders and letters management system.
             │   ├── add.php
             │   ├── edit.php
             │   └── index.php
-            ├── index.php
             ├── nav.php
             └── settings.php
 ```
@@ -67,9 +67,24 @@ APP::Module('Mail')->Send(
 );
 ```
 
+### Triggers
+- Add letter
+- Remove letter
+- Update letter
+- Add group of letters
+- Remove group of letters
+- Update group of letters
+- Add sender
+- Remove sender
+- Update sender
+- Add group of senders
+- Remove group of senders
+- Update group of senders
+- Update mail settings
+- Send mail
+
 ### WEB interfaces
 ```
-/admin/mail                                                              // Manage mail
 /admin/mail/letters/<group_sub_id_hash>/preview/<letter_id_hash>         // Preview letter
 /admin/mail/letters/<group_sub_id_hash>/groups/add                       // Add letters group
 /admin/mail/letters/<group_sub_id_hash>/groups/<group_id_hash>/edit      // Edit letters group
@@ -82,6 +97,7 @@ APP::Module('Mail')->Send(
 /admin/mail/senders/<group_sub_id_hash>/edit/<sender_id_hash>            // Edit sender
 /admin/mail/senders/<group_sub_id_hash>                                  // Manage senders
 /admin/mail/settings                                                     // Mail settings
+
 /admin/mail/api/letters/add.json                                         // [API] Add letter
 /admin/mail/api/letters/remove.json                                      // [API] Remove letter
 /admin/mail/api/letters/update.json                                      // [API] Update letter

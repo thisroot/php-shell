@@ -27,6 +27,8 @@ class Routing {
     }
 
     public function SelfUrl() {
+        if (!isset($_SERVER['SERVER_NAME'])) return false;
+
         $s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';
         $sp = strtolower($_SERVER['SERVER_PROTOCOL']);
         $pr = substr($sp, 0, strpos($sp, '/')) . $s;
