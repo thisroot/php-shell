@@ -5,6 +5,7 @@ Manage log files
 - [Routing](https://github.com/evildevel/php-shell/tree/master/protected/modules/Routing)
 - [Crypt](https://github.com/evildevel/php-shell/tree/master/protected/modules/Crypt)
 - [Utils](https://github.com/evildevel/php-shell/tree/master/protected/modules/Utils)
+- [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
 
 ### Files
 ```
@@ -22,13 +23,17 @@ Manage log files
         └── /admin
             ├── index.php
             ├── nav.php
-            ├── remove.php
             └── view.php
 ```
 
+### Triggers
+- Remove log file
+
 ### WEB interfaces
 ```
-/logs                   // Manage log files
-/logs/view/<file>       // View log file
-/logs/remove/<file>     // Remove log file
+/admin/logs                             // Manage logs
+/admin/logs/view/<filename_hash>        // View log
+        
+/admin/logs/api/list.json               // [API] List logs
+/admin/logs/api/remove.json             // [API] Remove log
 ```

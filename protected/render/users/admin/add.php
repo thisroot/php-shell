@@ -1,124 +1,164 @@
 <!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <title>Users</title>
-    <meta charset="UTF-8">
-    <meta name="robots" content="none">
-    <style>
-        .has-error {
-            background: #fdd3d3;
-        }
-        .error {
-            display: none;
-        }
-        .is-visible {
-            display: block;
-        }
-    </style>
-    <script src="<?= APP::Module('Routing')->root ?>public/js/jquery-3.1.0.min.js"></script>
-</head>
-<body>
-    <h1>Users</h1>
-    <a href="<?= APP::Module('Routing')->root ?>admin">Admin</a> > <a href="<?= APP::Module('Routing')->root ?>admin/users">Users</a> > Add user
-    <hr>
-    
-    <form id="add-user">
-        <label for="email">E-mail</label>
-        <br>
-        <input id="email" type="email" name="email">
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="password">Password</label>
-        <br>
-        <input id="password" type="password" name="password">
-        <a href="javascript:void(0);" class="hide-password">Show</a>
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="re-password">Retype password</label>
-        <br>
-        <input id="re-password" type="password" name="re-password">
-        <a href="javascript:void(0);" class="hide-password">Show</a>
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="role">Role</label>
-        <br>
-        <select id="role" name="role">
-            <? foreach ($data['roles'] as $role) { ?><option value="<?= $role ?>"><?= $role ?></option><? } ?>
-        </select>
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="notification">Notification</label>
-        <br>
-        <select id="notification" name="notification">
-            <option value="0">none</option>
-            <option value="<?= APP::Module('Registry')->Get('module_users_register_activation_letter') ?>">with activation link</option>
-            <option value="<?= APP::Module('Registry')->Get('module_users_register_letter') ?>">without activation link</option>
-        </select>
-        <div class="error"></div>
-        <br><br>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>PHP-shell - Users</title>
 
-        <input type="submit" value="Add">
-    </form>
-    
-    <script>
-        $('.hide-password').on('click', function() {
-            var $this = $(this),
-                $password_field = $this.prev('input');
-
-            ('password' == $password_field.attr('type')) ? $password_field.attr('type', 'text') : $password_field.attr('type', 'password');
-            ('Hide' == $this.text()) ? $this.text('Show') : $this.text('Hide');
-        });
+        <!-- Vendor CSS -->
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
         
-        $('#add-user').submit(function(event) {
-            event.preventDefault();
+        <? APP::Render('core/widgets/css') ?>
+    </head>
+    <body data-ma-header="teal">
+        <? 
+        APP::Render('admin/widgets/header', 'include', [
+            'Users' => 'admin/users'
+        ]);
+        ?>
+        <section id="main">
+            <? APP::Render('admin/widgets/sidebar') ?>
 
-            var email = $(this).find('#email');
-            var password = $(this).find('#password');
-            var re_password = $(this).find('#re-password');
-            var role = $(this).find('#role');
-            var notification = $(this).find('#email');
+            <section id="content">
+                <div class="container">
+                    <div class="card">
+                        <form id="add-user" class="form-horizontal" role="form">
+                            <div class="card-header">
+                                <h2>Add new user</h2>
+                            </div>
+                            <div class="card-body card-padding">
+                                <div class="form-group">
+                                    <label for="email" class="col-sm-2 control-label">E-mail</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="email" class="form-control" name="email" id="email">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="col-sm-2 control-label">Password</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="password" class="form-control" name="password" id="password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="re-password" class="col-sm-2 control-label">Retype password</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="password" class="form-control" name="re-password" id="re-password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="role" class="col-sm-2 control-label">Role</label>
+                                    <div class="col-sm-3">
+                                        <select id="role" name="role" class="selectpicker">
+                                            <? foreach ($data['roles'] as $role) { ?><option value="<?= $role ?>"><?= $role ?></option><? } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notification" class="col-sm-2 control-label">Notification</label>
+                                    <div class="col-sm-3">
+                                        <select id="notification" name="notification" class="selectpicker">
+                                            <option value="0">none</option>
+                                            <option value="<?= APP::Module('Registry')->Get('module_users_register_activation_letter') ?>">with activation link</option>
+                                            <option value="<?= APP::Module('Registry')->Get('module_users_register_letter') ?>">without activation link</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-5">
+                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
 
-            email.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            password.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            re_password.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            role.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            notification.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
+            <? APP::Render('admin/widgets/footer') ?>
+        </section>
 
-            if (email.val() === '') { email.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (password.val() === '') { password.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (password.val() !== re_password.val()) { re_password.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Passwords do not match'); return false; }
-            if (role.val() === '') { role.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (notification.val() === '') { notification.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            
-            $(this).find('[type="submit"]').attr('disabled', true);
-            
-            $.ajax({
-                type: 'post',
-                url: '<?= APP::Module('Routing')->root ?>admin/users/api/add.json',
-                data: $(this).serialize(),
-                success: function(result) {
-                    switch(result.status) {
-                        case 'success': 
-                            alert('User "' + email.val() + '" has been added');
-                            window.location.href = '<?= APP::Module('Routing')->root ?>admin/users';
-                            break;
-                        case 'error': 
-                            $.each(result.errors, function(i, error) {
-                                switch(error) {
-                                    case 2: $('#email').addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Already registered'); break;
-                                }
-                            });
-                            break;
-                    }
-                    
-                    $('#add-user').find('[type="submit"]').attr('disabled', false);
-                }
+        <? APP::Render('core/widgets/page_loader') ?>
+        <? APP::Render('core/widgets/ie_warning') ?>
+
+        <!-- Javascript Libraries -->
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
+        
+        <? APP::Render('core/widgets/js') ?>
+        
+        <script>
+            $(document).ready(function() {
+                $('#add-user').submit(function(event) {
+                    event.preventDefault();
+
+                    var email = $(this).find('#email');
+                    var password = $(this).find('#password');
+                    var re_password = $(this).find('#re-password');
+                    var role = $(this).find('#role');
+                    var notification = $(this).find('#email');
+
+                    email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    re_password.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    role.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    notification.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+
+                    if (email.val() === '') { email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (password.val() === '') { password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (password.val() !== re_password.val()) { re_password.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Passwords do not match</small>'); return false; }
+                    if (role.val() === '') { role.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (notification.val() === '') { notification.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+
+                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+
+                    $.ajax({
+                        type: 'post',
+                        url: '<?= APP::Module('Routing')->root ?>admin/users/api/add.json',
+                        data: $(this).serialize(),
+                        success: function(result) {
+                            switch(result.status) {
+                                case 'success':
+                                    swal({
+                                        title: 'Done!',
+                                        text: 'User "' + email.val() + '" has been added',
+                                        type: 'success',
+                                        showCancelButton: false,
+                                        confirmButtonText: 'Ok',
+                                        closeOnConfirm: false
+                                    }, function(){
+                                        window.location.href = '<?= APP::Module('Routing')->root ?>admin/users';
+                                    });
+                                    break;
+                                case 'error': 
+                                    $.each(result.errors, function(i, error) {
+                                        switch(error) {
+                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Already registered</small>'); break;
+                                        }
+                                    });
+                                    break;
+                            }
+
+                            $('#add-user').find('[type="submit"]').html('Add').attr('disabled', false);
+                        }
+                    });
+                  });
             });
-          });
-    </script>
-</body>
-</html>
+        </script>
+    </body>
+  </html>

@@ -2,112 +2,193 @@
 $nav = [];
 
 foreach ($data['path'] as $key => $value) {
-    $title = $key ? $value : 'Leters';
-    $nav[] = '<a href="' . APP::Module('Routing')->root . 'admin/mail/letters/' . APP::Module('Crypt')->Encode($key) . '">' . $title . '</a>';
+    $nav[$key ? $value : 'Letters'] = 'admin/mail/letters/' . APP::Module('Crypt')->Encode($key);
 }
 ?>
 <!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <title>Mail</title>
-    <meta charset="UTF-8">
-    <meta name="robots" content="none">
-    <style>
-        .has-error {
-            background: #fdd3d3;
-        }
-        .error {
-            display: none;
-        }
-        .is-visible {
-            display: block;
-        }
-    </style>
-    <script src="<?= APP::Module('Routing')->root ?>public/js/jquery-3.1.0.min.js"></script>
-</head>
-<body>
-    <h1>Mail</h1>
-    <a href="<?= APP::Module('Routing')->root ?>admin">Admin</a> > <a href="<?= APP::Module('Routing')->root ?>admin/mail">Mail</a> > <?= implode(' > ', $nav) ?> > Edit letter
-    <hr>
-    
-    <form id="edit-letter">
-        <input type="hidden" name="id" value="<?= APP::Module('Routing')->get['letter_id_hash'] ?>">
-        
-        <label for="sender_id">Sender</label>
-        <br>
-        <input id="sender_id" type="text" name="sender_id" value="<?= $data['letter']['sender_id'] ?>">
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="subject">Subject</label>
-        <br>
-        <input id="subject" type="text" name="subject" value="<?= $data['letter']['subject'] ?>" style="width: 400px;">
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="html">HTML-version</label>
-        <br>
-        <textarea name="html" id="html" style="width: 100%; height: 300px;"><?= htmlspecialchars($data['letter']['html']) ?></textarea>
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="plaintext">Plaintext-version</label>
-        <br>
-        <textarea name="plaintext" id="plaintext" style="width: 100%; height: 300px;"><?= htmlspecialchars($data['letter']['plaintext']) ?></textarea>
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="list_id">List-ID header</label>
-        <br>
-        <input id="list_id" type="text" name="list_id" value="<?= $data['letter']['list_id'] ?>">
-        <div class="error"></div>
-        <br><br>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>PHP-shell - Letters</title>
 
-        <input type="submit" value="Save changes">
-    </form>
-    
-    <script>
-        $('#edit-letter').submit(function(event) {
-            event.preventDefault();
+        <!-- Vendor CSS -->
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
+        
+        <? APP::Render('core/widgets/css') ?>
+    </head>
+    <body data-ma-header="teal">
+        <? APP::Render('admin/widgets/header', 'include', $nav) ?>
+        
+        <section id="main">
+            <? APP::Render('admin/widgets/sidebar') ?>
 
-            var sender_id = $(this).find('#sender_id');
-            var subject = $(this).find('#subject');
-            var html = $(this).find('#html');
-            var plaintext = $(this).find('#plaintext');
-            
-            sender_id.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            subject.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            html.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            plaintext.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            
-            if (sender_id.val() === '') { sender_id.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (subject.val() === '') { subject.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (html.val() === '') { html.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (plaintext.val() === '') { plaintext.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
+            <section id="content">
+                <div class="container">
+                    <div class="card">
+                        <form id="edit-letter" class="form-horizontal" role="form">
+                            <input type="hidden" name="id" value="<?= APP::Module('Routing')->get['letter_id_hash'] ?>">
+                            
+                            <div class="card-header">
+                                <h2>Edit letter</h2>
+                            </div>
 
-            $(this).find('[type="submit"]').attr('disabled', true);
-            
-            $.ajax({
-                type: 'post',
-                url: '<?= APP::Module('Routing')->root ?>admin/mail/api/letters/update.json',
-                data: $(this).serialize(),
-                success: function(result) {
-                    switch(result.status) {
-                        case 'success': 
-                            alert('Letter "' + subject.val() + '" has been updated');
-                            window.location.href = '<?= APP::Module('Routing')->root ?>admin/mail/letters/<?= APP::Module('Crypt')->Encode($data['group_sub_id']) ?>';
-                            break;
-                        case 'error': 
-                            $.each(result.errors, function(i, error) {
-                                switch(error) {}
-                            });
-                            break;
+                            <div class="card-body card-padding">
+                                <div class="form-group">
+                                    <label for="sender_id" class="col-sm-2 control-label">Sender</label>
+                                    <div class="col-sm-3">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="sender_id" id="sender_id">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject" class="col-sm-2 control-label">Subject</label>
+                                    <div class="col-sm-10">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="subject" id="subject">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="html" class="col-sm-2 control-label">HTML-version</label>
+                                    <div class="col-sm-10">
+                                        <div class="fg-line">
+                                            <textarea name="html" id="html" class="form-control" placeholder="Write HTML version of the letter"><?= $data['letter']['html'] ?></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="plaintext" class="col-sm-2 control-label">Plaintext-version</label>
+                                    <div class="col-sm-10">
+                                        <div class="fg-line">
+                                            <textarea name="plaintext" id="plaintext" class="form-control" placeholder="Write plaintext version of the letter"><?= $data['letter']['plaintext'] ?></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="list_id" class="col-sm-2 control-label">List-ID header</label>
+                                    <div class="col-sm-10">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="list_id" id="list_id">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-5">
+                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <? APP::Render('admin/widgets/footer') ?>
+        </section>
+
+        <? APP::Render('core/widgets/page_loader') ?>
+        <? APP::Render('core/widgets/ie_warning') ?>
+
+        <!-- Javascript Libraries -->
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/autosize/dist/autosize.min.js"></script>
+
+        <? APP::Render('core/widgets/js') ?>
+        
+        <script>
+            $(document).ready(function() {
+                $('#sender_id').val('<?= $data['letter']['sender_id'] ?>');
+                $('#subject').val('<?= $data['letter']['subject'] ?>');
+                $('#list_id').val('<?= $data['letter']['list_id'] ?>');
+
+                autosize($('#html'));
+                autosize($('#plaintext'));
+                
+                $('#edit-letter').submit(function(event) {
+                    event.preventDefault();
+
+                    var sender_id = $(this).find('#sender_id');
+                    var subject = $(this).find('#subject');
+                    var html = $(this).find('#html');
+                    var plaintext = $(this).find('#plaintext');
+ 
+                    sender_id.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+                    html.closest('.form-group').removeClass('has-error has-feedback');
+                    plaintext.closest('.form-group').removeClass('has-error has-feedback');
+                    subject.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+
+                    if (sender_id.val() === '') { sender_id.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (subject.val() === '') { subject.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-10').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>'); return false; }
+                    if (html.val() === '') { 
+                        html.closest('.form-group').addClass('has-error has-feedback'); 
+                        swal({
+                            title: 'Error!',
+                            text: 'HTML-version empty',
+                            type: 'error',
+                            showCancelButton: false,
+                            confirmButtonText: 'Ok',
+                            closeOnConfirm: false
+                        }); 
+                        return false; 
                     }
-                    
-                    $('#edit-letter').find('[type="submit"]').attr('disabled', false);
-                }
+                    if (plaintext.val() === '') { 
+                        plaintext.closest('.form-group').addClass('has-error has-feedback'); 
+                        swal({
+                            title: 'Error!',
+                            text: 'Plaintext-version empty',
+                            type: 'error',
+                            showCancelButton: false,
+                            confirmButtonText: 'Ok',
+                            closeOnConfirm: false
+                        }); 
+                        return false; 
+                    }
+
+                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+
+                    $.ajax({
+                        type: 'post',
+                        url: '<?= APP::Module('Routing')->root ?>admin/mail/api/letters/update.json',
+                        data: $(this).serialize(),
+                        success: function(result) {
+                            switch(result.status) {
+                                case 'success':
+                                    swal({
+                                        title: 'Done!',
+                                        text: 'Letter "' + subject.val() + '" has been updated',
+                                        type: 'success',
+                                        showCancelButton: false,
+                                        confirmButtonText: 'Ok',
+                                        closeOnConfirm: false
+                                    }, function(){
+                                        window.location.href = '<?= APP::Module('Routing')->root ?>admin/mail/letters/<?= APP::Module('Crypt')->Encode($data['group_sub_id']) ?>';
+                                    });
+                                    break;
+                                case 'error': 
+                                    $.each(result.errors, function(i, error) {
+                                        switch(error) {}
+                                    });
+                                    break;
+                            }
+
+                            $('#edit-letter').find('[type="submit"]').html('Save changes').attr('disabled', false);
+                        }
+                    });
+                  });
             });
-          });
-    </script>
-</body>
+        </script>
+    </body>
 </html>

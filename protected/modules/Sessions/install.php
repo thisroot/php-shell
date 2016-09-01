@@ -101,6 +101,9 @@ if (!APP::Module('Registry')->Get('module_sessions_gc_maxlifetime')) {
     APP::Module('Registry')->Add('module_sessions_gc_maxlifetime', $_SESSION['core']['install']['sessions']['settings']['gc']);
 }
 
+// Add triggers support
+APP::Module('Triggers')->Register('update_sessions_settings', 'Sessions', 'Update settings');
+
 $data->extractTo(ROOT);
 
 $sessions_conf_file = ROOT . '/protected/modules/Sessions/conf.php';

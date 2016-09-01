@@ -6,15 +6,7 @@ class Admin {
     }
 
     public function Manage() {
-        $modules = [];
-        
-        foreach (APP::$modules as $key => $value) {
-            if (method_exists($value, 'Admin')) {
-                $modules[$key] = $value->Admin();
-            }
-        }
-        
-        APP::Render('admin/index', 'include', $modules);
+        APP::Render('admin/index');
     }
     
     public function System() {
@@ -39,47 +31,52 @@ class Admin {
             $free_data[] = $line;
         }
 
-        APP::Render('admin/system', 'include', [$top, $df_data, $free_data]);
+        return [$top, $df_data, $free_data];
     }
-    
-    public function App() {
-        APP::Render('admin/app/index');
-    }
-    
+
     public function ImportModules() {
         if (isset($_FILES['modules'])) {
             foreach ($_FILES['modules']['name'] as $key => $value) {
-                if ($value) move_uploaded_file($_FILES['modules']['tmp_name'][$key], ROOT . '/protected/import/' . basename($value));
+                if ($value) {
+                    APP::Module('Triggers')->Exec('import_locale_module', [
+                        'module' => basename($value),
+                        'result' => move_uploaded_file($_FILES['modules']['tmp_name'][$key], ROOT . '/protected/import/' . basename($value))
+                    ]);
+                }
             }
         }
         
-        APP::Render('admin/app/modules/import');
+        APP::Render('admin/modules/import');
     }
     
     public function NetworkImportModules() {
         if (session_status() == PHP_SESSION_NONE) session_start();
-        APP::Import('admin/app/modules/network_import');
+        APP::Import('admin/modules/network_import');
     }
     
     public function RemoveImportedModule() {
         $module = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['module_path']);
         unlink($module);
-        header('Location: ' . APP::Module('Routing')->root . 'admin/app/modules/import');
+        APP::Module('Triggers')->Exec('remove_imported_module', ['module' => basename($module)]);
+        
+        header('Location: ' . APP::Module('Routing')->root . 'admin/modules/import');
         exit;
     }
     
     public function InstallImportedModules() {
         if (session_status() == PHP_SESSION_NONE) session_start();
-        APP::Install('admin/app/modules/install');
+        APP::Install('admin/modules/install');
     }
     
     public function ExportModule() {
-        APP::ExportModule(APP::Module('Crypt')->Decode(APP::Module('Routing')->get['module_hash']));
+        $module = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['module_hash']);
+        APP::Module('Triggers')->Exec('export_module', ['module' => $module]);
+        APP::ExportModule($module);
     }
     
     public function UninstallModule() {   
         $module = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['module_hash']);
-        APP::Render('admin/app/modules/uninstall', 'include',[$module, APP::InstalledModuleDependencies($module)]);
+        APP::Render('admin/modules/uninstall', 'include',[$module, APP::InstalledModuleDependencies($module)]);
     }
     
     public function APIUninstallModule() {   
@@ -87,7 +84,10 @@ class Admin {
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');
         
-        echo json_encode(APP::UninstallModule(APP::Module('Crypt')->Decode(APP::Module('Routing')->get['module_hash'])));
+        $module = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['module_hash']);
+        APP::Module('Triggers')->Exec('uninstall_module', ['module' => $module]);
+        
+        echo json_encode(APP::UninstallModule($module));
         exit;
     }
 

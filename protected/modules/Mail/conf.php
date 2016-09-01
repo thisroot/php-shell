@@ -1,7 +1,6 @@
 <?
 return [
     'routes' => [
-        ['admin\/mail(\?.*)?',                                                                      'Mail', 'ManageMail'],             // Manage mail
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/preview\/(?P<letter_id_hash>.*)',        'Mail', 'PreviewLetter'],          // Preview letter
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/groups\/add',                            'Mail', 'AddLettersGroup'],        // Add letters group
         ['admin\/mail\/letters\/(?P<group_sub_id_hash>.*)\/groups\/(?P<group_id_hash>.*)\/edit',    'Mail', 'EditLettersGroup'],       // Edit letters group

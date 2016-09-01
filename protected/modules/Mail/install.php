@@ -136,3 +136,21 @@ $data->extractTo(ROOT);
 $mail_conf_file = ROOT . '/protected/modules/Mail/conf.php';
 $mail_conf = preg_replace('/\'connection\' => \'auto\'/', '\'connection\' => \'' . $_SESSION['core']['install']['mail']['connection']. '\'', file_get_contents($mail_conf_file));
 file_put_contents($mail_conf_file, $mail_conf);
+
+// Add triggers support
+APP::Module('Triggers')->Register('mail_add_letter', 'Mail / Letters', 'Add');
+APP::Module('Triggers')->Register('mail_remove_letter', 'Mail / Letters', 'Remove');
+APP::Module('Triggers')->Register('mail_update_letter', 'Mail / Letters', 'Update');
+APP::Module('Triggers')->Register('mail_add_letters_group', 'Mail / Letters', 'Add group');
+APP::Module('Triggers')->Register('mail_remove_letters_group', 'Mail / Letters', 'Remove group');
+APP::Module('Triggers')->Register('mail_update_letters_group', 'Mail / Letters', 'Update group');
+
+APP::Module('Triggers')->Register('mail_add_sender', 'Mail / Senders', 'Add');
+APP::Module('Triggers')->Register('mail_remove_sender', 'Mail / Senders', 'Remove');
+APP::Module('Triggers')->Register('mail_update_sender', 'Mail / Senders', 'Update');
+APP::Module('Triggers')->Register('mail_add_senders_group', 'Mail / Senders', 'Add group');
+APP::Module('Triggers')->Register('mail_remove_senders_group', 'Mail / Senders', 'Remove group');
+APP::Module('Triggers')->Register('mail_update_senders_group', 'Mail / Senders', 'Update group');
+
+APP::Module('Triggers')->Register('mail_update_settings', 'Mail', 'Update settings');
+APP::Module('Triggers')->Register('mail_send_letter', 'Mail', 'Send mail');

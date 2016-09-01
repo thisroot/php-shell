@@ -395,9 +395,11 @@ if (!APP::Module('Registry')->Get('module_users_role')) {
     $sub_id_user = APP::Module('Registry')->Add('module_users_role', 'user');
     $sub_id_admin = APP::Module('Registry')->Add('module_users_role', 'admin');
     
-    APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/login"]', $sub_id_default);
-    APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/login"]', $sub_id_new);
-    APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/login"]', $sub_id_user);
+    APP::Module('Registry')->Add('module_users_rule', '["users\\\/actions\\\/change-password(.*)","users\/actions\/login"]', $sub_id_default);
+    APP::Module('Registry')->Add('module_users_rule', '["users\\\/profile","users\/actions\/login"]', $sub_id_default);
+    APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/actions\/login"]', $sub_id_default);
+    APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/actions\/login"]', $sub_id_new);
+    APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/actions\/login"]', $sub_id_user);
 }
 
 if (!APP::Module('Registry')->Get('module_users_auth_token')) APP::Module('Registry')->Add('module_users_auth_token', $_SESSION['core']['install']['users']['settings']['auth_token']);
@@ -419,6 +421,29 @@ if (!APP::Module('Registry')->Get('module_users_social_auth_ya_key')) APP::Modul
 if (!APP::Module('Registry')->Get('module_users_timeout_activation')) APP::Module('Registry')->Add('module_users_timeout_activation', $_SESSION['core']['install']['users']['settings']['timeout_activation']);
 if (!APP::Module('Registry')->Get('module_users_timeout_email')) APP::Module('Registry')->Add('module_users_timeout_email', $_SESSION['core']['install']['users']['settings']['timeout_email']);
 if (!APP::Module('Registry')->Get('module_users_timeout_token')) APP::Module('Registry')->Add('module_users_timeout_token', $_SESSION['core']['install']['users']['settings']['timeout_token']);
+
+// Add triggers support
+APP::Module('Triggers')->Register('user_logout', 'Users', 'Logout');
+APP::Module('Triggers')->Register('user_activate', 'Users', 'Activate');
+APP::Module('Triggers')->Register('remove_user', 'Users', 'Remove');
+APP::Module('Triggers')->Register('add_user', 'Users', 'Add');
+APP::Module('Triggers')->Register('user_login', 'Users', 'Login');
+APP::Module('Triggers')->Register('user_double_login', 'Users', 'Double login');
+APP::Module('Triggers')->Register('register_user', 'Users', 'Register');
+APP::Module('Triggers')->Register('reset_user_password', 'Users', 'Reset password');
+APP::Module('Triggers')->Register('change_user_password', 'Users', 'Change password');
+APP::Module('Triggers')->Register('update_user', 'Users', 'Update');
+APP::Module('Triggers')->Register('add_user_role', 'Users / Roles', 'Add');
+APP::Module('Triggers')->Register('remove_user_role', 'Users / Roles', 'Remove');
+APP::Module('Triggers')->Register('add_user_rule', 'Users / Rules', 'Add');
+APP::Module('Triggers')->Register('remove_user_rule', 'Users / Rules', 'Remove');
+APP::Module('Triggers')->Register('update_user_rule', 'Users / Rules', 'Update');
+APP::Module('Triggers')->Register('update_users_oauth_settings', 'Users / Settings', 'Update OAuth');
+APP::Module('Triggers')->Register('update_users_notifications_settings', 'Users / Settings', 'Update notifications');
+APP::Module('Triggers')->Register('update_users_services_settings', 'Users / Settings', 'Update services');
+APP::Module('Triggers')->Register('update_users_auth_settings', 'Users / Settings', 'Update auth');
+APP::Module('Triggers')->Register('update_users_passwords_settings', 'Users / Settings', 'Update passwords');
+APP::Module('Triggers')->Register('update_users_timeouts_settings', 'Users / Settings', 'Update timeouts');
 
 $data->extractTo(ROOT);
 

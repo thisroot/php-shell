@@ -160,15 +160,32 @@ class Users {
         return $pass;
     }
     
+    public function Logout() {
+        APP::Module('Triggers')->Exec('user_logout', $this->user);
+
+        if (isset(APP::Module('Routing')->get['account']) ? (bool) APP::Module('Routing')->get['account'] : false) {
+            setcookie(
+                'modules[users][email]', '', 
+                strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_email')), 
+                APP::$conf['location'][2], APP::$conf['location'][1]
+            );
+        }
+        
+        setcookie(
+            'modules[users][token]', '', 
+            strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_token')), 
+            APP::$conf['location'][2], APP::$conf['location'][1]
+        );
+        
+        $this->user = false;
+        
+        header('Location: ' . APP::Module('Routing')->root);
+        exit;
+    }
+    
     
     public function ManageUsers() {
-        APP::Render(
-            'users/admin/index', 'include', 
-            APP::Module('DB')->Select(
-                $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
-                ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users'
-            )
-        );
+        APP::Render('users/admin/index');
     }
     
     public function AddUser() {
@@ -191,11 +208,11 @@ class Users {
         );
     }
     
-    public function LoginForm() {
+    public function Actions() {
         $return = isset(APP::Module('Routing')->get['return']) ? APP::Module('Crypt')->SafeB64Decode(APP::Module('Routing')->get['return']) : false;
 
         APP::Render(
-            'users/login', 'include', 
+            'users/actions', 'include', 
             [
                 'return' => $return ? filter_var($return, FILTER_VALIDATE_URL) ? $return : false : false,
                 'social_networks' => APP::Module('Registry')->Get([
@@ -219,28 +236,6 @@ class Users {
             ]
         );
     }
-    
-    public function RegisterForm() {
-        APP::Render(
-            'users/register', 'include', 
-            [
-                'social_networks' => APP::Module('Registry')->Get([
-                    'module_users_social_auth_vk_id',
-                    'module_users_social_auth_fb_id',
-                    'module_users_social_auth_google_id',
-                    'module_users_social_auth_ya_id'
-                ])
-            ]
-        );
-    }
-
-    public function ResetPasswordForm() {
-        APP::Render('users/reset_password');
-    }
-    
-    public function ChangePasswordForm() {
-        APP::Render('users/change_password');
-    }
 
     public function Activate() {
         $result = 'success';
@@ -255,6 +250,8 @@ class Users {
                     ['role', '!=', 'user', PDO::PARAM_STR]
                 ]
             );
+            
+            APP::Module('Triggers')->Exec('user_activate', ['user_id' => $user_id]);
         } else {
             $result = 'error';
         }
@@ -276,7 +273,7 @@ class Users {
     }
     
     public function ManageRoles() {
-        APP::Render('users/admin/roles/index', 'include', APP::Module('Registry')->Get(['module_users_role'], ['id', 'value'])['module_users_role']);
+        APP::Render('users/admin/roles/index');
     }
     
     public function AddRole() {
@@ -284,16 +281,12 @@ class Users {
     }
     
     public function ManageRules() {
-        $role_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['role_id_hash']);
-        $rules = APP::Module('Registry')->Get(['module_users_rule'], ['id', 'value'], $role_id);
-        
         APP::Render('users/admin/roles/rules/index', 'include', [
             'role' => APP::Module('DB')->Select(
                 APP::Module('Registry')->conf['connection'], ['fetchColumn', 0], 
                 ['value'], 'registry',
-                [['id', '=', $role_id, PDO::PARAM_INT]]
-            ),
-            'rules' => array_key_exists('module_users_rule', $rules) ? (array) $rules['module_users_rule'] : []
+                [['id', '=', APP::Module('Crypt')->Decode(APP::Module('Routing')->get['role_id_hash']), PDO::PARAM_INT]]
+            )
         ]);
     }
     
@@ -325,11 +318,11 @@ class Users {
         ]);
     }
     
-    public function SetupSocial() {
+    public function SetupOAuthClients() {
         $prefix = 'module_users_social_auth_';
         
         APP::Render(
-            'users/admin/social', 'include', 
+            'users/admin/oauth_clients', 'include', 
             APP::Module('Registry')->Get([
                 $prefix . 'fb_id',
                 $prefix . 'fb_key',
@@ -399,6 +392,36 @@ class Users {
     }
     
     
+    public function APIListUsers() {
+        $rows = [];
+        
+        foreach (APP::Module('DB')->Select(
+            $this->conf['connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
+            $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
+            false, false, false,
+            [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
+            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+        ) as $row) {
+            $row['auth_token'] = APP::Module('Crypt')->Encode(json_encode([$row['email'], $row['password']]));
+            $row['user_id_token'] = APP::Module('Crypt')->Encode($row['id']);
+            
+            array_push($rows, $row);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => APP::Module('DB')->Select($this->conf['connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
+        ]);
+        exit;
+    }
+    
     public function APIRemoveUser() {
         $out = [
             'status' => 'success',
@@ -419,6 +442,8 @@ class Users {
                 $this->conf['connection'], 'users',
                 [['id', '=', $_POST['id'], PDO::PARAM_INT]]
             );
+            
+            APP::Module('Triggers')->Exec('remove_user', ['id' => $_POST['id'], 'result' => $out['count']]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -492,6 +517,14 @@ class Users {
             }
             
             $out['user_id'] = $user_id;
+            
+            APP::Module('Triggers')->Exec('add_user', [
+                'id' => $out['user_id'],
+                'email' => $_POST['email'],
+                'password' => $_POST['password'],
+                'role' => $_POST['role'],
+                'notification' => $_POST['notification']
+            ]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -508,13 +541,17 @@ class Users {
         if (($user = $this->Login($_POST['email'], APP::Module('Crypt')->Encode($_POST['password']))) && ((int) APP::Module('Registry')->Get('module_users_login_service'))) {
             $this->user = $this->Auth($user, true, isset($_POST['remember-me']));
             $status = 'success';
+            
+            APP::Module('Triggers')->Exec('user_login', [
+                'id' => $user,
+                'email' => $_POST['email'],
+                'password' => $_POST['password'],
+                'remember-me' => $_POST['remember-me']
+            ]);
         }
         
-        $ref = $_SERVER['HTTP_REFERER'] ? parse_url($_SERVER['HTTP_REFERER']) : false;
-        $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $_SERVER['HTTP_ORIGIN'];
-        
-        header('Access-Control-Allow-Origin: ' .($domain ? $domain : '*') );
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         
         echo json_encode(['status' => $status]);
@@ -525,12 +562,13 @@ class Users {
         $status = 'error';
         
         if ($this->user['password'] === APP::Module('Crypt')->Encode($_POST['password'])) {
+            APP::Module('Triggers')->Exec('user_double_login', $this->user);
             APP::Module('Sessions')->session['modules']['users']['double_auth'] = true;
             $status = 'success';
         }
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         
         echo json_encode(['status' => $status]);
@@ -604,13 +642,16 @@ class Users {
             );
             
             $out['user_id'] = $user_id;
+            
+            APP::Module('Triggers')->Exec('register_user', [
+                'id' => $out['user_id'],
+                'email' => $_POST['email'],
+                'password' => $_POST['password']
+            ]);
         }
-        
-        $ref = $_SERVER['HTTP_REFERER'] ? parse_url($_SERVER['HTTP_REFERER']) : false;
-        $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $_SERVER['HTTP_ORIGIN'];
-        
-        header('Access-Control-Allow-Origin: ' .($domain ? $domain : '*') );
+
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         
         echo json_encode($out);
@@ -658,16 +699,21 @@ class Users {
                 ['join/senders' => [['senders.id','=','letters.sender_id']]]
             );
 
-            $reset_password_details = ['link' => APP::Module('Routing')->root . 'users/change-password?user_token=' . APP::Module('Crypt')->Encode(json_encode($token))];
+            $reset_password_details = ['link' => APP::Module('Routing')->root . 'users/actions/change-password?user_token=' . APP::Module('Crypt')->Encode(json_encode($token))];
             
-            $out = APP::Module('Mail')->Send(
-                [$letter['email'], $letter['name']], $_POST['email'], $letter['subject'], 
-                [
-                    APP::Render($letter['html'], 'eval', $reset_password_details),
-                    APP::Render($letter['plaintext'], 'eval', $reset_password_details)
-                ],
-                ['List-id' => $letter['list_id']]
-            );
+            $out = [
+                'status' => 'success',
+                'info' => APP::Module('Mail')->Send(
+                    [$letter['email'], $letter['name']], $_POST['email'], $letter['subject'], 
+                    [
+                        APP::Render($letter['html'], 'eval', $reset_password_details),
+                        APP::Render($letter['plaintext'], 'eval', $reset_password_details)
+                    ],
+                    ['List-id' => $letter['list_id']]
+                )
+            ];
+            
+            APP::Module('Triggers')->Exec('reset_user_password', ['email' => $_POST['email']]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -684,23 +730,31 @@ class Users {
             'errors' => []
         ];
 
-        if (empty($_POST['password'])) {
+        if (!isset($this->user['id'])) {
             $out['status'] = 'error';
             $out['errors'][] = 1;
-        } else if (strlen($_POST['password']) < (int) APP::Module('Registry')->Get('module_users_min_pass_length')) {
+        } else if (empty($_POST['password'])) {
             $out['status'] = 'error';
             $out['errors'][] = 2;
-        } else if ($_POST['password'] != $_POST['re-password']) {
+        } else if (strlen($_POST['password']) < (int) APP::Module('Registry')->Get('module_users_min_pass_length')) {
             $out['status'] = 'error';
             $out['errors'][] = 3;
+        } else if ($_POST['password'] != $_POST['re-password']) {
+            $out['status'] = 'error';
+            $out['errors'][] = 4;
         }
         
         if (!(int) APP::Module('Registry')->Get('module_users_change_password_service')) {
             $out['status'] = 'error';
-            $out['errors'][] = 4;
+            $out['errors'][] = 5;
         }
 
         if ($out['status'] == 'success') {
+            APP::Module('Triggers')->Exec('change_user_password', [
+                'user' => $this->user,
+                'password' => $_POST['password']
+            ]);
+            
             APP::Module('DB')->Update(
                 $this->conf['connection'], 'users', 
                 ['password' => APP::Module('Crypt')->Encode($_POST['password'])], 
@@ -727,17 +781,20 @@ class Users {
 
             $change_password_details = [
                 'email' => $this->user['email'],
-                'password' => $_POST['password'],
+                'password' => $_POST['password']
             ];
             
-            $out = APP::Module('Mail')->Send(
-                [$letter['email'], $letter['name']], $this->user['email'], $letter['subject'], 
-                [
-                    APP::Render($letter['html'], 'eval', $change_password_details),
-                    APP::Render($letter['plaintext'], 'eval', $change_password_details)
-                ],
-                ['List-id' => $letter['list_id']]
-            );
+            $out = [
+                'status' => 'success',
+                'info' => APP::Module('Mail')->Send(
+                    [$letter['email'], $letter['name']], $this->user['email'], $letter['subject'], 
+                    [
+                        APP::Render($letter['html'], 'eval', $change_password_details),
+                        APP::Render($letter['plaintext'], 'eval', $change_password_details)
+                    ],
+                    ['List-id' => $letter['list_id']]
+                )
+            ];
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -749,7 +806,7 @@ class Users {
     }
     
     public function APILogout() {
-        $this->user = false;
+        APP::Module('Triggers')->Exec('user_logout', $this->user);
 
         if (isset(APP::Module('Routing')->get['account']) ? (bool) APP::Module('Routing')->get['account'] : false) {
             setcookie(
@@ -764,6 +821,8 @@ class Users {
             strtotime('-' . APP::Module('Registry')->Get('module_users_timeout_token')), 
             APP::$conf['location'][2], APP::$conf['location'][1]
         );
+        
+        $this->user = false;
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
@@ -810,6 +869,12 @@ class Users {
             if (APP::Module('Sessions')->session['modules']['users']['double_auth']) {
                 APP::Module('DB')->Update($this->conf['connection'], 'users', ['password' => APP::Module('Crypt')->Encode($_POST['password'])], [['id', '=', $user_id, PDO::PARAM_INT]]);
             }
+            
+            APP::Module('Triggers')->Exec('update_user', [
+                'id' => $user_id,
+                'password' => APP::Module('Sessions')->session['modules']['users']['double_auth'] ? $_POST['password'] : false,
+                'role' => $_POST['role']
+            ]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -817,6 +882,34 @@ class Users {
         header('Content-Type: application/json');
         
         echo json_encode($out);
+        exit;
+    }
+    
+    public function APIListRoles() {
+        $roles = [];
+        $rows = [];
+        
+        foreach (APP::Module('Registry')->Get(['module_users_role'], ['id', 'value'])['module_users_role'] as $role) {
+            if (($_POST['searchPhrase']) && (preg_match('/^' . $_POST['searchPhrase'] . '/', $role['value']) === 0)) continue;
+            array_push($roles, $role);
+        }
+        
+        for ($x = ($_POST['current'] - 1) * $_POST['rowCount']; $x < $_POST['rowCount'] * $_POST['current']; $x ++) {
+            if (!isset($roles[$x])) continue;
+            $roles[$x]['token'] = APP::Module('Crypt')->Encode($roles[$x]['id']);
+            array_push($rows, $roles[$x]);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => count($roles)
+        ]);
         exit;
     }
     
@@ -832,7 +925,8 @@ class Users {
         }
         
         if ($out['status'] == 'success') {
-            $out['user_id'] = APP::Module('Registry')->Add('module_users_role', $_POST['role']);
+            $out['role_id'] = APP::Module('Registry')->Add('module_users_role', $_POST['role']);
+            APP::Module('Triggers')->Exec('add_user_role', ['id' => $out['role_id'], 'role' => $_POST['role']]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -861,6 +955,8 @@ class Users {
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('Registry')->Delete([['id', '=', $_POST['id'], PDO::PARAM_INT]]);
             $out['count'] = APP::Module('Registry')->Delete([['sub_id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            
+            APP::Module('Triggers')->Exec('remove_user_role', ['id' => $_POST['id'], 'result' => $out['count']]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -868,6 +964,42 @@ class Users {
         header('Content-Type: application/json');
         
         echo json_encode($out);
+        exit;
+    }
+    
+    public function APIListRules() {
+        $tmp_rules = APP::Module('Registry')->Get(['module_users_rule'], ['id', 'value'], isset($_POST['role']) ? $_POST['role'] : 0);
+
+        $rules = [];
+        $rows = [];
+        
+        foreach (array_key_exists('module_users_rule', $tmp_rules) ? (array) $tmp_rules['module_users_rule'] : [] as $rule) {
+            $rule_value = json_decode($rule['value'], 1);
+            if (($_POST['searchPhrase']) && (preg_match('/^' . $_POST['searchPhrase'] . '/', $rule_value[0]) === 0)) continue;
+            
+            array_push($rules, [
+                'id' => $rule['id'],
+                'pattern' => $rule_value[0],
+                'target' => $rule_value[1],
+                'token' => APP::Module('Crypt')->Encode($rule['id'])
+            ]);
+        }
+        
+        for ($x = ($_POST['current'] - 1) * $_POST['rowCount']; $x < $_POST['rowCount'] * $_POST['current']; $x ++) {
+            if (!isset($rules[$x])) continue;
+            array_push($rows, $rules[$x]);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => count($rules)
+        ]);
         exit;
     }
     
@@ -900,6 +1032,13 @@ class Users {
         
         if ($out['status'] == 'success') {
             $out['rule_id'] = APP::Module('Registry')->Add('module_users_rule', json_encode([$_POST['uri_pattern'], $_POST['target']]), $role_id);
+            
+            APP::Module('Triggers')->Exec('add_user_rule', [
+                'id' => $out['rule_id'], 
+                'role_id' => $role_id,
+                'uri_pattern' => $_POST['uri_pattern'],
+                'target' => $_POST['target']
+            ]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -927,6 +1066,7 @@ class Users {
         
         if ($out['status'] == 'success') {
             $out['count'] = APP::Module('Registry')->Delete([['id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            APP::Module('Triggers')->Exec('remove_user_rule', ['id' => $_POST['id'], 'result' => $out['count']]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -965,7 +1105,14 @@ class Users {
         }
         
         if ($out['status'] == 'success') {
-            $out['rule_id'] = APP::Module('Registry')->Update(['value' => json_encode([$_POST['uri_pattern'], $_POST['target']])], [['id', '=', $rule_id, PDO::PARAM_INT]]);
+            APP::Module('Registry')->Update(['value' => json_encode([$_POST['uri_pattern'], $_POST['target']])], [['id', '=', $rule_id, PDO::PARAM_INT]]);
+            
+            APP::Module('Triggers')->Exec('update_user_rule', [
+                'id' => $rule_id, 
+                'rule' => $_POST['rule'],
+                'uri_pattern' => $_POST['uri_pattern'],
+                'target' => $_POST['target']
+            ]);
         }
 
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -976,7 +1123,7 @@ class Users {
         exit;
     }
     
-    public function APIUpdateSocialSettings() {
+    public function APIUpdateOAuthClientSettings() {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_social_auth_fb_id']], [['item', '=', 'module_users_social_auth_fb_id', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_social_auth_fb_key']], [['item', '=', 'module_users_social_auth_fb_key', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_social_auth_vk_id']], [['item', '=', 'module_users_social_auth_vk_id', PDO::PARAM_STR]]);
@@ -986,6 +1133,17 @@ class Users {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_social_auth_ya_id']], [['item', '=', 'module_users_social_auth_ya_id', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_social_auth_ya_key']], [['item', '=', 'module_users_social_auth_ya_key', PDO::PARAM_STR]]);
 
+        APP::Module('Triggers')->Exec('update_users_oauth_settings', [
+            'social_auth_fb_id' => $_POST['module_users_social_auth_fb_id'],
+            'social_auth_fb_key' => $_POST['module_users_social_auth_fb_key'],
+            'social_auth_vk_id' => $_POST['module_users_social_auth_vk_id'],
+            'social_auth_vk_key' => $_POST['module_users_social_auth_vk_key'],
+            'social_auth_google_id' => $_POST['module_users_social_auth_google_id'],
+            'social_auth_google_key' => $_POST['module_users_social_auth_google_key'],
+            'social_auth_ya_id' => $_POST['module_users_social_auth_ya_id'],
+            'social_auth_ya_key' => $_POST['module_users_social_auth_ya_key']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');
@@ -1003,6 +1161,13 @@ class Users {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_register_letter']], [['item', '=', 'module_users_register_letter', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_change_password_letter']], [['item', '=', 'module_users_change_password_letter', PDO::PARAM_STR]]);
         
+        APP::Module('Triggers')->Exec('update_users_notifications_settings', [
+            'register_activation_letter' => $_POST['module_users_register_activation_letter'],
+            'reset_password_letter' => $_POST['module_users_reset_password_letter'],
+            'register_letter' => $_POST['module_users_register_letter'],
+            'change_password_letter' => $_POST['module_users_change_password_letter']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');
@@ -1015,10 +1180,17 @@ class Users {
     }
     
     public function APIUpdateServicesSettings() {
-        APP::Module('Registry')->Update(['value' => $_POST['module_users_login_service']], [['item', '=', 'module_users_login_service', PDO::PARAM_STR]]);
-        APP::Module('Registry')->Update(['value' => $_POST['module_users_register_service']], [['item', '=', 'module_users_register_service', PDO::PARAM_STR]]);
-        APP::Module('Registry')->Update(['value' => $_POST['module_users_reset_password_service']], [['item', '=', 'module_users_reset_password_service', PDO::PARAM_STR]]);
-        APP::Module('Registry')->Update(['value' => $_POST['module_users_change_password_service']], [['item', '=', 'module_users_change_password_service', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_users_login_service'])], [['item', '=', 'module_users_login_service', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_users_register_service'])], [['item', '=', 'module_users_register_service', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_users_reset_password_service'])], [['item', '=', 'module_users_reset_password_service', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_users_change_password_service'])], [['item', '=', 'module_users_change_password_service', PDO::PARAM_STR]]);
+        
+        APP::Module('Triggers')->Exec('update_users_services_settings', [
+            'login_service' => $_POST['module_users_login_service'],
+            'register_service' => $_POST['module_users_register_service'],
+            'reset_password_service' => $_POST['module_users_reset_password_service'],
+            'change_password_service' => $_POST['module_users_change_password_service']
+        ]);
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
@@ -1032,9 +1204,14 @@ class Users {
     }
     
     public function APIUpdateAuthSettings() {
-        APP::Module('Registry')->Update(['value' => $_POST['module_users_check_rules']], [['item', '=', 'module_users_check_rules', PDO::PARAM_STR]]);
-        APP::Module('Registry')->Update(['value' => $_POST['module_users_auth_token']], [['item', '=', 'module_users_auth_token', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_users_check_rules'])], [['item', '=', 'module_users_check_rules', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => isset($_POST['module_users_auth_token'])], [['item', '=', 'module_users_auth_token', PDO::PARAM_STR]]);
 
+        APP::Module('Triggers')->Exec('update_users_auth_settings', [
+            'check_rules' => $_POST['module_users_check_rules'],
+            'auth_token' => $_POST['module_users_auth_token']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');
@@ -1050,6 +1227,11 @@ class Users {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_min_pass_length']], [['item', '=', 'module_users_min_pass_length', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_gen_pass_length']], [['item', '=', 'module_users_gen_pass_length', PDO::PARAM_STR]]);
 
+        APP::Module('Triggers')->Exec('update_users_passwords_settings', [
+            'min_pass_length' => $_POST['module_users_min_pass_length'],
+            'gen_pass_length' => $_POST['module_users_gen_pass_length']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');
@@ -1066,6 +1248,12 @@ class Users {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_timeout_email']], [['item', '=', 'module_users_timeout_email', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_timeout_activation']], [['item', '=', 'module_users_timeout_activation', PDO::PARAM_STR]]);
 
+        APP::Module('Triggers')->Exec('update_users_timeouts_settings', [
+            'timeout_token' => $_POST['module_users_timeout_token'],
+            'timeout_email' => $_POST['module_users_timeout_email'],
+            'timeout_activation' => $_POST['module_users_timeout_activation']
+        ]);
+        
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
         header('Content-Type: application/json');

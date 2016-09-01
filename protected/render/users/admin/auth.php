@@ -1,88 +1,120 @@
 <!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <title>Users</title>
-    <meta charset="UTF-8">
-    <meta name="robots" content="none">
-    <style>
-        .has-error {
-            background: #fdd3d3;
-        }
-        .error {
-            display: none;
-        }
-        .is-visible {
-            display: block;
-        }
-    </style>
-    <script src="<?= APP::Module('Routing')->root ?>public/js/jquery-3.1.0.min.js"></script>
-</head>
-<body>
-    <h1>Users</h1>
-    <a href="<?= APP::Module('Routing')->root ?>admin">Admin</a> > <a href="<?= APP::Module('Routing')->root ?>admin/users">Users</a> > Authentication
-    <hr>
-    
-    <form id="update-auth">
-        <label for="module_users_check_rules">Check rules</label>
-        <br>
-        <select id="module_users_check_rules" name="module_users_check_rules">
-            <option value="1">Enable</option>
-            <option value="0">Disable</option>
-        </select>
-        <div class="error"></div>
-        <br><br>
-        
-        <label for="module_users_auth_token">Token auth</label>
-        <br>
-        <select id="module_users_auth_token" name="module_users_auth_token">
-            <option value="1">Enable</option>
-            <option value="0">Disable</option>
-        </select>
-        <div class="error"></div>
-        <br><br>
-        
-        <input type="submit" value="Save changes">
-    </form>
-    
-    <script>
-        $('#module_users_check_rules').val('<?= $data['module_users_check_rules'] ?>');
-        $('#module_users_auth_token').val('<?= $data['module_users_auth_token'] ?>');
-        
-        $('#update-auth').submit(function(event) {
-            event.preventDefault();
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>PHP-shell - Users</title>
 
-            var module_users_check_rules = $(this).find('#module_users_check_rules');
-            var module_users_auth_token = $(this).find('#module_users_auth_token');
-            
-            module_users_auth_token.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            module_users_check_rules.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
-            
-            if (module_users_auth_token.val() === '') { module_users_auth_token.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            if (module_users_check_rules.val() === '') { module_users_check_rules.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); return false; }
-            
-            $(this).find('[type="submit"]').attr('disabled', true);
-            
-            $.ajax({
-                type: 'post',
-                url: '<?= APP::Module('Routing')->root ?>admin/users/api/auth/update.json',
-                data: $(this).serialize(),
-                success: function(result) {
-                    switch(result.status) {
-                        case 'success': 
-                            alert('Authentication settings has been updated');
-                            window.location.href = '<?= APP::Module('Routing')->root ?>admin/users/auth';
-                            break;
-                        case 'error': 
-                            $.each(result.errors, function(i, error) {
-                                switch(error) {}
-                            });
-                            break;
-                    }
-                    
-                    $('#update-auth').find('[type="submit"]').attr('disabled', false);
-                }
+        <!-- Vendor CSS -->
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">        
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/google-material-color/dist/palette.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">
+        
+        <? APP::Render('core/widgets/css') ?>
+    </head>
+    <body data-ma-header="teal">
+        <? 
+        APP::Render('admin/widgets/header', 'include', [
+            'Users' => 'admin/users'
+        ]);
+        ?>
+        <section id="main">
+            <? APP::Render('admin/widgets/sidebar') ?>
+
+            <section id="content">
+                <div class="container">
+                    <div class="card">
+                        <form id="update-auth" class="form-horizontal" role="form">
+                            <div class="card-header">
+                                <h2>Authentication</h2>
+                            </div>
+                            <div class="card-body card-padding">
+                                <div class="form-group">
+                                    <label for="module_users_check_rules" class="col-sm-2 control-label">Check rules</label>
+                                    <div class="col-sm-1">
+                                        <div class="toggle-switch m-t-10">
+                                            <input id="module_users_check_rules" name="module_users_check_rules" type="checkbox" hidden="hidden">
+                                            <label for="module_users_check_rules" class="ts-helper"></label>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-group">
+                                    <label for="module_users_auth_token" class="col-sm-2 control-label">Token auth</label>
+                                    <div class="col-sm-1">
+                                        <div class="toggle-switch m-t-10">
+                                            <input id="module_users_auth_token" name="module_users_auth_token" type="checkbox" hidden="hidden">
+                                            <label for="module_users_auth_token" class="ts-helper"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-5">
+                                        <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <? APP::Render('admin/widgets/footer') ?>
+        </section>
+
+        <? APP::Render('core/widgets/page_loader') ?>
+        <? APP::Render('core/widgets/ie_warning') ?>
+
+        <!-- Javascript Libraries -->
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+        <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
+        
+        <? APP::Render('core/widgets/js') ?>
+        
+        <script>
+            $('#module_users_check_rules').prop('checked', <?= (int) $data['module_users_check_rules'] ?>);
+            $('#module_users_auth_token').prop('checked', <?= (int) $data['module_users_auth_token'] ?>);
+
+            $(document).ready(function() {
+                $('#update-auth').submit(function(event) {
+                    event.preventDefault();
+
+                    $(this).find('[type="submit"]').html('Processing...').attr('disabled', true);
+
+                    $.ajax({
+                        type: 'post',
+                        url: '<?= APP::Module('Routing')->root ?>admin/users/api/auth/update.json',
+                        data: $(this).serialize(),
+                        success: function(result) {
+                            switch(result.status) {
+                                case 'success':
+                                    swal({
+                                        title: 'Done!',
+                                        text: 'Authentication settings has been updated',
+                                        type: 'success',
+                                        showCancelButton: false,
+                                        confirmButtonText: 'Ok',
+                                        closeOnConfirm: true
+                                    });
+                                    break;
+                                case 'error': 
+                                    $.each(result.errors, function(i, error) {});
+                                    break;
+                            }
+
+                            $('#update-auth').find('[type="submit"]').html('Save changes').attr('disabled', false);
+                        }
+                    });
+                  });
             });
-          });
-    </script>
-</body>
+        </script>
+    </body>
 </html>

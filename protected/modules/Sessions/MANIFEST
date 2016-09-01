@@ -1,6 +1,6 @@
 [name]Sessions[/name]
 [description]Storing Sessions in a Database[/description]
-[dependencies]Routing Crypt DB Registry[/dependencies]
+[dependencies]Routing Crypt DB Registry Triggers[/dependencies]
 
 [file]protected/modules/Sessions/MANIFEST[/file]
 [file]protected/modules/Sessions/README.md[/file]
