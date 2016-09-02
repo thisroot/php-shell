@@ -4,13 +4,15 @@ header('Status: 503 Service Temporarily Unavailable');
 header('Retry-After: 10');
 
 switch ($data[0]) {
-    case 0:     $title = 'PHP ErrorHandler';            break;
-    case 1:     $title = 'PHP ExceptionHandler';        break;
-    case 2:     $title = 'PHP ShutdownHandler';         break;
-    case 3:     $title = 'Module class not found';      break;
-    case 4:     $title = 'Invalid module class name';   break;
-    case 5:     $title = 'Can\'t render file';          break;
-    default:    $title = 'Unknown error';               break;
+    case 0:     $title = 'PHP ErrorHandler';                break;
+    case 1:     $title = 'PHP ExceptionHandler';            break;
+    case 2:     $title = 'PHP ShutdownHandler';             break;
+    case 3:     $title = 'Module class not found';          break;
+    case 4:     $title = 'Invalid module class name';       break;
+    case 5:     $title = 'Can\'t render file';              break;
+    case 6:     $title = 'Module test class not found';     break;
+    case 7:     $title = 'Invalid module test class name';  break;
+    default:    $title = 'Unknown error';                   break;
 }
 ?>
 <!DOCTYPE html>

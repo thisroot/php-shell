@@ -1,4 +1,0 @@
-<?
-return [
-    'connection' => 'auto'
-];

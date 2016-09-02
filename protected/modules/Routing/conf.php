@@ -1,5 +1,0 @@
-<?
-return [
-    'routes' => [],
-    'init' => true
-];
