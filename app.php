@@ -19,7 +19,11 @@ class APP {
 
         self::$conf = $conf;
         
-        if (($conf['install']) && (!$argv)) {
+        if (!file_exists($conf['logs'])) {
+            mkdir($conf['logs']);
+        }
+        
+        if (($conf['install']) && (!count($argv))) {
             session_start();
             
             switch ($_SERVER['REQUEST_URI']) {
@@ -29,12 +33,36 @@ class APP {
 
             exit;
         }
-        
+
         foreach (glob(ROOT . '/protected/modules/*') as $path) self::LoadModule($path);
         foreach (self::$modules as $module) self::InitModule($module);
-        
-        if ($argv) {
-            self::$modules[$argv[1]]->{$argv[2]}($argv);
+
+        if (count($argv)) {
+            $args = [];
+            
+            for ($x = array_search('init.php', (array) $argv) + 1; $x < count($argv); $x ++) {
+                $args[] = $argv[$x];
+            }
+            
+            switch ($args[0]) {
+                case 'test':
+                    foreach (glob(ROOT . '/protected/modules/*') as $path) self::LoadModuleTest($path);
+                    
+                    $module = $args[1];
+                    $method = $args[2];
+                    
+                    unset($args[0], $args[1], $args[2]);
+                    break;
+                default:
+                    $module = $args[0];
+                    $method = $args[1];
+                    
+                    unset($args[0], $args[1]);
+                    break;
+            }
+            
+            call_user_func_array([self::$modules[$module], $method], $args);
+            exit;
         } else {
             foreach (self::$handlers as $handler) self::Module($handler[0])->{$handler[1]}($handler[2]);
         }
@@ -270,6 +298,28 @@ class APP {
             self::$modules[$name]->conf = $conf_data;
         }
         
+        return self::$modules[$name];
+    }
+    
+    public static function LoadModuleTest($path) {
+        $name = basename($path) . 'Test';
+        $class = $path . '/test.php';
+
+        if (!file_exists($class)) {
+            self::Error('core/error', 6, $name);
+        }
+        
+        if (!array_key_exists($name, self::$modules)) {
+            include_once $class;
+
+            if (!class_exists($name)) {
+                self::Error('core/error', 7, $name);
+            }
+
+            self::$modules[$name] = new $name();
+            self::$modules[$name]->conf = ['init' => false];
+        }
+
         return self::$modules[$name];
     }
     

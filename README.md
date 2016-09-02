@@ -1,9 +1,11 @@
+![travis](https://travis-ci.org/evildevel/php-shell.svg?branch=master)
+
 # php-shell
 Micro PHP Framework
 
 ### Requirements
 
-You need at least `PHP 5.2.0` with extensions:
+You need at least `PHP 5.6` with extensions:
 
 - [Zip](http://php.net/manual/en/book.zip.php)
 
@@ -81,33 +83,30 @@ Error code and details are available in the file (var `$data`).
 Set `APP::$conf['debug'] = false` to disable verbose error information.
 
 ### Console
-Run method `Test` in the module `Console`
 ```php
+// Example module
 class Console {
-    public function Test($args) {
-        var_dump($args);
+    public function Test($arg1, $arg2, $arg3) {}
+}
+```
+Run method `Test` in the module `Console` with args
+
+`php init.php Console Test par1 par2 par3`
+
+### Unit testing
+Each module provides a class for testing.
+```php
+// Example module test
+use PHPUnit\Framework\TestCase;
+
+class LogsTest extends TestCase {
+    public function testLogDir($arg1, $arg2, $arg3) {
+        $this->assertEquals(true, file_exists(APP::$conf['logs']));
     }
 }
 ```
-```sh
-php /var/www/phpshell/init.php Console Test arg1 arg2 arg3
-```
-```php
-array(4) {
-  [0] =>
-  string(40) "/var/www/phpshell/init.php"
-  [1] =>
-  string(8) "Console"
-  [2] =>
-  string(3) "Test"
-  [3] =>
-  string(3) "arg1"
-  [4] =>
-  string(4) "arg2"
-  [5] =>
-  string(5) "arg3"
-}
-```
+Run method `testLogDir` in the test class of module `Logs` with args
+`php phpunit.phar init.php test LogsTest testLogDir par1 par2 par3`
 
 ### Files
 ```
