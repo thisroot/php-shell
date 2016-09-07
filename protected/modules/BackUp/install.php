@@ -36,7 +36,7 @@ if (isset($_POST['action'])) {
                 $_SESSION['core']['install']['backup']['module_backup_remote_host'] = $_POST['host'];
                 $_SESSION['core']['install']['backup']['module_backup_remote_email'] = $_POST['email'];
                 $_SESSION['core']['install']['backup']['module_backup_remote_pass'] = APP::Module('Crypt')->Encode($_POST['password']);
-                $_SESSION['core']['install']['backup']['module_backup_server_mode'] = isset($_POST['server-mode'])?$_POST['server-mode']:FALSE;
+                $_SESSION['core']['install']['backup']['module_backup_server_mode'] = isset($_POST['server-mode'])?1:0;
                 $_SESSION['core']['install']['backup']['register'] = 'register';
             } else {
                 $_SESSION['core']['install']['backup']['module_backup_remote_host'] = 0;
@@ -522,6 +522,8 @@ if (!APP::Module('Registry')->Get('module_backup_remote_host')) {
     APP::Module('Registry')->Add('module_backup_remote_email', $_SESSION['core']['install']['backup']['module_backup_remote_email']);
     APP::Module('Registry')->Add('module_backup_remote_pass', $_SESSION['core']['install']['backup']['module_backup_remote_pass']);
     APP::Module('Registry')->Add('module_backup_server_mode', $_SESSION['core']['install']['backup']['module_backup_server_mode']);
+    APP::Module('Registry')->Add('module_backup_max_saved_backups', 10);
+    APP::Module('Registry')->Add('module_backup_segment_size', 500);
 }
 
 if (!APP::Module('Registry')->Get('module_backup_cron_id')) {
@@ -554,11 +556,12 @@ if (!APP::Module('Registry')->Get('module_backup__users_rule')) {
     $roles = APP::Module('Registry')->Get(['module_users_role'],['id','value']);
         foreach ($roles['module_users_role'] as $role) {
             if ($role['value'] == 'default') {
-                APP::Module('Registry')->Add('module_users_rule','["backup\\\/user(.*)","users\/login"]',$role['id']);
-                APP::Module('Registry')->Add('module_backup_users_rule',$role['id']);
+                $id = APP::Module('Registry')->Add('module_users_rule','["backup\\\/user(.*)","users\/login"]',$role['id']);
+                APP::Module('Registry')->Add('module_backup_users_rule',$id);
             }
         }
 }
+
 
 if (!APP::Module('DB')->Open('auto')->query('SHOW TABLES LIKE "backups"')->rowCount()) {
         APP::Module('DB')->Open('auto')->query('CREATE TABLE backups (

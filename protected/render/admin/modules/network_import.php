@@ -72,7 +72,7 @@
                                             <label for="server" class="col-sm-2 control-label">URL</label>
                                             <div class="col-sm-3">
                                                 <div class="fg-line">
-                                                    <input type="text" name="server" value="http://phpshell.evildevel.com" class="form-control">
+                                                    <input type="text" name="server" value="https://php-shell.com" class="form-control">
                                                 </div>
                                             </div>
                                         </div>

@@ -20,7 +20,7 @@ class Mail {
         $message_from = mb_encode_mimeheader($from[1], APP::Module('Registry')->Get('module_mail_charset'), "B") . ' <' . $from[0] . '>';
         $message_subject = mb_encode_mimeheader($subject, APP::Module('Registry')->Get('module_mail_charset'), "B");
 
-        $message_id = sprintf("%s.%s@%s", base_convert(microtime(), 10, 36), base_convert(bin2hex(openssl_random_pseudo_bytes(8)), 16, 36), $_SERVER['SERVER_NAME']);
+        $message_id = sprintf("%s.%s@%s", base_convert(microtime(), 10, 36), base_convert(bin2hex(openssl_random_pseudo_bytes(8)), 16, 36), APP::$conf['location'][1]);
         $boundary = md5(uniqid());
 
         $message_headers = [
@@ -54,7 +54,7 @@ class Mail {
             . $html_msg
             . "\r\n--" . $boundary . "--\r\n";
 
-        $res = mail($to, $message_subject, $msg, implode("\r\n", $message_headers), '-fbounce-' . md5($to) . '@' . $_SERVER['SERVER_NAME']) ? ['success', $message_id] : ['error', 0];
+        $res = mail($to, $message_subject, $msg, implode("\r\n", $message_headers), '-fbounce-' . md5($to) . '@' . APP::$conf['location'][1]) ? ['success', $message_id] : ['error', 0];
     
         APP::Module('Triggers')->Exec('mail_send_letter', [
             'result' => $res,
