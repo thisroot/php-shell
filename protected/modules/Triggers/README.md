@@ -41,14 +41,14 @@ mixed APP::Module('Triggers')->Exec(str $id, mixed $data)
 
 ### WEB interfaces
 ```
-/admin/triggers                              // Manage triggers
-/admin/triggers/add                          // Add trigger
-/admin/triggers/edit/<connection_id_hash>    // Edit trigger
+/admin/triggers                             // Manage triggers
+/admin/triggers/add                         // Add trigger
+/admin/triggers/edit/<trigger_id_hash>      // Edit trigger
    
-/admin/triggers/api/list.json                // [API] List triggers     
-/admin/triggers/api/add.json                 // [API] Add trigger
-/admin/triggers/api/update.json              // [API] Update trigger
-/admin/triggers/api/remove.json              // [API] Remove trigger
+/admin/triggers/api/list.json               // [API] List triggers     
+/admin/triggers/api/add.json                // [API] Add trigger
+/admin/triggers/api/update.json             // [API] Update trigger
+/admin/triggers/api/remove.json             // [API] Remove trigger
 ```
 
 ### Examples

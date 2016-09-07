@@ -7,16 +7,20 @@ class BackUp {
             APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
     }
     
- 
     public function Admin() {
         return APP::Render('backup/admin/nav', 'content');
     }
     
-    public function APIClientList() {
+    public function Install() {
         
-        $APIServer = '/backup/user/api/server/list.json';
-        $APILogin = '/users/api/login.json';
-        
+        return APP::Render('backup/admin/install');
+    }
+    
+    public function Installold() {
+        return APP::Render('backup/admin/install_1', 'content');
+    }
+    
+    protected function APIHeader() {
         $ref = isset($_SERVER['HTTP_REFERER']) ? parse_url($_SERVER['HTTP_REFERER']) : false;
         $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN']: '';
         $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $origin;
@@ -24,6 +28,87 @@ class BackUp {
         header('Access-Control-Allow-Origin: ' . ($domain ? $domain : '*'));
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
         header('Content-Type: application/json');
+    }
+    
+    private function Auth($AuthUrl,$login,$pass) {
+       
+       // SAMPLE: $AuthUrl = '/users/api/login.json';
+        
+        $this->APIHeader();
+          
+             $ch = curl_init();
+        // if https connetion
+        if (strtolower((substr($AuthUrl, 0, 5)) == 'https')) { 
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+        
+        curl_setopt($ch, CURLOPT_URL, $AuthUrl);
+        curl_setopt($ch, CURLOPT_REFERER, APP::Module('Routing')->root);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "email=" . $login . "&password=" . $pass. "&remember-me=true");
+        curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-SHELL');
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        //save COOKIE in file
+        curl_setopt($ch, CURLOPT_COOKIEJAR, ROOT. '/protected/modules/BackUp/cookie.txt');
+        curl_setopt($ch, CURLOPT_COOKIEFILE,ROOT. '/protected/modules/BackUp/cookie.txt');
+        $result = curl_exec($ch);
+        
+        // Then, after your curl_exec call:
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($result, 0, $header_size);
+        $body = substr($result, $header_size);
+        
+        
+        if(!json_decode($body)->status == 'success') {
+            return FALSE;
+        }
+        
+        return TRUE;
+    }
+    
+    private function PostRequest($data) {
+        
+        // SAMPLE: $data['url'] = '/users/api/login.json';
+        //         $data['referer'] = 
+        //         $data['cookie_path'] = 
+        //         $data['referer'] = 
+        //         $data['post'] = 
+      
+        $ch = curl_init();
+        if (strtolower((substr($data['url'], 0, 5)) == 'https')) { 
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+        
+        curl_setopt($ch, CURLOPT_REFERER,$data['referer']);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-SHELL');
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $data['url']);
+        curl_setopt($ch, CURLOPT_COOKIEFILE,$data['cookie_path']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data['post']);
+        
+        $result = curl_exec($ch);
+        // Then, after your curl_exec call:
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($result, 0, $header_size);
+        $body = substr($result, $header_size);
+        return $body;
+    }
+
+    public function APIClientList() {
+        
+        $APIServer = '/backup/user/api/server/list.json';
+        $APILogin = '/users/api/login.json';
+        
+        $this->APIHeader();
           
              $setings = [
             'url_auth' => APP::Module('Registry')->Get('module_backup_remote_host').$APILogin,
@@ -70,57 +155,77 @@ class BackUp {
             $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
             $header = substr($result, 0, $header_size);
             $body = substr($result, $header_size);
-            echo $body;
         }
+        
+        $backups = [];
+        $rows = [];
+        $tmp_connections = APP::Module('Registry')->Get(['module_ssh_connection'], ['id', 'value']);
+        $tmp_backups = json_decode($body, true);
+        
+       
+        foreach ($tmp_backups as $backup) {
+            
+            $backup_name = $backup['id_archive'];
+            if (($_POST['searchPhrase']) && (preg_match('/^' . $_POST['searchPhrase'] . '/', $backup_name) === 0)) continue;
+            
+            array_push($backups, [
+                'id' => $backup['id'],
+                'value' => $backup_name,
+                'token' => $backup['id_hash'],
+                'date' => $backup['date']    
+            ]);
+        }
+        
+          // sort desc
+        rsort($backups);
+        
+        for ($x = ($_POST['current'] - 1) * $_POST['rowCount']; $x < $_POST['rowCount'] * $_POST['current']; $x ++) {
+            if (!isset($backups[$x])) continue;
+            array_push($rows, $backups[$x]);
+        }
+        
+      
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => count($backups)
+        ]);
+        exit;
+           
     }
     
+    
+    
     public function SendFile(){
-       
-        $status = 'false';
         
-        // перечислить в гет и одним запросом
+        $status = 'false';
         
         $setings = [
             'url_auth' => APP::Module('Registry')->Get('module_backup_remote_host').'/users/api/login.json',
             'url' => APP::Module('Registry')->Get('module_backup_remote_host').'/backup/user/server/upload',
             'email' => APP::Module('Registry')->Get('module_backup_remote_email'),
             'pass' => APP::Module('Crypt')->Decode(APP::Module('Registry')->Get('module_backup_remote_pass')),
+            'cookie_path' => ROOT. '/protected/modules/BackUp/cookie.txt',
+            'referer' => APP::Module('Routing')->root
         ];
-                
-        $ch = curl_init();
-        // if https connetion
-        if (strtolower((substr($setings['url_auth'], 0, 5)) == 'https')) { 
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        
+        // Authentification
+        if(!$this->Auth($setings['url_auth'],$setings['email'],$setings['pass'])) {
+            echo json_encode(['status'=>'error', 'message' => 'authentification failed']); exit();
         }
         
-        curl_setopt($ch, CURLOPT_URL, $setings['url_auth']);
-        curl_setopt($ch, CURLOPT_REFERER, APP::Module('Routing')->root);
-        // cURL будет выводить подробные сообщения о всех производимых действиях
-        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "email=" . $setings['email'] . "&password=" . $setings['pass']. "&remember-me=true");
-        curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-SHELL');
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        //save COOKIE in file
-        curl_setopt($ch, CURLOPT_COOKIEJAR, ROOT. '/protected/modules/BackUp/cookie.txt');
-        curl_setopt($ch, CURLOPT_COOKIEFILE,ROOT. '/protected/modules/BackUp/cookie.txt');
-        $result = curl_exec($ch);
+        // GetParams
+        $setings['url'] = APP::Module('Registry')->Get('module_backup_remote_host').'/backup/api/server/params.json';
+        $setings['post'] = "";
+        $params = json_decode($this->PostRequest($setings));
+        $setings['url'] =APP::Module('Registry')->Get('module_backup_remote_host').'/backup/user/server/upload';
         
-        // Then, after your curl_exec call:
-        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($result, 0, $header_size);
-        $body = substr($result, $header_size);
-        
-        
-        if(json_decode($body)->status == 'success') {
-            $status = 'success';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $setings['url']);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $setings['cookie_path'] );
             
-           
-            curl_setopt($ch, CURLOPT_URL, $setings['url']);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, ROOT. '/protected/modules/BackUp/cookie.txt');
             
         // make archeve
         $backupDir = ROOT . '/'.$this->conf['dir_backup_DB'];
@@ -133,6 +238,7 @@ class BackUp {
 
         APP::Module('SSH')->Open(APP::Module('Registry')->Get('module_backup_ssh_connection', 'value'));
 
+        
         //create all DB dumps;
         foreach (APP::Module('DB')->conf['connections'] as $key => $value) {
 
@@ -177,7 +283,7 @@ class BackUp {
         $zip->close();
 */
         
- if(!shell_exec('cd '.ROOT.'/ ;mkdir /tmp/'.$archiveFolder.'; zip -r -s 20  /tmp/'.$archiveFolder.'/'.$archiveName.' .* -x logs\*')) {
+ if(!shell_exec('cd '.ROOT.'/ ;mkdir /tmp/'.$archiveFolder.'; zip -r -s '.$params->module_backup_segment_size.'  /tmp/'.$archiveFolder.'/'.$archiveName.' .* -x logs\* ..\*')) {
     echo json_encode(['status'=>'error', 'message' => 'error creating archive']);            exit();
  } 
  
@@ -202,25 +308,24 @@ foreach ($files as $name => $file) {
             rmdir($backupDir);
             exit();
         }
+    
+    public function APIServerParams() {
+        $this->APIHeader();
+        echo json_encode(APP::Module('Registry')->Get(['module_backup_segment_size', 'module_backup_max_saved_backups' ]));   
     }
     
-     public function APIServerDownload() {
+    public function APIServerDownload() {
         
-        $ref = isset($_SERVER['HTTP_REFERER']) ? parse_url($_SERVER['HTTP_REFERER']) : false;
-        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN']: '';
-        $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $origin;
-
-        header('Access-Control-Allow-Origin: ' . ($domain ? $domain : '*'));
-        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Content-Type: application/json');
+        $this->APIHeader();
         
          if(APP::Module('Registry')->Get('module_backup_server_mode') === 'false') {
             echo json_encode(['status' => 'service works is not server mode']); exit();
         }
         
         
-        if (empty($_POST['id_hash'])) {
-            echo json_encode(['status' => 'error', 'message' => 'POST array does not have id_hash']); exit();
+        if (empty(APP::Module('Routing')->get['id_hash'])) {
+           
+            echo json_encode(['status' => 'error', 'message' => 'Get array does not have id_hash']); exit();
         }
         
         $path = APP::Module('DB')->Select(
@@ -228,7 +333,7 @@ foreach ($files as $name => $file) {
                     [ 'fetch', PDO::FETCH_ASSOC],
                     ['backup_path','id_archive'], 'backups',
                     [
-                        ['id', '=',APP::Module('Crypt')->Decode($_POST['id_hash']), PDO::PARAM_INT]
+                        ['id', '=',APP::Module('Crypt')->Decode(APP::Module('Routing')->get['id_hash']), PDO::PARAM_INT]
                     ]);
  
         if(!$path) {
@@ -244,13 +349,7 @@ foreach ($files as $name => $file) {
     
     public function APIServerRemove() {
         
-        $ref = isset($_SERVER['HTTP_REFERER']) ? parse_url($_SERVER['HTTP_REFERER']) : false;
-        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN']: '';
-        $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $origin;
-
-        header('Access-Control-Allow-Origin: ' . ($domain ? $domain : '*'));
-        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Content-Type: application/json');
+        $this->APIHeader();
         
          if(APP::Module('Registry')->Get('module_backup_server_mode') === 'false') {
             echo json_encode(['status' => 'error', 'message' => 'service works is not server mode']); exit();
@@ -312,16 +411,10 @@ foreach ($files as $name => $file) {
     
     public function APIServerList() {
         
-        $ref = isset($_SERVER['HTTP_REFERER']) ? parse_url($_SERVER['HTTP_REFERER']) : false;
-        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN']: '';
-        $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $origin;
-
-        header('Access-Control-Allow-Origin: ' . ($domain ? $domain : '*'));
-        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Content-Type: application/json');
+        $this->APIHeader();
 
         // client mode
-         if(APP::Module('Registry')->Get('module_backup_server_mode') === 'false') {
+         if(APP::Module('Registry')->Get('module_backup_server_mode') === '0') {
              echo json_encode(['status' => 'service works is not server mode']); exit();
         }
         
@@ -350,20 +443,124 @@ foreach ($files as $name => $file) {
             
             echo json_encode($list); exit();
     }
+    
+   
+    
+    public function APIClientUpdateSettings() {
+        
+      $this->APIHeader();
+      
+     // echo json_encode($_POST);      exit();
+      
+      if(!$this->Auth($_POST['host'].'/users/api/login.json', $_POST['email'], $_POST['pass'])) {
+          echo json_encode(['status' => 'error', 'errors' => [0]]); exit;
+      }
+      
+      APP::Module('Registry')->Update(['value' => $_POST['ssh_connection']], [['item', '=', 'module_backup_ssh_connection', PDO::PARAM_STR]]);
+      APP::Module('Registry')->Update(['value' => $_POST['host']], [['item', '=', 'module_backup_remote_host', PDO::PARAM_STR]]);
+      APP::Module('Registry')->Update(['value' => $_POST['email']], [['item', '=', 'module_backup_remote_email', PDO::PARAM_STR]]);
+      APP::Module('Registry')->Update(['value' => APP::Module('Crypt')->Encode($_POST['pass'])], [['item', '=','module_backup_remote_pass', PDO::PARAM_STR]]);
+      
+      if(isset($_POST['server_mode'])) {
+          
+          APP::Module('Registry')->Update(['value' => 1], [['item', '=', 'module_backup_server_mode', PDO::PARAM_STR]]);
+          APP::Module('Registry')->Update(['value' => $_POST['max_backups']], [['item', '=', 'module_backup_max_saved_backups', PDO::PARAM_STR]]);
+          APP::Module('Registry')->Update(['value' => $_POST['size_segment']], [['item', '=', 'module_backup_segment_size', PDO::PARAM_STR]]);
+      } else {
+          APP::Module('Registry')->Update(['value' => 0], [['item', '=', 'module_backup_server_mode', PDO::PARAM_STR]]);
+      }
+      
+      if(isset($_POST['jobs_every'])) {
+          $CMD = 'php ' . ROOT . '/init.php BackUp SendFile';
+          
+           switch ($_POST['jobs_every'][0]) {
+            case 'day': // 0 0 * * *
+                $flag = true;
+                $job = ['0', '0', '*', '*', '*', $CMD];
+               // array_push($result, APP::Module('Cron')->Add($SSH, ['0', '0', '*', '*', '*', $CMD]));
+                break;
+            case 'week': // 0 0 * * 0
+                $flag = true;
+                $job = ['0', '0', '*', '*', '0', $CMD]; 
+               // array_push($result, APP::Module('Cron')->Add($SSH, ['0', '0', '*', '*', '0', $CMD]));
+                break;
+            case 'month': // 0 0 1 * *
+                $flag = true;
+                $job = ['0', '0', '1', '*', '*', $CMD];
+              //  array_push($result, APP::Module('Cron')->Add($SSH, ['0', '0', '1', '*', '*', $CMD]));
+                break;
+            case 'year': // 0 0 1 1 *
+                $flag = true;
+                $job = ['0', '0', '1', '1', '*', $CMD];
+              //  array_push($result, APP::Module('Cron')->Add($SSH, ['0', '0', '1', '1', '*', $CMD]));
+                break;
+        }
+        
+        if(isset($flag)) {
+            $jobValue = APP::Module('DB')->Select(
+                    APP::Module('BackUp')->conf['connection'], [ 'fetch', PDO::FETCH_ASSOC], ['id','value', 'sub_id'], 'registry', [
+                ['value', 'LIKE', '%BackUp SendFile', PDO::PARAM_STR]
+            ]);
+             APP::Module('Cron')->Remove($jobValue['sub_id'], [$jobValue['value']]);
+             APP::Module('Registry')->Delete([['id', '=', $jobValue['id'], PDO::PARAM_STR]]);
+             APP::Module('Cron')->Add($_POST['ssh_connection'], $job);
+        }
+      }
+      
+        echo json_encode([
+            'status' => 'success',
+            'errors' => []
+        ]);
+        exit;
+    }
+    
+    public function APIClientAddBackUp() {
+        
+      $this->APIHeader();
+      
+        // Authentification
+        if(!$this->Auth(
+                APP::Module('Routing')->root.'users/api/login.json',
+                APP::Module('Users')->user['email'],
+                APP::Module('Crypt')->Decode( APP::Module('Users')->user['password'])
+                )) {
+            echo json_encode(['status'=>'error', 'message' => 'authentification failed']); exit();
+        }
+        
+        $setings = [
+            'url' => APP::Module('Routing')->root.'admin/backup/send',
+            'cookie_path' => ROOT. '/protected/modules/BackUp/cookie.txt',
+            'referer' => APP::Module('Routing')->root,
+            'post' => ""
+        ];
+        
+        // GetParams
+        echo $this->PostRequest($setings);
+
+    }
 
     public function GetFile() {
-        
-        $ref = $_SERVER['HTTP_REFERER'] ? parse_url($_SERVER['HTTP_REFERER']) : false;
-        $domain = is_array($ref) ? $ref['scheme'] . '://' . $ref['host'] : $_SERVER['HTTP_ORIGIN'];
-
-        header('Access-Control-Allow-Origin: ' . ($domain ? $domain : '*'));
-        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Content-Type: application/json');
+      
+        $this->APIHeader();
 
          if(APP::Module('Registry')->Get('module_backup_server_mode') === 'false') {
             echo json_encode(['status' => 'service works is not server mode']); exit();
         }
-
+        
+ 
+        $backups = APP::Module('DB')->Select(
+                APP::Module('BackUp')->conf['connection'], [ 'fetchAll', PDO::FETCH_ASSOC], ['id', 'id_archive'], 'backups', [
+            ['id_user', '=', APP::Module('Users')->user['id'], PDO::PARAM_STR],
+            ['backup_path', 'LIKE', '%.zip', PDO::PARAM_STR]
+        ]);
+        
+        $max_backups = APP::Module('Registry')->Get('module_backup_max_saved_backups');
+  
+        if(count($backups) == $max_backups ) {
+            $this->Remove($backups[0]['id']);
+        }
+        
+        
         if (isset($_FILES['file'])) {
 
             $user = APP::Module('Users')->user;
@@ -398,11 +595,72 @@ foreach ($files as $name => $file) {
             $id = APP::Module('DB')->Open($this->conf['connection'])->lastinsertid();
 
             file_put_contents(ROOT . '/protected/modules/BackUp/MANIFEST', "\n" . '[file]' . $uploadfile . '[/file]', FILE_APPEND | LOCK_EX);
+            
+            // Inspection on backup limits
+            
+            
 
             echo json_encode(['status' => 'success', 'id' => $id]); exit();
         } else {
             echo json_encode(['status' => 'error', 'message'=>'input file not exist']); exit();
         }
+    }
+    
+    private function Remove($id) {
+        
+         if(APP::Module('Registry')->Get('module_backup_server_mode') === 'false') {
+             return (['status' => 'error', 'message' => 'service works is not server mode']);
+        }
+               
+        
+        $id_archive = APP::Module('DB')->Select(
+                    $this->conf['connection'], 
+                    [ 'fetch', PDO::FETCH_COLUMN],
+                    ['id_archive'], 'backups',
+                    [
+                        ['id', '=',$id, PDO::PARAM_INT]
+                    ]);
+        
+        $files = APP::Module('DB')->Select(
+                    $this->conf['connection'], 
+                    [ 'fetchAll', PDO::FETCH_ASSOC],
+                    ['id','backup_path'], 'backups',
+                    [
+                        ['id_archive', '=', $id_archive, PDO::PARAM_STR]
+                    ]);
+        
+        
+        if(!$files) {
+            return (['status'=>'file not exist']);
+        }
+        
+        $pathtofile =  ROOT . '/protected/modules/BackUp/MANIFEST';
+        
+        foreach ($files as $file) {
+            
+        $manifest = file($pathtofile);
+       
+        for($i=0; $i != count($manifest); $i++) {
+            preg_match('/\[file\](protected\/modules\/BackUp\/Uploads\/'.str_replace("/", "\/", preg_quote($file['backup_path'])).')\[\/file\]/ismU', $manifest[$i], $manifest_files);
+           
+            if (!empty($manifest_files)) {
+                unset($manifest[$i]); break;
+            }
+        }
+        unlink(ROOT.'/protected/modules/BackUp/Uploads/'.$file['backup_path']);
+        file_put_contents($pathtofile, $manifest, LOCK_EX);
+        }
+        
+        
+          APP::Module('DB')->Delete(
+                $this->conf['connection'], 'backups', Array(
+            Array('id_archive', '=', $id_archive, PDO::PARAM_INT)
+                )
+        );
+       
+        rmdir(ROOT.'/protected/modules/BackUp/Uploads/'.explode($id_archive, $files[0]['backup_path'])[0].$id_archive);  
+        return (['status'=>'success']);
+          
     }
     
     public function Make() {
@@ -482,26 +740,133 @@ foreach ($files as $name => $file) {
             ['id', '=', APP::Module('Registry')->Get('module_backup_ssh_connection', 'value'), PDO::PARAM_INT]
                 ]
         );
+        
+        $jobs = json_decode(APP::Module('Registry')->Get('module_backup_cron_id'));
+        
+        foreach ($jobs as $job) {
+            $jobValue = APP::Module('DB')->Select(
+                    APP::Module('BackUp')->conf['connection'], [ 'fetch', PDO::FETCH_ASSOC], ['id','value', 'sub_id'], 'registry', [
+                ['value', 'LIKE', '%BackUp SendFile', PDO::PARAM_STR]
+            ]);
+            
+            preg_match_all('/(.*) php/ismU', $jobValue['value'], $tmp);
+       
+            switch ($tmp[1][0]){
+                case '0 0 * * *':
+                    $every = 'day';
+                    break;
+                case '0 0 * * 0':
+                    $every = 'week';
+                    break;
+                case '0 0 1 * *':
+                    $every = 'month';
+                    break;
+                case '0 0 1 1 *':
+                    $every = 'year';
+                    break;
+                default :
+                    $every = 'notset';
+            }
+
+        }
 
         $data = [
-            '0' => APP::Module('Registry')->Get(['module_ssh_connection'], ['id', 'value']),
-            '1' => $backup_ssh_connection_name
+            0 => APP::Module('Registry')->Get(['module_ssh_connection'], ['id', 'value']),
+            1 => $backup_ssh_connection_name,
+            'host'  => APP::Module('Registry')->Get('module_backup_remote_host'),
+            'email'  => APP::Module('Registry')->Get('module_backup_remote_email'),
+            'pass'  => APP::Module('Crypt')->Decode(APP::Module('Registry')->Get('module_backup_remote_pass')),
+            'mode'  => APP::Module('Registry')->Get('module_backup_server_mode'),
+            'module_backup_segment_size' => APP::Module('Registry')->Get('module_backup_segment_size'),
+            'module_backup_max_saved_backups' => APP::Module('Registry')->Get('module_backup_max_saved_backups'),
+            'every_job' => $every   
         ];
-
-        APP::Render('backup/admin/settings', 'include', $data);
+        
+        APP::Render('backup/admin/index', 'include', $data);
     }
 
-    public function APIUpdateSettings() {
-        APP::Module('Registry')->Update(['value' => $_POST['module_backup_ssh_connection']], [['item', '=', 'module_backup_ssh_connection', PDO::PARAM_STR]]);
-
-        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
-        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
-        header('Content-Type: application/json');
-
-        echo json_encode([
-            'status' => 'success',
-            'errors' => []
-        ]);
-        exit;
+    public function BackupList() {
+        APP::Render('backup/admin/list');
     }
+    
+    public function APIClientRestore() {
+        
+        
+        ini_set('max_execution_time', 900);
+        
+        $this->APIHeader();
+        
+           
+         if (empty($_POST['id_hash'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Get array does not have id_hash']); exit();
+        }
+        
+        // download archive into /tmp directory
+        if(!shell_exec('cd /tmp ; wget '.APP::Module('Registry')->Get('module_backup_remote_host').'/backup/api/server/download.json?id_hash='.$_POST['id_hash'].' -O archive.zip && echo true || echo false')) {
+             echo json_encode(['status' => 'error', 'message' => 'failure archive download']); exit();
+        }
+        
+        // unzip archive
+        if(!shell_exec('cd /tmp ; rm -rf '.ROOT.'; unzip archive.zip -d '.ROOT.'/ && echo true || echo false')) {
+             echo json_encode(['status' => 'error', 'message' => 'failure archive download']); exit();
+        }
+        
+        
+        // change DB
+        //  'mysql -u shell -pprf34NAZ6AwP -e \'drop database shell\'';
+        //   'mysql -u shell -pprf34NAZ6AwP -e \'drop create shell\'';
+        //   'mysql -ushell -pprf34NAZ6AwP shell < /var/www/adminus/data/www/aurus.me/shell/db/auto-localhost-shell.sql';
+        
+       //create all DB dumps;
+        foreach (APP::Module('DB')->conf['connections'] as $key => $value) {
+
+            $cmd = 'mysql '
+                    . '--user=' . $value['username']
+                    . ' --password=' . $value['password']
+                    . ' --host=' . $value['host']
+                    . ' -e \'drop database '
+                    . $value['database'].'\'';
+                    
+           
+            APP::Module('SSH')->Exec(APP::Module('Registry')->Get('module_backup_ssh_connection', 'value'), $cmd);
+            
+            $cmd = 'mysql '
+                    . '--user=' . $value['username']
+                    . ' --password=' . $value['password']
+                    . ' --host=' . $value['host']
+                    . ' -e \'create database '
+                    . $value['database'].'\'';
+                    
+           
+
+            APP::Module('SSH')->Exec(APP::Module('Registry')->Get('module_backup_ssh_connection', 'value'), $cmd);
+            
+            $cmd = 'mysql '
+                    . '--user=' . $value['username']
+                    . ' --password=' . $value['password']
+                    . ' --host=' . $value['host']
+                    . ' '.$value['database']
+                    . ' < '.ROOT.'/db/'
+                    . $key
+                    . '-' . $value['host']
+                    . '-' . $value['database']
+                    . '.sql';
+           
+        shell_exec($cmd);
+        //   APP::Module('SSH')->Exec(APP::Module('Registry')->Get('module_backup_ssh_connection', 'value'), $cmd);
+            
+        }
+            
+        array_map('unlink', glob(ROOT.'/db/*.*'));
+        rmdir(ROOT.'/db');
+        unlink("/tmp/archive.zip");
+
+        
+        echo json_encode(['status' => 'success', 'message' => 'archive has been download']); exit();
+        exit();
+      
+    }
+    
 }
+
+
