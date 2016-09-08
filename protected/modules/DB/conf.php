@@ -1,1 +1,1 @@
-<? return ['connections' => ['auto' => ['type' => 'mysql', 'host' => 'localhost', 'database' => 'datas', 'username' => 'datas', 'password'  => 'prf34NAZ6AwP','charset' => 'utf8']], 'init' => true];
+<? return ['connections' => ['auto' => ['type' => 'mysql', 'host' => 'localhost', 'database' => 'datas', 'username' => 'datas', 'password'  => 'prf34NAZ6AwP','charset' => 'utf8']]];
