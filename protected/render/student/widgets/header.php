@@ -1,6 +1,6 @@
 <header id="header" class="media">
     <div class="pull-left h-logo">
-        <a href="<?= APP::Module('Routing')->root ?>admin" class="hidden-xs">
+        <a href="<?= APP::Module('Routing')->root ?>" class="hidden-xs">
             STUDENT'S TOOL  
             <small>LECTIONS & EXAMS</small>
         </a>
@@ -18,6 +18,7 @@
         <li class="hm-alerts" data-user-alert="shell-app" data-ma-action="sidebar-open" data-ma-target="user-alerts">
             <a href=""><i class="hm-icon zmdi zmdi-settings"></i></a>
         </li>
+        <? if(isset(APP::Module('Users')->user['email'])) { ?>
         <li class="dropdown hm-profile">
             <a data-toggle="dropdown" href="">
                 <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . 'public/ui/img/profile-pics/default.png') ?>&t=<?= time() ?>">
@@ -35,5 +36,25 @@
                 </li>
             </ul>
         </li>
+        <? } else { ?>
+            
+             <li class="dropdown hm-profile">
+            <a data-toggle="dropdown" href="">
+               <img src="<?= APP::Module('Routing')->root . 'public/ui/img/profile-pics/default.png'?>">
+            </a>
+
+            <ul class="dropdown-menu pull-right dm-icon">
+                
+                <li>
+                    <a href="<?= APP::Module('Routing')->root ?>users/actions/login?return=<?= APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->root)?>"><i class="zmdi zmdi-time-restore"></i> Login</a>
+                </li>
+                <li>
+                    <a href="<?= APP::Module('Routing')->root ?>users/actions/register?return=<?= APP::Module('Crypt')->SafeB64Encode(APP::Module('Routing')->root)?>"><i class="zmdi zmdi-time-restore"></i> Registration</a>
+                </li>
+            </ul>
+        </li>
+            
+     <?   } ?>
+        
     </ul>
 </header>

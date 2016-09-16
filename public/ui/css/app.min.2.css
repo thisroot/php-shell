@@ -1343,6 +1343,32 @@ select.chosen {
   content: "\f136";
 }
 
+
+.note-editor .fa.fa-strikethrough:before,
+.note-popover .fa.fa-strikethrough:before {
+  content: "\f24c";
+}
+
+.note-editor .fa.fa-undo:before,
+.note-popover .fa.fa-undo:before {
+  content: "\f258";
+}
+
+.note-editor .fa.fa-repeat:before,
+.note-popover .fa.fa-repeat:before {
+  content: "\f253";
+}
+
+.note-editor .fa.fa-superscript:before,
+.note-popover .fa.fa-superscript:before {
+  content: "\f252";
+}
+
+.note-editor .fa.fa-subscript:before,
+.note-popover .fa.fa-subscript:before {
+  content: "\f250";
+}
+
 .note-editor .note-air-popover .arrow,
 .note-popover .note-air-popover .arrow {
   left: 20px;
