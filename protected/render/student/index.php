@@ -29,6 +29,11 @@
         .main-menu {
             padding-top: 120px;
         }
+        
+        .not-active {
+            pointer-events: none;
+            cursor: default;
+        }
     </style>
 
    
@@ -48,7 +53,7 @@
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header">
-                                
+                                <?= $data['role']; ?>
                             </div>
                         </div>
                     </div>
@@ -77,9 +82,54 @@
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/nouislider/distribute/jquery.nouislider.all.min.js"></script>
-
+    <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootstrap-growl/bootstrap-growl.min.js" type="text/javascript"></script>
+    
 <? APP::Render('core/widgets/js') ?>
 
+    <script type="text/javascript">
+    $(document).ready(function() {
+        
+        function notify(message, type){
+            $.growl({
+                message: message
+            },{
+                type: type,
+                allow_dismiss: true,
+                label: 'Cancel',
+                className: 'btn-xs btn-inverse',
+                placement: {
+                    from: 'bottom',
+                    align: 'right'
+                },
+                delay: 10000,
+                animate: {
+                        enter: 'animated bounceInRight',
+                        exit: 'animated bounceOut'
+                },
+                offset: {
+                    x: 40,
+                    y: 40
+                }
+            });
+        };
+        
+        switch('<?= $data['role'] ?>') {
+            case 'default':
+                 notify('If you want to use all scopes, you need  register','inverse');
+                 break;
+                 
+            case 'new':
+                 notify('If you want to use scopes of your personal profile, you need activate it via email','inverse');
+                 break;
+            
+        }
+        
+       
+        
+       
+        
+    });
+    </script>
    
 </body>
 </html>

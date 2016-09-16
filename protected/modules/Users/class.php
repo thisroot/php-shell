@@ -268,6 +268,8 @@ class Users {
         $user_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_id_hash']);
         
         if (APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['id'], 'users', [['id', '=', $user_id, PDO::PARAM_INT]])) {
+            
+           
             APP::Module('DB')->Update(
                 $this->settings['module_users_db_connection'], 'users', 
                 ['role' => 'user'], 
