@@ -7,7 +7,7 @@ return [
       ['students\/lectures\/find(\?.*)?',                                'Student', 'LectureFind'],        // View all backups /admin
       ['students\/user\/lecture\/(?P<hash>.*)\/edit(\?.*)?',             'Student', 'LectureEdit'],        // View all backups /admin
       ['students\/user\/lecture\/(?P<hash>.*)(\?.*)?',                   'Student', 'LectureView'],        // View all backups /admin
-      ['students\/user\/settings(\?.*)?',                                'Student', 'UserSettings'],           // View all backups /admin
+      ['students\/user\/settings(\?.*)?',                                'Student', 'UserSettings'],       // View all backups /admin
         
         
       ['students\/user\/api\/edit\/settings.json(\?.*)?',                'Student', 'APIUserSettingsEdit'],    // View all backups /admin

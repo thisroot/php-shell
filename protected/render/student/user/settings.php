@@ -285,7 +285,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-globe"></i></span>
                                                 <div class="fg-line ">
-                                                    <select class="select2" id="country" data-ph="country" data-set="country">
+                                                    <select class="select2" value="<?= $data['user_template']['country']; ?>" id="country" data-ph="country" data-set="country">
                                                         <option></option>
                                                     </select>
                                                 </div>
@@ -398,7 +398,7 @@
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/Waves/dist/waves.min.js"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
-    <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/nouislider/distribute/jquery.nouislider.all.min.js"></script>
+  <!--  <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/nouislider/distribute/jquery.nouislider.all.min.js"></script> -->
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
 
     <!-- Module addition Libraries -->
@@ -516,6 +516,7 @@
         demoUpload();
         
         $.each($('.select2'), function() {
+        var def_value = $(this).attr('value');
             $(this).select2({
                 placeholder: $(this).attr('id'),
                 minimumInputLength: 3,
@@ -548,11 +549,16 @@
                           })
                       };
                   },
-
+                },
+                
+                initSelection: function (element, callback) {
+                    callback({id: 1, text: def_value });
                 },
 
                 width: '100%',
                 });
+            
+           // $(this).select2(value, "1");
         });
 
 });

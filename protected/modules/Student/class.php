@@ -32,6 +32,14 @@ class Student {
                     ['id','lang','name_first', 'name_second', 'phone', 'email', 'groups', 'friends', 'img_crop','img_full'], 'student_user_settings',
                     [
                         ['id', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT]
+                    ]),
+            'user_template' => APP::Module('DB')->Select(
+                    'auto', 
+                    [ 'fetch', PDO::FETCH_ASSOC],
+                    ['*'], 'student_user_templates',
+                    [
+                        ['id_user', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT],
+                        ['type', '=', 'uni', PDO::PARAM_STR]
                     ])
             ];
         
@@ -321,6 +329,7 @@ class Student {
         }
 
         $id = APP::Module('Crypt')->Decode($_POST['pk']);
+        
         switch ($_POST['name']) {
             case 'update-index':
 
