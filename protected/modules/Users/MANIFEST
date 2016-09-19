@@ -1,6 +1,6 @@
 [name]Users[/name]
 [description]User management system[/description]
-[dependencies]Routing Sessions Crypt DB Registry Mail Triggers[/dependencies]
+[dependencies]Routing Sessions Crypt DB Registry Mail Triggers SSH Cron[/dependencies]
 
 [file]protected/modules/Users/MANIFEST[/file]
 [file]protected/modules/Users/README.md[/file]

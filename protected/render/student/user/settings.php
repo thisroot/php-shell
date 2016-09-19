@@ -18,13 +18,13 @@
     <link href="<?= APP::Module('Routing')->root ?>public/plugins/Croppie/croppie.css" rel="stylesheet" type="text/css"/>
     <!-- Module Vendor CSS -->
     <link href="<?= APP::Module('Routing')->root ?>public/plugins/select2/dist/css/select2.css" rel="stylesheet" type="text/css"/>
-
+    <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/farbtastic/farbtastic.css" rel="stylesheet" type="text/css"/>
 
 
      <? APP::Render('core/widgets/css') ?>
     <style type="text/css">
         .toggle-switch {
-            margin-top: 10px;
+            margin-top: 4px;
         }
 
         .h-logo a small {
@@ -175,7 +175,7 @@
                             <div class="card-body card-padding">
                                 <div class="form-group">
                                 <div class="fg-line">
-                                    <textarea class="form-control" rows="5" placeholder="Short about youself...."></textarea>
+                                    <textarea id="user_about" class="form-control" rows="5" placeholder="Short about youself...."><?= $data['user_settings']['about'] ?></textarea>
                                 </div>
                             </div>
                             </div>
@@ -187,18 +187,16 @@
                         <div class="card">
                             <div class="card-header">
                                 <h2>Personal settings
-                                    
                                 </h2>
                             </div>
                             <div class="card-body card-padding">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <div class="input-group">
-
-                                                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>  
+                                                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span> 
                                                 <div class="fg-line">
-                                                    <input id="user_fisrt_name" class="form-control" placeholder="first name" type="text">
+                                                    <input value="<?= $data['user_settings']['first_name'] ?>" id="user_first_name" class="form-control" placeholder="first name" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -206,10 +204,9 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <div class="input-group">
-
                                                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span> 
                                                 <div class="fg-line">
-                                                    <input id="user_second_name" class="form-control" placeholder="second name" type="text">
+                                                    <input value="<?= $data['user_settings']['last_name'] ?>" id="user_last_name" class="form-control" placeholder="last name" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -221,7 +218,7 @@
 
                                                 <span class="input-group-addon"><i class="zmdi zmdi-email"></i></span>    
                                                 <div class="fg-line">
-                                                    <input id="user_email" class="form-control" placeholder="email" type="text">
+                                                    <input value="<?= $data['user_settings']['email'] ?>" id="user_email" class="form-control" placeholder="email" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -233,7 +230,7 @@
 
                                                 <span class="input-group-addon"><i class="zmdi zmdi-phone"></i></span>    
                                                 <div class="fg-line">
-                                                    <input id="user_phone" class="form-control" placeholder="phone" type="text">
+                                                    <input value="<?= $data['user_settings']['phone'] ?>" id="user_phone" class="form-control input-mask" data-mask="0 (000) 000 - 0000" placeholder="phone"  type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -250,22 +247,30 @@
                                 <h2>Education template
                                     
                                 </h2>
+                                
+                                
                                 <ul class="ah-actions actions a-alt">
-                                <li>
-                                   
-                                      
-                                    <div class="toggle-switch">
-                                        <label for="ts1" class="ts-label">Russian</label>
-                                        <input id="ts1" type="checkbox" hidden="hidden">
-                                        <label for="ts1" class="ts-helper"></label>
-                                        <label for="ts1" class="ts-label m-l-20">English</label>
-                                    </div>
-                                           
-                                       
-                                   
-                                </li>
+                                    <li>
 
-                            </ul>
+                                        <div class="toggle-switch" >
+                                            <label for="lang" class="ts-label">Russian</label>
+                                            <input id="lang" type="checkbox" hidden="hidden">
+                                            <label for="lang" class="ts-helper"></label>
+                                            <label for="lang" class="ts-label m-l-20">English</label>
+                                        </div>
+
+                                    </li>
+                                    <li>
+                                        <div class="btn-group">
+                                        <button id="submit-save" class="btn palette-Teal bg btn-icon-text waves-effect"><i class="zmdi zmdi-save "></i> Save</button>
+                                    
+                                   
+                                        <button id="submit-reset" class="btn palette-Purple-400 bg btn-icon-text waves-effect"><i class="zmdi zmdi-refresh"></i> Reset</button>
+                                        </div>
+                                        </li>
+                                </ul>
+                                
+                                
                             </div>
                             <div class="card-body card-padding">
                                 <div class="row">
@@ -275,7 +280,7 @@
 
                                                 <span class="input-group-addon"><i class="zmdi zmdi-sun"></i></span>
                                                 <div class="fg-line">
-                                                    <input id="lecture" class="form-control" placeholder="specialisation programm" type="text">
+                                                    <input id="lecture" class="form-control" value="<?= $data['user_template']['name']; ?>" placeholder="specialisation programm" type="text">
                                                 </div>
                                             </div>
                                         </div>
@@ -285,7 +290,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-globe"></i></span>
                                                 <div class="fg-line ">
-                                                    <select class="select2" value="<?= $data['user_template']['country']; ?>" id="country" data-ph="country" data-set="country">
+                                                    <select class="select2" data-def_id ="<?= $data['user_template']['id_country']; ?>" value="<?= $data['user_template']['country']; ?>" id="country" data-ph="country" data-set="country">
                                                         <option></option>
                                                     </select>
                                                 </div>
@@ -297,7 +302,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-city"></i></span>
                                                 <div class="fg-line">
-                                                     <select class="select2" id="city" data-ph="city" data-set="city">
+                                                     <select class="select2" data-def_id ="<?= $data['user_template']['id_city']; ?>" value="<?= $data['user_template']['city']; ?>" id="city" data-ph="city" data-set="city">
                                                         <option></option>
                                                     </select>
                                                 </div>
@@ -309,7 +314,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-graduation-cap"></i></span>
                                                 <div class="fg-line">
-                                                    <select class="select2" id="university" data-ph="university"  data-set="university">
+                                                    <select class="select2" id="university" data-def_id ="<?= $data['user_template']['id_university']; ?>" value="<?= $data['user_template']['university']; ?>" data-ph="university"  data-set="university">
                                                         <option></option>
                                                     </select>
                                                 </div>
@@ -321,7 +326,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-accounts"></i></span>
                                                 <div class="fg-line">
-                                                    <select class="select2" id="faculty" data-ph="faculty"  data-set="faculty">
+                                                    <select class="select2" data-def_id ="<?= $data['user_template']['id_faculty']; ?>" value="<?= $data['user_template']['faculty']; ?>" id="faculty" data-ph="faculty"  data-set="faculty">
                                                         <option></option>
                                                     </select>
                                                 </div>
@@ -333,7 +338,7 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                                                 <div class="fg-line">
-                                                    <select class="select2" id="chair" data-ph="chair"  data-set="chair">
+                                                    <select class="select2" data-def_id ="<?= $data['user_template']['id_chair']; ?>" value="<?= $data['user_template']['chair']; ?>" id="chair" data-ph="chair"  data-set="chair">
                                                         <option></option>
                                                     </select>
                                                 </div>
@@ -346,11 +351,11 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-eye"></i></span>
                                                 <div class="fg-line">
-                                                     <select class="selectpicker">                                                      
-                                                        <option>All from all</option>                                                       
-                                                        <option>All from groups </option>                                                     
-                                                        <option>All from friends </option>
-                                                        <option>All looked from all </option>
+                                                     <select id="user_priv_view" class="selectpicker">                                                      
+                                                        <option value="0">for all</option>                                                       
+                                                        <option value="1">for groups </option>                                                     
+                                                        <option value="2">for friends </option>
+                                                        <option value="3">looked for all </option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -361,11 +366,11 @@
                                                 <div class="input-group">
                                                 <span class="input-group-addon"><i class="zmdi zmdi-edit"></i></span>
                                                 <div class="fg-line">
-                                                     <select class="selectpicker">                                                      
-                                                        <option>All from all</option>                                                       
-                                                        <option>All from groups </option>                                                     
-                                                        <option>All from friends </option>
-                                                        <option>All looked from all </option>
+                                                     <select id="user_priv_edit" class="selectpicker">                                                      
+                                                        <option value="0">for all</option>                                                       
+                                                        <option value="1">for groups </option>                                                     
+                                                        <option value="2">for friends </option>
+                                                        <option value="3">looked for all </option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -404,13 +409,16 @@
     <!-- Module addition Libraries -->
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/Croppie/croppie.min.js" type="text/javascript"></script>
-
+    <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/fileinput/fileinput.min.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/input-mask/input-mask.min.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/farbtastic/farbtastic.min.js" type="text/javascript"></script>
+    
 <? APP::Render('core/widgets/js') ?>
 
     <script>
     $(document).ready(function() {
         
-     function demoUpload() {
+        function demoUpload() {
 		var $uploadCrop;
 
 		function readFile(input) {
@@ -515,52 +523,186 @@
         
         demoUpload();
         
-        $.each($('.select2'), function() {
-        var def_value = $(this).attr('value');
-            $(this).select2({
-                placeholder: $(this).attr('id'),
-                minimumInputLength: 3,
-                ajax: {
-                  dataType: 'json',
-                  type: 'POST',
-                  data: function (params) {
-                    var query = {
-                      search: params.term,
-                      page: params.page,
-                      set: $(this).data('set'),
-                      // set specific fields
-                      id_country: ($('#country'))?$('#country').val():"",
-                      id_city: ($('#city'))?$('#city').val():"",
-                      id_university: ($('#university'))?$('#university').val():"",
-                      id_faculty: ($('#faculty'))?$('#faculty').val():"",
-                    }
-                    return query;
-                },
-                  url: '<?= APP::Module('Routing')->root ?>students/user/api/get/vkdata.json',
-                  delay: 500,
+        
+            // SERVER MODE
+        var flag, check;
+        function checkMode() {
 
-                  processResults: function (data) {
-                      return {
-                          results: $.map(data, function (item) {
-                              return {
-                                  text: item.name,
-                                  id: item.id
-                              }
-                          })
-                      };
-                  },
-                },
-                
-                initSelection: function (element, callback) {
-                    callback({id: 1, text: def_value });
-                },
+           if(flag !== 1) {
+               check = '<?= $data['user_settings']['lang'] ?>';
+           }
+               if(check == 1) {
+                   $('#lang').attr("checked", true);
+               }  
+       }
 
-                width: '100%',
-                });
+        checkMode();
+
+        $('#lang').bind('click', function(){
+                   check = (check == 1)?0:1;
+                   checkMode();
+               });
+
+        flag = 1;    
             
-           // $(this).select2(value, "1");
+            
+         $('#submit-reset').on('click', function(event) {
+            event.preventDefault();
+            
+            $.each($('.select2'), function() {
+                $(this).val('').trigger('change');          
+            });
+            
+            $('#lecture').val('');
+            
         });
 
+        
+        $('#submit-save').on('click', function(event) {
+            event.preventDefault();
+                       
+            var first_name = $('#user_first_name');
+            var last_name = $('#user_last_name');
+            var email = $('#user_email');
+            var phone = $('#user_phone');
+            var about = $('#user_about');
+            var lecture = $('#lecture');
+            var country = $('#country :selected');
+            var city = $('#city :selected');
+            var university = $('#university :selected');
+            var faculty = $('#faculty :selected');
+            var chair = $('#chair :selected');
+            
+            var priv_view = ($('#user_priv_view'))[0]['value'];
+            var priv_edit = ($('#user_priv_edit'))[0]['value'];
+            var lang = $('#lang:checked');
+            
+            
+            first_name.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+            last_name.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+            email.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+            phone.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
+            
+             if (first_name.val() === '') {
+                    first_name.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    return false;
+                }
+                
+             if (last_name.val() === '') {
+                    last_name.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    return false;
+                }
+                
+             if (email.val() === '') {
+                    email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    return false;
+                }
+                
+             if (phone.val() === '') {
+                    phone.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    return false;
+                }
+                
+            var data = {
+                action: 'main-info',
+                id_hash: '<?= APP::Module('Crypt')->Encode($data['user_settings']['id']); ?>',
+                first_name: first_name.val()?first_name.val():'NULL',
+                last_name: last_name.val()?last_name.val():'NULL',
+                email: email.val()?email.val():'NULL',
+                phone: phone.val()?phone.val():'NULL',
+                about: about.val()?about.val():'NULL',
+                lecture: lecture.val()?lecture.val():'NULL',
+                id_country: country.val()?country.val():'NULL',
+                country: country.text()?country.text():'NULL',
+                id_city: city.val()?city.val():'NULL',
+                city: city.text()?city.text():'NULL',
+                id_university: university.val()?university.val():'NULL',
+                university: university.text()?university.text():'NULL',
+                id_faculty: faculty.val()?faculty.val():'NULL',
+                faculty: faculty.text()?faculty.text():'NULL',
+                id_chair: chair.val()?chair.val():'NULL',
+                chair: chair.text()?chair.text():'NULL',
+                
+                priv_view: priv_view,
+                priv_edit: priv_edit,
+                lang: lang.val()?1:0
+                }
+                
+                
+                
+                
+                 $.ajax({
+                    type: 'post',
+                    url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/settings.json',
+                    data: data,
+                    success: function (result) {
+                        switch (result.status) {
+                            case 'success':
+                              
+                                swal({
+                                    title: 'Done!',
+                                    text: 'Sessions settings has been updated',
+                                    type: 'success',
+                                    showCancelButton: false,
+                                    confirmButtonText: 'Ok',
+                                    closeOnConfirm: true
+                                });
+                                
+                                break;
+                            case 'error':
+                                $.each(result.errors, function (i, error) {});
+                                break;
+                        }
+                    }
+                });
+            
+        });
+        
+        
+        $.each($('.select2'), function() {
+        if((def_value !=='') || (def_value !== 0)) {
+           // add saved value
+           var def_value = $(this).attr('value');
+           var def_id = $(this).data('def_id');
+           $(this).find('option').attr('value', def_id).text(def_value);
+       }
+               $(this).select2({
+                   placeholder: $(this).attr('id'),
+                   minimumInputLength: 3,
+                   ajax: {
+                     dataType: 'json',
+                     type: 'POST',
+                     data: function (params) {
+                       var query = {
+                         search: params.term,
+                         page: params.page,
+                         set: $(this).data('set'),
+                         // set specific fields
+                         id_country: ($('#country'))?$('#country').val():"",
+                         id_city: ($('#city'))?$('#city').val():"",
+                         id_university: ($('#university'))?$('#university').val():"",
+                         id_faculty: ($('#faculty'))?$('#faculty').val():"",
+                       }
+                       return query;
+                   },
+                     url: '<?= APP::Module('Routing')->root ?>students/user/api/get/vkdata.json',
+                     delay: 500,
+
+                     processResults: function (data) {
+                         return {
+                             results: $.map(data, function (item) {
+                                 return {
+                                     text: item.name,
+                                     id: item.id
+                                 }
+                             })
+                         };
+                     },
+                   },
+                   width: '100%'
+
+                   });
+           });
 });
     </script>
 

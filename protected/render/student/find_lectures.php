@@ -221,6 +221,7 @@
                     }    
                 })
            
+           
          $.each($('.select2'), function() {
             $(this).select2({
                 placeholder: $(this).attr('id'),

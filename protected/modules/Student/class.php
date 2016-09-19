@@ -29,7 +29,7 @@ class Student {
             'user_settings' =>  APP::Module('DB')->Select(
                     'auto', 
                     [ 'fetch', PDO::FETCH_ASSOC],
-                    ['id','lang','name_first', 'name_second', 'phone', 'email', 'groups', 'friends', 'img_crop','img_full'], 'student_user_settings',
+                    ['*'], 'student_user_settings',
                     [
                         ['id', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT]
                     ]),
@@ -118,6 +118,7 @@ class Student {
             echo json_encode(['status' => 'error', 'message' => 'does not have post data']); exit();
         }
          
+        
         $list =   APP::Module('DB')->Select(
                     'auto', 
                     [ 'fetchAll', PDO::FETCH_ASSOC],
@@ -126,7 +127,7 @@ class Student {
 
             foreach ($list as $item => $value) {
               
-            if (($_POST['search']) && (preg_match('/^.*' . $_POST['search'] . '.*/i', $value[$_POST['set']]) === 0)) continue;    
+            if (($_POST['search']) && (preg_match('/^.*' . $_POST['search'] . '.*/', $value[$_POST['set']]) === 0)) continue;    
             
             array_push($out, [
                 'id' => $item + 1,
@@ -161,9 +162,12 @@ class Student {
         foreach ($list as $item) {
             
             $list_name = $item['name'];
+            $university = $item['university'];
+            $faculty = $item['faculty'];
+            $chair = $item['chair'];
             
             if (($_POST['searchPhrase']) && (preg_match('/^.*' . $_POST['searchPhrase'] . '.*/', $list_name) === 0)) continue;
-            
+           
             array_push($out, [
                 'id' => $item['id'],
                 'id_hash' => APP::Module('Crypt')->Encode($item['id']),
@@ -200,9 +204,6 @@ class Student {
         
         $this->SetHeader();
         
-        
-              
-         
           $list =   APP::Module('DB')->Select(
                     'auto', 
                     [ 'fetchAll', PDO::FETCH_ASSOC],
@@ -221,10 +222,10 @@ class Student {
               
             $list_name = $item['name'];
             
-            if($_POST['chair'] != '') { if (($_POST['searchPhrase']) && (preg_match('/^.*' . $_POST['searchPhrase'] . '.*/', $list_name) === 0)) continue;}
-            if($_POST['chair'] != ' ') { if (($_POST['university']) && (preg_match('/^.*' . $_POST['university'] . '.*/', $item['university']) === 0)) continue;}
-            if($_POST['chair'] != ' ') { if (($_POST['faculty']) && (preg_match('/^.*' . $_POST['faculty'] . '.*/', $item['faculty']) === 0)) continue;}
-            if($_POST['chair'] != ' ') { if (($_POST['chair']) && (preg_match('/^.*' . $_POST['chair'] . '.*/', $item['chair']) === 0)) continue; }
+            if($_POST['searchPhrase'] != '') { if (($_POST['searchPhrase']) && (preg_match('/^.*' . $_POST['searchPhrase'] . '.*/', $list_name) === 0)) continue;}
+            if($_POST['university'] != '') { if (($_POST['university']) && (preg_match('/^.*' . $_POST['university'] . '.*/', $item['university']) === 0)) continue;}
+            if($_POST['faculty'] != '') { if (($_POST['faculty']) && (preg_match('/^.*' . $_POST['faculty'] . '.*/', $item['faculty']) === 0)) continue;}
+            if($_POST['chair'] != '') { if (($_POST['chair']) && (preg_match('/^.*' . $_POST['chair'] . '.*/', $item['chair']) === 0)) continue; }
            
             array_push($out, [
                 'id' => $item['id'],
@@ -359,7 +360,7 @@ class Student {
                         'date' => 'NOW()'
                     ]);
                 }
-                echo json_encode(['status' => $result]);
+                echo json_encode(['status' => 'success']);
                 exit();
 
 
@@ -492,32 +493,81 @@ class Student {
         switch ($_POST['action']) {
             case 'image-crop':
                 APP::Module('DB')->Update(
-                            'auto', 'student_user_settings', [
-                        'img_crop' => $_POST['data']
-                            ], [
-                                ['id', '=', $user_id, PDO::PARAM_INT]
-                            ]
-                    );
-                
-                echo   json_encode(['status'=> 'success']); exit();
-                
+                        'auto', 'student_user_settings', [
+                    'img_crop' => $_POST['data']
+                        ], [
+                    ['id', '=', $user_id, PDO::PARAM_INT]
+                        ]
+                );
+
+                echo json_encode(['status' => 'success']);
+                exit();
+
             case 'image-full':
                 APP::Module('DB')->Update(
-                            'auto', 'student_user_settings', [
-                        'img_full' => $_POST['data']
-                            ], [
-                                ['id', '=', $user_id, PDO::PARAM_INT]
-                            ]
-                    );
+                        'auto', 'student_user_settings', [
+                    'img_full' => $_POST['data']
+                        ], [
+                    ['id', '=', $user_id, PDO::PARAM_INT]
+                        ]
+                );
+
+                echo json_encode(['status' => 'success']);
+                exit();
                 
-                echo   json_encode(['status'=> 'success']); exit();
+            case 'main-info':
+                
+                foreach ($_POST as &$item) {
+                    if($item  == 'NULL') {
+                        $item = NULL;
+                    }
+                }
+               
+                $result = APP::Module('DB')->Update(
+                        'auto', 'student_user_settings', [
+                    'first_name' => $_POST['first_name'],
+                    'last_name' => $_POST['last_name'],
+                    'email' => $_POST['email'],
+                    'phone' => $_POST['phone'],
+                    'privacy_view' => $_POST['priv_view'],
+                    'privacy_edit' => $_POST['priv_edit'],
+                    'about' => $_POST['about'],
+                    'lang' => $_POST['lang']
+                        ], 
+                        
+                        [
+                    ['id', '=', $user_id, PDO::PARAM_INT]
+                        ]
+                );
                 
                 
+               $result = APP::Module('DB')->Update(
+                        'auto', 'student_user_templates', [
+
+                    'country' => $_POST['country'],
+                    'id_country' => $_POST['id_country'],                      
+                    'city' => $_POST['city'],
+                    'id_city' => $_POST['id_city'],
+                    'university' => $_POST['university'],
+                    'id_university' => $_POST['id_university'],
+                    'faculty' => $_POST['faculty'],
+                    'id_faculty' => $_POST['id_faculty'],
+                    'chair' => $_POST['chair'],
+                    'id_chair' => $_POST['id_chair'],                           
+                    'name' => $_POST['lecture']
+                        ], [
+                    ['id', '=', $user_id, PDO::PARAM_INT],
+                    ['type', '=', 'uni', PDO::PARAM_STR]
+                        ]
+                );
+                
+                echo json_encode(['status' => $result]);
+                exit();
         }
-        
-        
-        
-        echo   json_encode(['status'=> $_POST]); exit();
+
+
+
+        echo   json_encode(['status'=> 'error', 'message' => 'action not exist']); exit();
         
     }
 

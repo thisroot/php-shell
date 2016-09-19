@@ -45,6 +45,14 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="module_users_tmp_dir" class="col-sm-2 control-label">Temp dir</label>
+                                    <div class="col-sm-2">
+                                        <div class="fg-line">
+                                            <input type="text" class="form-control" name="module_users_tmp_dir" id="module_users_tmp_dir">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-2">
                                         <button type="submit" class="btn palette-Teal bg waves-effect btn-lg">Save changes</button>
                                     </div>
@@ -74,6 +82,7 @@
         <script>
             $(document).ready(function() {
                 $('#module_users_db_connection').val('<?= APP::Module('Users')->settings['module_users_db_connection'] ?>');
+                $('#module_users_tmp_dir').val('<?= APP::Module('Users')->settings['module_users_tmp_dir'] ?>');
 
                 $('#update-settings').submit(function(event) {
                     event.preventDefault();

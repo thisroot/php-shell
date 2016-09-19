@@ -277,7 +277,7 @@
                     return false;
                 }
 
-                if('server_mode' === 'on') {
+                if(server_mode.val() === 'on') {
                     if (max_backups.val() === '') {
                         max_backups.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
                         return false;

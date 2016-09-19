@@ -9,6 +9,8 @@ User management system
 - [Registry](https://github.com/evildevel/php-shell/tree/master/protected/modules/Registry)
 - [Mail](https://github.com/evildevel/php-shell/tree/master/protected/modules/Mail)
 - [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
+- [Cron](https://github.com/evildevel/php-shell/tree/master/protected/modules/Cron)
+- [SSH](https://github.com/evildevel/php-shell/tree/master/protected/modules/SSH)
 
 ### Files
 ```
@@ -86,7 +88,7 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 - Add rule
 - Remove rule
 - Update rule
-- Update OAuth settings
+- Update OAuth clients settings
 - Update notifications settings
 - Update services settings
 - Update auth settings
@@ -102,7 +104,7 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /users/login/google                                         // Login via Google
 /users/login/ya                                             // Login via Yandex
 /users/login/double/<return_hash>                           // Double login form
-/users/activate/<user_id_hash>                              // User activation
+/users/activate/<user_id_hash>/<params>                     // User activation
 /users/profile                                              // User profile
 /users/logout                                               // Logout
 

@@ -7,6 +7,8 @@ Simple E-Mail sending. Senders and letters management system.
 - [Registry](https://github.com/evildevel/php-shell/tree/master/protected/modules/Registry)
 - [DB](https://github.com/evildevel/php-shell/tree/master/protected/modules/DB)
 - [Triggers](https://github.com/evildevel/php-shell/tree/master/protected/modules/Triggers)
+- [SSH](https://github.com/evildevel/php-shell/tree/master/protected/modules/SSH)
+- [Cron](https://github.com/evildevel/php-shell/tree/master/protected/modules/Cron)
 
 ### Files
 ```
@@ -48,27 +50,15 @@ Simple E-Mail sending. Senders and letters management system.
 ### Methods
 ```php
 // Send E-Mail message
-array APP::Module('Mail')->Send(string $transport, array $from, string $to, string $subject, array $message[, array $headers = false])
+array APP::Module('Mail')->Send(string $recepient, int $letter[, mixed $params = false])
 ```
 
 ### Examples
 ```php
 APP::Module('Mail')->Send(
-    'default',
-    Array(
-        'from email', 
-        'from name'
-    ), 
-    'to email', 
-    'subject', 
-    Array(
-        'html message',
-        'plaintext message'
-    ),
-    // headers (optional)
-    Array(
-        'List-id' => 'php-shell'
-    )
+    'user@domain.com',  // Recepient E-Mail
+    1,                  // Letter ID
+    ['name' => 'Max']   // Available in a letter like $data['name']
 );
 ```
 
@@ -86,7 +76,8 @@ APP::Module('Mail')->Send(
 - Remove group of senders
 - Update group of senders
 - Update mail settings
-- Send mail
+- Send mail (before)
+- Send mail (after)
 - Add transport
 - Remove transport
 - Update transport

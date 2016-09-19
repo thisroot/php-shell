@@ -51,8 +51,8 @@ class TaskManager {
                 ]
             ) as $task) {
                 APP::Module('Triggers')->Exec('taskmanager_exec', [
-                    'task' => $task, 
-                    'result' => call_user_func_array([APP::$modules[$task['module']], $task['method']], json_decode($task['args'], true))
+                    'task' => $task,
+                    'result' => call_user_func_array([APP::Module($task['module']), $task['method']], json_decode($task['args'], true))
                 ]);
                 
                 APP::Module('DB')->Update($this->settings['module_taskmanager_db_connection'], 'task_manager', [

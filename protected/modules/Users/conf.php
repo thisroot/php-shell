@@ -7,7 +7,7 @@ return [
         ['users\/login\/google(\?.*)?',                                         'Users', 'LoginGoogle'],                // Login via Google
         ['users\/login\/ya(\?.*)?',                                             'Users', 'LoginYA'],                    // Login via Yandex
         ['users\/login\/double\/(?P<return_hash>.*)',                           'Users', 'DoubleLoginForm'],            // Double login form
-        ['users\/activate\/(?P<user_id_hash>.*)',                               'Users', 'Activate'],                   // User activation
+        ['users\/activate\/(?P<user_id_hash>.*)\/(?P<params>.*)',               'Users', 'Activate'],                   // User activation
         ['users\/profile(\?.*)?',                                               'Users', 'Profile'],                    // User profile
         ['users\/logout(\?.*)?',                                                'Users', 'Logout'],                     // Logout
 

@@ -53,14 +53,14 @@
     <br>
     <a href="javascript:void(0)" onclick="return confirm('Are you sure?') ? Logout(this) : false;">Logout</a>
     
-    <h2>Social networks</h2>
+    <h2>Accounts</h2>
     <?
     if (count($data['social-profiles'])) {
         ?>
         <ul>
             <?
             foreach ($data['social-profiles'] as $profile) {
-                switch ($profile['network']) {
+                switch ($profile['service']) {
                     case 'vk': ?><li><a href="https://vk.com/id<?= $profile['extra'] ?>" target="_blank">VK</a></li><? break;
                     case 'fb': ?><li><a href="http://facebook.com/profile.php?id=<?= $profile['extra'] ?>" target="_blank">Facebook</a></li><? break;
                     case 'google': ?><li><a href="https://plus.google.com/u/0/<?= $profile['extra'] ?>" target="_blank">Google</a></li><? break;

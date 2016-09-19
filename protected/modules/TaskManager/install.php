@@ -287,13 +287,14 @@ $db->query('ALTER TABLE `task_manager` ADD PRIMARY KEY (`id`),ADD KEY `token` (`
 $db->query('ALTER TABLE `task_manager` MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;');
 
 APP::Module('Registry')->Add('module_taskmanager_db_connection', $_SESSION['core']['install']['taskmanager']['db_connection']);
+APP::Module('Registry')->Add('module_taskmanager_ssh_connection', $_SESSION['core']['install']['taskmanager']['ssh_connection']);
 APP::Module('Registry')->Add('module_taskmanager_complete_lifetime', $_SESSION['core']['install']['taskmanager']['settings']['complete_lifetime']);
 APP::Module('Registry')->Add('module_taskmanager_max_execution_time', $_SESSION['core']['install']['taskmanager']['settings']['max_execution_time']);
 APP::Module('Registry')->Add('module_taskmanager_memory_limit', $_SESSION['core']['install']['taskmanager']['settings']['memory_limit']);
 APP::Module('Registry')->Add('module_taskmanager_tmp_dir', $_SESSION['core']['install']['taskmanager']['settings']['tmp_dir']);
 
-APP::Module('Cron')->Add($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php TaskManager Exec']);
-APP::Module('Cron')->Add($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php TaskManager GC']);
+APP::Module('Cron')->Add($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php TaskManager Exec []']);
+APP::Module('Cron')->Add($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php TaskManager GC []']);
 
 APP::Module('Registry')->Add('module_trigger_type', '["taskmanager_add", "Task Manager", "Add task"]');
 APP::Module('Registry')->Add('module_trigger_type', '["taskmanager_update", "Task Manager", "Update task"]');

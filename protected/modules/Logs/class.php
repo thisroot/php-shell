@@ -16,7 +16,7 @@ class Logs {
     
     public function View() {
         $file = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['filename_hash']);
-        APP::Render('logs/admin/view', 'include', [$file, file($file)]);
+        APP::Render('logs/admin/view', 'include', [$file, file($file, FILE_SKIP_EMPTY_LINES)]);
     }
     
     
