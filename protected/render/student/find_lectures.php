@@ -22,6 +22,7 @@
 
 
      <? APP::Render('core/widgets/css') ?>
+    <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
         .toggle-switch {
             margin-top: 10px;
@@ -56,9 +57,13 @@
         }
         
         #lectures-table td a {
-            padding:15px;
+            padding:10px;
             display: block;
             width: 100%;
+        }
+        
+        #module-student #content a, #module-student .card-header h2, #module-student .input-group-addon   {
+            color: #7e57c2;
         }
         
         
@@ -67,12 +72,20 @@
 
 
 </head>
-<body data-ma-header="purple-400">
-    <?
-    APP::Render('student/widgets/header', 'include', [
-        'BackUp' => 'admin/backup/settings'
-    ]);
-    ?>
+<body  id="module-student">
+    
+    
+    <!-- Render Header -->
+   <? 
+   if(APP::Module('Users')->user['role'] != 'default') {
+   APP::Render('student/widgets/header', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+   ]); } else {
+      APP::Render('student/widgets/header');
+    } ?>
+     <!-- Stop Render Header -->
+     
+     
     <section id="main">
         <? APP::Render('student/widgets/sidebar') ?>
 
@@ -81,10 +94,8 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="card">
-                            <div class="card-header">
-                                <h2>Search lectures
-                                    <small>Try to find what you need</small>
-                                </h2>
+                            <div style="padding:5px" class="card-header">
+                                
                             </div>
                             <div class="card-body">
 
@@ -92,7 +103,7 @@
                                 <thead>
                                     <tr>
                                         <th class="th-link" data-column-id="id" data-visible="false" data-width="20%">ID</th>
-                                        <th class="th-link"  data-column-id="name" data-formatter="link">Name</th>
+                                        <th class="th-link"  data-column-id="name" data-formatter="link">lectures</th>
                                       
                                     </tr>
                                 </thead>
@@ -117,7 +128,7 @@
                                         <span class="input-group-addon"><i class="zmdi zmdi-graduation-cap"></i></span>
                                         <div class="fg-line">
                                             <select class="select2" id="university" data-ph="university"  data-set="university">
-                                                <option></option>
+                                                 <option></option>
                                             </select>
                                         </div>
                                     </div>
@@ -188,8 +199,12 @@
     <script>
     $(document).ready(function() {
         
-         var connections_table = $("#lectures-table").bootgrid({
-                    rowCount: [4,10,20],
+        $("#lectures-table").bootgrid({
+                searchSettings: {
+                    delay: 500,
+                    characters: 3
+                    },
+                    rowCount: [6,15,30],
                     ajax: true,
                     ajaxSettings: {
                         method: 'POST',
@@ -207,7 +222,14 @@
                     formatters: {
          
                         link: function(column, row){
-                                return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' + row.name + '</a>';
+                        return    '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' +
+                            '<div class="list-group-item media">'+
+                                    '<div class="pull-left"><img class="avatar-img" src="img/profile-pics/1.jpg" alt=""></div>'+
+                                    '<div class="pull-right">hello</div>' +
+                                            '<div class="media-body"><div class="lgi-heading">' + row.name + '</div>'+
+                                            '<small class="lgi-text">'+row.country+' | '+ row.city +' | '+ row.university +'</small></div></div></a>';
+ 
+                              //  return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' + row.name + '</a>';
                         }
                     },
                         
@@ -216,6 +238,7 @@
                         request.university = $('#university :selected').text().replace(/\s+/g,' ');
                         request.faculty = $('#faculty :selected').text().replace(/\s+/g,' ');
                         request.chair = $('#chair :selected').text().replace(/\s+/g,' ');
+                        request.id_user_hash = '<?= APP::Module('Crypt')->Encode(isset(APP::Module('Users')->user['id'])?APP::Module('Users')->user['id']:'default') ?>';
                      
                         return request;
                     }    
@@ -234,8 +257,10 @@
                       search: params.term,
                       page: params.page,
                       set: $(this).data('set'),
+                      lang: 'RU',
+                      type: 'filter'
                     
-                    }
+                    };
                     return query;
                 },
                   url: '<?= APP::Module('Routing')->root ?>students/user/api/get/filter/lectures.json',
@@ -263,7 +288,7 @@
                     searchTimeout = setTimeout(function () {
                         $('#lectures-table').bootgrid('reload');
                     }, 500);
-                });;
+                });            
         });
 
 

@@ -1,8 +1,10 @@
-<header id="header" class="media">
+<header  id="header" class="media">
     <div class="pull-left h-logo">
         <a href="<?= APP::Module('Routing')->root ?>" class="hidden-xs">
+        <img style="width: 200px;" src="<?= APP::Module('Routing')->root ?>public/modules/students/img/logo-students-tool.png" alt=""/>
+        <!--
             STUDENT'S TOOL  
-            <small>LECTIONS & EXAMS</small>
+            <small>LECTIONS & EXAMS</small> -->
         </a>
     </div>
 
@@ -14,6 +16,7 @@
                     <a data-action="fullscreen" href=""><i class="zmdi zmdi-fullscreen"></i> Toggle Fullscreen</a>
                 </li>
             </ul>
+            
         </li>
         <li class="hm-alerts" data-user-alert="shell-app" data-ma-action="sidebar-open" data-ma-target="user-alerts">
             <a href=""><i class="hm-icon zmdi zmdi-settings"></i></a>
@@ -21,7 +24,9 @@
         <? if(isset(APP::Module('Users')->user['email'])) { ?>
         <li class="dropdown hm-profile">
             <a data-toggle="dropdown" href="">
+               <? if(isset($data['img']) && ($data['img'] != NULL)) { echo '<img src="'.$data['img'].'">';} else { ?>
                 <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . 'public/ui/img/profile-pics/default.png') ?>&t=<?= time() ?>">
+               <? } ?>
             </a>
 
             <ul class="dropdown-menu pull-right dm-icon">
@@ -57,4 +62,5 @@
      <?   } ?>
         
     </ul>
+   
 </header>

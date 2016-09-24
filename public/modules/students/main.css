@@ -1,0 +1,402 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 20.09.2016, 21:13:15
+    Author     : User
+*/
+
+/*
+[data-ma-header="purple-400"]::before, [data-ma-header="purple-400"] #header {
+    background-color: #AB47BC;
+    background-image: url("https://nebesa.me/public/modules/students/img/1.jpg");
+}
+*/
+
+body:before {
+       background-image: url("https://nebesa.me/public/modules/students/img/9.jpg");
+       background-position: left center;
+       height: 300px;
+}
+
+#s-main-menu, .sub-menu > a::before, .sub-menu > a::after {
+ /* padding-top: 40px; */
+ position: fixed;
+ top: 200px;
+}
+
+.hm-profile > a img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid;
+}
+
+.avatar-img, .avatar-char {
+    border-radius: 50%;
+    border: 2px solid;
+}
+
+.toggle-switch {
+    margin-top: 2px;
+    color: #7E57C2;
+}
+
+#module-student .fg-line:not([class*="has-"])::after {
+    background: #7E57C2;
+}
+
+#module-student .has-error .input-group-addon {
+    color: #fff !important;
+    border-color: #ab47bc;
+    background-color: #ab47bc;
+}
+
+#module-student .has-error .help-block, .has-error .control-label, 
+#module-student .has-error .radio, .has-error .checkbox, 
+#module-student .has-error .radio-inline, .has-error .checkbox-inline, 
+#module-student .has-error.radio label, .has-error.checkbox label, 
+#module-student .has-error.radio-inline label, 
+#module-student .has-error.checkbox-inline label {
+    color: #ab47bc;
+    position: absolute;
+    left: 0px;
+}
+
+#module-student .has-error .form-control-feedback {
+    color: #ab47bc;
+}
+
+#module-student .has-error .form-control {
+    border-color: #ab47bc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.h-logo a small {
+    font-size: 14px;
+}
+
+.select2-container {
+    margin-top: 8px;
+}
+
+#module-student .select2-container--default .select2-selection--single {
+    background-color: #fff;
+    border: 0px;
+    border-bottom: 1px solid #e0e0e0;;
+    border-radius: 0px;
+    color: #7E57C2;
+}
+
+#module-student .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #7E57C2;
+}
+
+
+.fg-line:not(.form-group) {
+    padding-left: 8px;
+}
+
+.round-button-container{
+    list-style: none;
+    padding: 0;
+    margin: 30px 0 60px;
+    padding-left: 40px;
+}
+
+.round-button-container > li {
+    display: inline-block;
+
+    /* background-color: rgba(255, 255, 255, 0.2); */
+    margin-right: 13px;
+    color: #fff;
+    font-size: 20px;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.custom-counter {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.custom-counter li {
+    counter-increment: step-counter;
+    margin-bottom: 10px;
+}
+
+.custom-counter li::before {
+    content: counter(step-counter);
+    margin-right: 5px;
+    font-size: 80%;
+    background-color: rgb(0,200,200);
+    color: white;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 3px;
+}
+
+.block__list { 
+    max-width: 100%;   
+}
+
+/* editable */
+
+.editable-input, .form-control:not(.fc-alt), .form-inline .form-group {
+    width: 100%;
+}
+
+#module-student .card .actions .editable-input, #module-student .card .actions .form-inline .form-group {
+    width: 60px;
+}
+
+#module-student .card .actions select.input-sm {
+    height: 20px;
+    line-height: 20px;
+}
+
+.editable-container.editable-inline {
+    width: 50%;
+}
+
+
+
+
+#items .editableform {
+    margin-bottom: 0;
+    position: absolute;
+    left: 60px;
+    background-color: white;
+    z-index: 1;
+    margin-top: 8px;
+    width: 50%;
+
+}
+
+/* Dragging */
+.drag-handle {
+    margin-top: 8px;
+    position: absolute;
+    right: 60px;
+    color: #7e57c2;
+    z-index: 1;
+}
+
+.js-remove {
+    position: absolute;
+    right: 20px;
+    z-index: 1;
+    margin-top: 8px;
+    margin-right: 10px;
+    font: bold 20px Sans-Serif;
+    color: #7e57c2;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.js-edit, .js-save {
+    margin-top: 8px;
+    position: absolute;
+    right: 100px;
+    z-index: 1;
+    margin-right: 10px;
+    font: bold 20px Sans-Serif;
+    color: #7e57c2;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.block-name {
+    position: absolute;
+    left: 60px;
+    z-index: 1;
+    margin-right: 10px;
+    font-size: 14px;
+    color: #7e57c2;
+    display: inline-block;
+    background-color: white;
+    padding-top: 8px;
+
+}
+
+.button-hover:hover {
+    border: 1px solid #5f9edf;
+    background-color: #ececec;
+    border-radius: 3px;
+}
+
+/* summernote */
+.note-toolbar.panel-heading:before, .note-toolbar.panel-heading:after {
+    content: "";
+}
+
+ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
+    width: 110px; 
+}
+
+#module-student .card > .actions, #module-student .card-header .actions {
+    top: 27px;
+}
+
+#module-student #content a ,
+#module-student .card a,  
+#module-student .card-header h2,
+#module-student .input-group-addon {   
+    color: #7e57c2;
+}
+
+
+
+#module-student .card .editable-click, a.editable-click, a.editable-click:hover {
+    text-decoration: none;
+    border-bottom: dashed 1px #7e57c2;
+}
+
+#module-student .card .input-group-addon,  #module-student .card button,  #module-student .btn-default   {
+    color: #7e57c2;
+}
+
+#module-student .card button.bg {
+    color: white;
+}
+
+#module-student .note-editor .card .input-group-addon,  #module-student .note-editor .btn-default   {
+    color: #7e57c2;
+    background-color: #d5d5d5;
+}
+
+#module-student .card .note-editor .note-toolbar > .btn-group > .active, .note-popover .note-toolbar > .btn-group > .active, 
+#module-student .card .note-editor .popover-content > .btn-group > .active, .note-popover .popover-content > .btn-group > .active {
+    background: #F9F9F9;
+}
+
+#module-student .note-editor .note-editing-area .note-editable {
+    background-color: #EDECEC;
+
+}
+
+#module-student .note-editor .note-toolbar, .note-popover .note-toolbar, .note-editor .popover-content, .note-popover .popover-content {
+    background: #d5d5d5;
+}
+
+#module-student .card > .actions, .card-header .actions {
+    right: 30px;
+}
+
+#module-student .card .actions .dropdown a.dropdown-toggle {
+    color: white;
+}
+
+#lectures-table td {
+    padding: 0px 15px;
+}
+
+#lectures-table td a.link {
+    padding:15px;
+    display: block;
+    width: 100%;
+    color: #7e57c2;
+}
+
+#module-student .no-results {
+    padding: 30px;
+    color: rgb(126, 87, 194);
+    font-size: 16px;
+}
+
+.bootgrid-table  thead  th {
+    background-color: rgb(226, 226, 226);
+}
+
+.table > thead:first-child > tr:first-child > th {
+    background-color: #ede7f6;
+}
+
+#module-student #content .dropdown a.dropdown-toggle {
+    color: white;
+}
+
+#upload-photo {
+    display: none; 
+}
+
+#upload-photo.ready {
+    display: block;
+}
+
+#default-photo {
+
+    background-color: rgb(237, 236, 236);
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+}
+
+#default-photo img {
+
+    width: 100%;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+}
+
+#default-photo img:hover {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+}
+
+#default-photo div  {
+    position: absolute;
+    bottom: 40px;
+    width: calc(100% - 60px);
+    left: 0;
+    margin-left: 30px;
+    text-align: center;
+    background-color: rgb(188, 188, 188);
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    transition: .5s ease-in-out;
+
+}
+
+#default-photo div:hover {
+    background-color: rgba(171, 71, 188, 0.72);
+}
+
+#upload-buttons {
+    margin-top: 20px;
+}
+
+.lgi-heading.name {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 0px;
+}
+
+.lgi-text.about {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.round-button-container .media {
+    width: 200px;
+}
+
+.bootgrid-table .list-group-item {
+    position: relative;
+    display: block;
+    padding: 0px;
+    margin-bottom: -1px;
+    background-color: transparent;
+    border: none;
+}
+
+.bootgrid-table .lgi-heading {
+    color: #7E57C2;
+    margin-bottom: 4px;
+}

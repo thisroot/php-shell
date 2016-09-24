@@ -21,111 +21,35 @@
     <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/farbtastic/farbtastic.css" rel="stylesheet" type="text/css"/>
 
 
-     <? APP::Render('core/widgets/css') ?>
-    <style type="text/css">
+    <? APP::Render('core/widgets/css') ?>
+    <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
+ 
+<style type="text/css">
         .toggle-switch {
-            margin-top: 4px;
+            margin-top: 10px;
         }
-
-        .h-logo a small {
+        
+        .h-logo a {
             font-size: 14px;
         }
-
+        
         .main-menu {
             padding-top: 120px;
         }
-
-        .select2-container {
-            margin-top: 8px;
-        }
-
-        .select2-container--default .select2-selection--single {
-            background-color: #fff;
-            border: 0px;
-            border-bottom: 1px solid #e0e0e0;;
-            border-radius: 0px;
-        }
         
-      
-        .fg-line:not(.form-group) {
-            padding-left: 8px;
+        .not-active {
+            pointer-events: none;
+            cursor: default;
         }
-        
-        #lectures-table td {
-            padding: 0px 15px;
-        }
-        
-        #lectures-table td a {
-            padding:15px;
-            display: block;
-            width: 100%;
-        }
-        
-        #upload-photo {
-            display: none; 
-        }
-        
-        #upload-photo.ready {
-         display: block;
-        }
-        
-        #default-photo {
-          
-           background-color: rgb(237, 236, 236);
-           width: 100%;
-           height: 260px;
-           overflow: hidden;
-        }
-        
-        #default-photo img {
-         
-            width: 100%;
-            -webkit-transform: scale(1);
-            transform: scale(1);
-            -webkit-transition: .3s ease-in-out;
-            transition: .3s ease-in-out;
-        }
-
-        #default-photo img:hover {
-            -webkit-transform: scale(1.3);
-            transform: scale(1.3);
-        }
-        
-        #default-photo div  {
-            position: absolute;
-            bottom: 40px;
-            width: calc(100% - 60px);
-            left: 0;
-            margin-left: 30px;
-            text-align: center;
-            background-color: rgba(156, 156, 156, 0.72);
-            padding: 10px;
-            color: white;
-            cursor: pointer;
-            transition: .5s ease-in-out;
-           
-        }
-        
-         #default-photo div:hover {
-             background-color: rgba(171, 71, 188, 0.72);
-         }
-         
-         #upload-buttons {
-             margin-top: 20px;
-         }
-
-        
-
     </style>
 
-
 </head>
-<body data-ma-header="purple-400">
-    <?
-    APP::Render('student/widgets/header', 'include', [
-        'BackUp' => 'admin/backup/settings'
-    ]);
-    ?>
+<body  id="module-student">
+    <!-- Render Header -->
+   <? APP::Render('student/widgets/header', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+           ]); ?>
+     <!-- Stop Render Header -->
     <section id="main">
         <? APP::Render('student/widgets/sidebar') ?>
 
@@ -154,7 +78,7 @@
 
                                 <div id="default-photo">
                                     <? if($data['user_settings']['img_crop'] != NULL) {
-                                         echo ' <img src="'.$data['user_settings']['img_full'].'"/>';
+                                         echo ' <img src="'.$data['user_settings']['img_crop'].'"/>';
                                     } 
                                     else {
                                         echo ' <img style="padding:30px;" src="'.APP::Module('Routing')->root.'public/modules/students/img/social.svg"/>';
@@ -218,7 +142,7 @@
 
                                                 <span class="input-group-addon"><i class="zmdi zmdi-email"></i></span>    
                                                 <div class="fg-line">
-                                                    <input value="<?= $data['user_settings']['email'] ?>" id="user_email" class="form-control" placeholder="email" type="text">
+                                                    <input value="<?= $data['user_settings']['email'] ?>" id="user_email" class="form-control" placeholder="email" type="email">
                                                 </div>
                                             </div>
                                         </div>
@@ -353,8 +277,8 @@
                                                 <div class="fg-line">
                                                      <select id="user_priv_view" class="selectpicker">                                                      
                                                         <option value="0">for all</option>                                                       
-                                                        <option value="1">for groups </option>                                                     
-                                                        <option value="2">for friends </option>
+                                                        <option value="1">for univercity </option>                                                     
+                                                        <option value="2">for classmates </option>
                                                         <option value="3">looked for all </option>
                                                     </select>
                                                 </div>
@@ -368,18 +292,15 @@
                                                 <div class="fg-line">
                                                      <select id="user_priv_edit" class="selectpicker">                                                      
                                                         <option value="0">for all</option>                                                       
-                                                        <option value="1">for groups </option>                                                     
-                                                        <option value="2">for friends </option>
+                                                        <option value="1">for university </option>                                                     
+                                                        <option value="2">for classmates </option>
                                                         <option value="3">looked for all </option>
                                                     </select>
                                                 </div>
                                             </div>
                                             </div>
                                         </div>
-                                   
-                                   
-                                    
-
+                                                                                                       
                                 </div>
                             </div>
                         </div>
@@ -412,6 +333,9 @@
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/fileinput/fileinput.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/input-mask/input-mask.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/farbtastic/farbtastic.min.js" type="text/javascript"></script>
+    
+    <!-- Module Script -->
+    <script src="<?= APP::Module('Routing')->root ?>public/modules/students/main.js" type="text/javascript"></script>
     
 <? APP::Render('core/widgets/js') ?>
 
@@ -467,7 +391,7 @@
 		$('#upload-result').on('click', function (ev) {
 			$uploadCrop.croppie('result', {
 				type: 'canvas',
-				size: 'viewport'
+				size: [200,200]
 			}).then(function (resp) {
                                                      
                            var data = {
@@ -483,14 +407,22 @@
                                 url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/settings.json',
                                 data: data ? data : [0],
                                 success: function (result) {
-
+                                    
+                                    
+                                    $('#default-photo img').attr('src',img_crop).removeAttr('style');
+                                    $('#default-photo').removeClass('hidden');
+				    $('#upload-photo').removeClass('ready');
+                                    $('#upload-buttons').addClass('hidden');
+                                    
+                                    // enable if you want to uplad full image
+/*
                                     $uploadCrop.croppie('result', {
                                         type: 'canvas',
                                         size: 'original'
                                     }).then(function (resp) {
 
                                         var data = {
-                                             id_hash: '<?= APP::Module('Crypt')->Encode(APP::Module('Users')->user['id']) ?>',
+                                             id_hash: '<?//= APP::Module('Crypt')->Encode(APP::Module('Users')->user['id']) ?>',
                                              action: 'image-full',
                                              data: resp
                                          }
@@ -499,7 +431,7 @@
 
                                          $.ajax({
                                              type: 'post',
-                                             url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/settings.json',
+                                             url: '<?//= APP::Module('Routing')->root ?>students/user/api/edit/settings.json',
                                              data: data ? data : [0],
                                              success: function (result) {
                                                 
@@ -512,7 +444,7 @@
                                          });
 
                                     });
-
+*/
                                 } 
                             });
                             
@@ -584,22 +516,22 @@
             phone.closest('.form-group').removeClass('has-error has-feedback').find('.form-control-feedback, .help-block').remove();
             
              if (first_name.val() === '') {
-                    first_name.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    first_name.closest('.form-group').addClass('has-error has-feedback').find('.input-group').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
                     return false;
                 }
                 
              if (last_name.val() === '') {
-                    last_name.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    last_name.closest('.form-group').addClass('has-error has-feedback').find('.input-group').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
                     return false;
                 }
                 
-             if (email.val() === '') {
-                    email.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+             if ((email.val() === '') || (!validateEmail(email.val()))) {
+                    email.closest('.form-group').addClass('has-error has-feedback').find('.input-group').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
                     return false;
                 }
                 
              if (phone.val() === '') {
-                    phone.closest('.form-group').addClass('has-error has-feedback').find('.col-sm-3').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
+                    phone.closest('.form-group').addClass('has-error has-feedback').find('.input-group').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Not specified</small>');
                     return false;
                 }
                 
@@ -649,9 +581,12 @@
                                 });
                                 
                                 break;
-                            case 'error':
-                                $.each(result.errors, function (i, error) {});
-                                break;
+                            case 'error':     
+                                        switch(result.error) {
+                                            case 2: email.closest('.form-group').addClass('has-error has-feedback').find('.input-group').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Already registered</small>'); break;
+                                        }
+                                    
+                                    break;
                         }
                     }
                 });
@@ -677,6 +612,7 @@
                          search: params.term,
                          page: params.page,
                          set: $(this).data('set'),
+                         lang: $('#lang:checked').val()?1:0,
                          // set specific fields
                          id_country: ($('#country'))?$('#country').val():"",
                          id_city: ($('#city'))?$('#city').val():"",

@@ -1,7 +1,7 @@
 <?
 return [
     'routes' => [
-      ['',                                                               'Student', 'Index'],              // View all backups /admin
+      ['',                                                               'Student', 'LectureFind'],              // View all backups /admin
       ['students\/user\/lectures\/add(\?.*)?',                           'Student', 'LectureAdd'],         // View all backups /admin
       ['students\/user\/lectures\/list(\?.*)?',                          'Student', 'LectureList'],        // View all backups /admin
       ['students\/lectures\/find(\?.*)?',                                'Student', 'LectureFind'],        // View all backups /admin

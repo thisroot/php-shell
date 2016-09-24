@@ -1,0 +1,81 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 22.09.2016, 8:58:09
+    Author     : User
+*/
+
+.cke_chrome {
+    border: none;
+    box-shadow: none;
+}
+
+.cke_top, .cke_bottom {
+    box-shadow: none;
+    border-bottom: none;
+    border-top: none;
+    background-image:none;
+    background-color: #d5d5d5;
+}
+
+.cke_toolgroup {
+    border: none;
+    border-radius: 0px;
+    background-color: #d5d5d5;
+    background-image: none;
+    box-shadow: none;
+}
+
+.cke_ltr .cke_button:first-child, .cke_rtl .cke_button:last-child { 
+    border-radius: 2px;
+}
+
+a.cke_button_off:hover, a.cke_button_off:focus, a.cke_button_off:active, a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:active {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: white;
+    background-image: none;
+    filter: none;
+    border-radius: 2px;
+}
+
+.cke_button_on {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: none;
+    background-color: #d5d5d5;
+    background-image: none;
+    filter: none;
+    
+}
+
+a.cke_button_on:hover, a.cke_button_on:focus, a.cke_button_on:active {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-color: #d5d5d5;
+}
+
+.cke_editable {
+    cursor: text;
+    background-color: #edecec;
+}
+
+.cke_wysiwyg_frame, .cke_wysiwyg_div, .cke_wysiwyg_frame html {
+    background-color: #edecec;
+}
+
+.cke_editable, .cke_contents {
+    background-color: #edecec;
+}
+
+
+
+
+
+

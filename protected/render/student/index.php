@@ -38,12 +38,12 @@
 
    
 </head>
-<body data-ma-header="purple-400">
-    <?
-    APP::Render('student/widgets/header', 'include', [
-        'BackUp' => 'admin/backup/settings'
-    ]);
-    ?>
+<body >
+   <!-- Render Header -->
+   <? APP::Render('student/widgets/header', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+           ]); ?>
+     <!-- Stop Render Header -->
     <section id="main">
         <? APP::Render('student/widgets/sidebar') ?>
 
@@ -53,7 +53,6 @@
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header">
-                                <?= $data['role']; ?>
                             </div>
                         </div>
                     </div>

@@ -22,47 +22,23 @@
 
 
      <? APP::Render('core/widgets/css') ?>
+    <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
-        .toggle-switch {
-            margin-top: 10px;
-        }
-
-        .h-logo a small {
-            font-size: 14px;
-        }
-
+       
         .main-menu {
             padding-top: 120px;
         }
-
-        .select2-container {
-            margin-top: 8px;
-        }
-
-        .select2-container--default .select2-selection--single {
-            background-color: #fff;
-            border: 0px;
-            border-bottom: 1px solid #e0e0e0;;
-            border-radius: 0px;
-        }
-        
-      
-        .fg-line:not(.form-group) {
-            padding-left: 8px;
-        }
-        
-        
 
     </style>
 
 
 </head>
-<body data-ma-header="purple-400">
-    <?
-    APP::Render('student/widgets/header', 'include', [
-        'BackUp' => 'admin/backup/settings'
-    ]);
-    ?>
+<body  id="module-student">
+     <!-- Render Header -->
+   <? APP::Render('student/widgets/header', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+           ]); ?>
+     <!-- Stop Render Header -->
     <section id="main">
         <? APP::Render('student/widgets/sidebar') ?>
 
@@ -76,19 +52,19 @@
                                     <small>see youself lectures</small>
                                 </h2>
                             </div>
-                            <div class="card-body card-padding">
+                            <div class="card-body">
                                 
                                <table class="table table-hover table-vmiddle" id="lectures-table">
                                 <thead>
                                     <tr>
-                                        <th data-column-id="id" data-visible="false" data-width="20%">ID</th>
-                                        <th data-column-id="name">Name</th>
-                                        <th data-column-id="city" data-visible="false" data-width="20%">City</th>
-                                        <th data-column-id="country" data-visible="false" data-width="20%">Country</th>
-                                        <th data-column-id="university" data-visible="false" data-width="20%">University</th>
-                                        <th data-column-id="faculty" data-visible="false" data-width="20%">Faculty</th>
-                                        <th data-column-id="chair" data-visible="false" data-width="20%">Chair</th>
-                                        <th data-column-id="date" data-order="desc" data-visible="false" data-width="20%">Data</th>
+                                        <th data-column-id="id" data-formatter="link" data-visible="false" data-width="20%">ID</th>
+                                        <th data-column-id="name" data-formatter="link">Name</th>
+                                        <th data-column-id="city" data-formatter="link" data-visible="false" data-width="20%">City</th>
+                                        <th data-column-id="country" data-formatter="link" data-visible="false" data-width="20%">Country</th>
+                                        <th data-column-id="university" data-formatter="link" data-visible="false" data-width="20%">University</th>
+                                        <th data-column-id="faculty" data-formatter="link" data-visible="false" data-width="20%">Faculty</th>
+                                        <th data-column-id="chair" data-formatter="link" data-visible="false" data-width="20%">Chair</th>
+                                        <th data-column-id="date" data-formatter="link" data-order="desc" data-visible="false" data-width="20%">Data</th>
                                         <th data-column-id="actions" data-formatter="actions" data-width="20%">Actions</th>
                                     </tr>
                                 </thead>
@@ -144,10 +120,13 @@
                     },
                     sorting: false,
                     formatters: {
-                        actions: function(column, row) {
-                            return  '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '/edit" class="btn btn-sm btn-default btn-icon waves-effect waves-circle"><span class="zmdi zmdi-edit"></span></a> ' +                                                          
-                                    '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-lecture" data-id_hash="'  + row.id_hash  + '"><span class="zmdi zmdi-delete"></span></a>';
-                        }
+                        actions: function(column, row) {                                           
+                                 return     '<a href="javascript:void(0)" class="btn btn-sm btn-default btn-icon waves-effect waves-circle remove-lecture" data-id_hash="'  + row.id_hash  + '"><span class="zmdi zmdi-delete"></span></a>';
+                        },
+                                
+                          link: function(column, row){
+                                return '<a class="link" href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' + row.name + '</a>';
+                        }       
                     }
                 }).on('loaded.rs.jquery.bootgrid', function () {
                 

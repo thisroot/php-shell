@@ -17,51 +17,27 @@
 
     <!-- Module Vendor CSS -->
     <link href="<?= APP::Module('Routing')->root ?>public/plugins/select2/dist/css/select2.css" rel="stylesheet" type="text/css"/>
+    
 
 
-
-     <? APP::Render('core/widgets/css') ?>
+    <? APP::Render('core/widgets/css') ?>
+    <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
-        .toggle-switch {
-            margin-top: 10px;
-        }
-
-        .h-logo a small {
-            font-size: 14px;
-        }
-
+       
         .main-menu {
             padding-top: 120px;
         }
-
-        .select2-container {
-            margin-top: 8px;
-        }
-
-        .select2-container--default .select2-selection--single {
-            background-color: #fff;
-            border: 0px;
-            border-bottom: 1px solid #e0e0e0;;
-            border-radius: 0px;
-        }
         
-      
-        .fg-line:not(.form-group) {
-            padding-left: 8px;
-        }
-        
-        
-
     </style>
 
 
 </head>
-<body data-ma-header="purple-400">
-    <?
-    APP::Render('student/widgets/header', 'include', [
-        'BackUp' => 'admin/backup/settings'
-    ]);
-    ?>
+<body  id="module-student">
+    <!-- Render Header -->
+   <? APP::Render('student/widgets/header', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+           ]); ?>
+     <!-- Stop Render Header -->
     <section id="main">
         <? APP::Render('student/widgets/sidebar') ?>
 
@@ -226,6 +202,9 @@
                         university: university.text(),
                         faculty: faculty.text(),
                         chair: chair.text(),
+                        privacy_view: '<?= $data['settings']['privacy_view'] ?>',
+                        privacy_edit: '<?= $data['settings']['privacy_edit'] ?>',
+                        id_hash: '<?= APP::Module('Crypt')->Encode($data['settings']['id']) ?>'
                     }
                     
                     
