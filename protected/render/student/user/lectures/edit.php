@@ -149,8 +149,12 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/ckeditor/ckeditor.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/ckeditor/adapters/jquery.js" type="text/javascript"></script>
+    
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script>
 
     <link href="<?= APP::Module('Routing')->root ?>public/modules/students/ckeditor.css" rel="stylesheet" type="text/css"/>
+    
 
 <? APP::Render('core/widgets/js') ?>
 

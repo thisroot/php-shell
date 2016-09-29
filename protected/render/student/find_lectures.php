@@ -104,6 +104,7 @@
                                     <tr>
                                         <th class="th-link" data-column-id="id" data-visible="false" data-width="20%">ID</th>
                                         <th class="th-link"  data-column-id="name" data-formatter="link">lectures</th>
+                                        <th data-width="10%" data-column-id="privacy" data-formatter="privacy"></th>
                                       
                                     </tr>
                                 </thead>
@@ -192,6 +193,8 @@
 
     <!-- Module addition Libraries -->
     <script src="<?= APP::Module('Routing')->root ?>/public/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root ?>public/plugins/moment/min/moment.min.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root ?>public/plugins/moment/locale/ru.js" type="text/javascript"></script> 
 
 
 <? APP::Render('core/widgets/js') ?>
@@ -199,12 +202,23 @@
     <script>
     $(document).ready(function() {
         
+       
+
         $("#lectures-table").bootgrid({
+                labels: {
+                    loading:  
+                        '<div class="preloader pls-purple p-t-25">' + 
+                                '<svg class="pl-circular" viewBox="25 25 50 50">' + 
+                                    '<circle class="plc-path" cx="50" cy="50" r="20"></circle>' +
+                                '</svg>' + 
+                            '</div>'
+                },
+                
                 searchSettings: {
                     delay: 500,
                     characters: 3
                     },
-                    rowCount: [6,15,30],
+                    rowCount: [10,15,30],
                     ajax: true,
                     ajaxSettings: {
                         method: 'POST',
@@ -224,15 +238,23 @@
                         link: function(column, row){
                         return    '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' +
                             '<div class="list-group-item media">'+
-                                    '<div class="pull-left"><img class="avatar-img" src="img/profile-pics/1.jpg" alt=""></div>'+
-                                    '<div class="pull-right">hello</div>' +
+                                    '<div class="pull-left"><img class="avatar-img" src="'+ row.img +'" alt=""></div>'+
+                                    '<div class="pull-right p-t-10"><div class="time">'+ moment(row.date).fromNow() +'</div></div>' +
                                             '<div class="media-body"><div class="lgi-heading">' + row.name + '</div>'+
                                             '<small class="lgi-text">'+row.country+' | '+ row.city +' | '+ row.university +'</small></div></div></a>';
  
                               //  return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' + row.name + '</a>';
-                        }
-                    },
-                        
+                        },
+                       privacy: function(column,row) {
+                           if(row.edit == 1) {
+                               return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' +
+                                       '<span class="p-10"><i class="zmdi zmdi-scissors zmdi-hc-fw f-16"></i></span></a>'
+                        } else {
+                                return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' +
+                                        '<span class="p-10"><i class="zmdi zmdi-eye zmdi-hc-fw f-16"></i></span></a>'
+                            }
+                        }                       
+                        },
                      requestHandler : function (request) {
                        
                         request.university = $('#university :selected').text().replace(/\s+/g,' ');
@@ -242,7 +264,7 @@
                      
                         return request;
                     }    
-                })
+                });
            
            
          $.each($('.select2'), function() {
@@ -290,6 +312,8 @@
                     }, 500);
                 });            
         });
+        
+      
 
 
 });

@@ -1,6 +1,7 @@
 <?
 
 class Student {
+
     public $user_data;
 
     function __construct($conf) {
@@ -32,9 +33,9 @@ class Student {
     }
 
     public function AddUser($id, $data) {
-        APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_settings(id) VALUES('.$data['id'].')');
-        APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_templates(id,id_user) VALUES(NULL,'.$data['id'].')');
-        
+        APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_settings(id) VALUES(' . $data['id'] . ')');
+        APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_templates(id,id_user) VALUES(NULL,' . $data['id'] . ')');
+
         return 1;
     }
 
@@ -124,48 +125,53 @@ class Student {
                         ])
         );
     }
-    
+
     // надо усовершенствовать алгоритм выборки, сейчас при сравнении факультетов не учитывается институт
-    public function Relations($first_user_id, $second_user_id,$role_compare) {
-        if(($first_user_id || $second_user_id) == 'default') {
+    public function Relations($first_user_id, $second_user_id, $role_compare) {
+        if (($first_user_id || $second_user_id) == 'default') {
             return 0;
         }
         // friends, groups =>: at group, at university
         switch ($role_compare) {
             case 'university':
-                
-                foreach (APP::Module('DB')->Open('auto')->query('SELECT 
+
+                foreach (APP::Module('DB')->Open('auto')->query('SELECT
                     count(university) as count
                     FROM student_lectures
-                    WHERE ((id_user = '.$first_user_id.')
+                    WHERE ((id_user = ' . $first_user_id . ')
                     AND university IN (
                         SELECT DISTINCT
                         university
                         FROM student_lectures
-                        WHERE (id_user = '.$second_user_id.')))',PDO::FETCH_ASSOC) as $value) {       
+                        WHERE (id_user = ' . $second_user_id . ')))', PDO::FETCH_ASSOC) as $value) {
+                    
                 }
-               
-                if($value['count'] == 0) {
+
+                if ($value['count'] == 0) {
                     return 0;
-                } else {return 1;}
+                } else {
+                    return 1;
+                }
             case 'classmates':
-                
-               foreach (APP::Module('DB')->Open('auto')->query('SELECT 
+
+                foreach (APP::Module('DB')->Open('auto')->query('SELECT
                     count(faculty) as count
                     FROM student_lectures
-                    WHERE ((id_user = '.$first_user_id.')
+                    WHERE ((id_user = ' . $first_user_id . ')
                     AND faculty IN (
                         SELECT DISTINCT
                         faculty
                         FROM student_lectures
-                        WHERE (id_user = '.$second_user_id.')))',PDO::FETCH_ASSOC) as $value) {
+                        WHERE (id_user = ' . $second_user_id . ')))', PDO::FETCH_ASSOC) as $value) {
+                    
                 }
-               
-                if($value['count'] == 0) {
+
+                if ($value['count'] == 0) {
                     return 0;
-                } else {return 1;}
+                } else {
+                    return 1;
+                }
         }
-        
     }
 
     public function APILectureFind() {
@@ -180,28 +186,28 @@ class Student {
         $list = APP::Module('DB')->Select(
                 'auto', [ 'fetchAll', PDO::FETCH_ASSOC], [$_POST['set']], 'student_lectures', [], [], [$_POST['set']]);
         $out = [];
-        
-        
+
+
 
         foreach ($list as $item => $value) {
             if (($_POST['search']) && (preg_match('/^.*' . $_POST['search'] . '.*/', $value[$_POST['set']]) === 0))
                 continue;
-            
+
             array_push($out, [
                 'id' => $item + 1,
                 'name' => $value[$_POST['set']],
             ]);
         }
-        
-        if(count($out) == 0) {
+
+        if (count($out) == 0) {
             foreach ($list as $item => $value) {
-                 array_push($out, [
-                'id' => $item + 1,
-                'name' => $value[$_POST['set']],
-            ]);
+                array_push($out, [
+                    'id' => $item + 1,
+                    'name' => $value[$_POST['set']],
+                ]);
             }
         }
-        
+
         echo json_encode($out);
         exit();
     }
@@ -227,7 +233,8 @@ class Student {
             $faculty = $item['faculty'];
             $chair = $item['chair'];
 
-            if (($_POST['searchPhrase']) && (preg_match('/^.*' . $_POST['searchPhrase'] . '.*/', $list_name) === 0)) continue;
+            if (($_POST['searchPhrase']) && (preg_match('/^.*' . $_POST['searchPhrase'] . '.*/', $list_name) === 0))
+                continue;
 
             array_push($out, [
                 'id' => $item['id'],
@@ -263,98 +270,131 @@ class Student {
     public function APILectureOpenList() {
         $this->SetHeader();
 
-        $list = APP::Module('DB')->Select(
-                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['*'], 'student_lectures', [
-            ['privacy_view', 'NOT IN', [3], PDO::PARAM_INT],
-           // ['id_user', 'NOT IN', [APP::Module('Crypt')->Decode($_POST['id_user_hash'])], PDO::PARAM_INT],
-        ]);
-        
         /*
-         * $list = APP::Module('DB')->Select(
-                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], 
-                [
-                    'student_lectures.id',
-                    'student_lectures.id_user',
-                    'student_lectures.privacy_view',
-                    'student_lectures.privacy_edit',
-                    'student_lectures.name',
-                    'student_lectures.country',
-                    'student_lectures.city',
-                    'student_lectures.university',
-                    'student_lectures.faculty',
-                    'student_lectures.chair',
-                    'student_lectures.date_last_update',
-                    'student_user_settings.first_name',
-                    'student_user_settings.last_name',
-                    'student_user_settings.groups',
-                    'student_user_settings.friends',
-                    'student_user_settings.img_crop'
-                    
-                ], 'student_lectures', [
-            ['privacy_view', 'NOT IN', [3], PDO::PARAM_INT]
-                ], [
-            'join/student_user_settings' => [['student_lectures.id_user', '=', 'student_user_settings.id']]
-                ]);
+          $list = APP::Module('DB')->Select(
+          'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['*'], 'student_lectures', [
+          ['privacy_view', 'NOT IN', [3], PDO::PARAM_INT],
+          // ['id_user', 'NOT IN', [APP::Module('Crypt')->Decode($_POST['id_user_hash'])], PDO::PARAM_INT],
+          ]);
          */
+        
+        $where = [];
+        
+        array_push($where, ['student_lectures.privacy_view', '!=', 3, PDO::PARAM_INT]);
+        
+        // search filtering
+            if ($_POST['searchPhrase'] != '') {
+                array_push($where, ['student_lectures.name', 'LIKE','%'.$_POST['searchPhrase'].'%', PDO::PARAM_STR]);    
+            }
+            if ($_POST['university'] != '') {
+               array_push($where, ['student_lectures.university', 'LIKE','%'.$_POST['university'].'%', PDO::PARAM_STR]);   
+              //  if (($_POST['university']) && (preg_match('/^.*' . $_POST['university'] . '.*/', $list[$item]['university']) === 0))
+            }
+            if ($_POST['faculty'] != '') {
+                 array_push($where, ['student_lectures.faculty', 'LIKE','%'.$_POST['faculty'].'%', PDO::PARAM_STR]);  
+             //   if (($_POST['faculty']) && (preg_match('/^.*' . $_POST['faculty'] . '.*/', $list[$item]['faculty']) === 0))                  
+            }
+            if ($_POST['chair'] != '') {
+                 array_push($where, ['student_lectures.chair', 'LIKE','%'.$_POST['chair'].'%', PDO::PARAM_STR]);  
+              //  if (($_POST['chair']) && (preg_match('/^.*' . $_POST['chair'] . '.*/', $list[$item]['chair']) === 0))     
+            }
+            
+        // privacy view filtering
+            
+            /*if (($_POST['id_user_hash'] == 'default') && ($list['item']['privacy_view'] != 0)) {
+                  array_push($where, ['student_lectures.privacy_view','IN',0, PDO::PARAM_INT]); 
+            }
+            if ($list[$item]['privacy_view'] == 1) {
+                array_push($where, ['student_lectures.privacy_view','=',0, PDO::PARAM_INT]); 
+                if (!(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'university'))) {
+                    
+                }
+            } elseif (($list[$item]['privacy_view'] == 2) && (APP::Module('Crypt')->Decode($_POST['id_user_hash']) != $list[$item]['id_user'])) {
+                if (!(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'classmates')) ||
+                        !(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'university'))) {
+                }
+            }*/
+        
+     //   echo json_encode($where); exit();
+
+        $current = ($_POST['current'] * $_POST['rowCount']) - $_POST['rowCount'];
+        $offset = $_POST['rowCount'];
+        $list = APP::Module('DB')->Select(
+                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], [
+            'student_lectures.id',
+            'student_lectures.id_user',
+            'student_lectures.privacy_view',
+            'student_lectures.privacy_edit',
+            'student_lectures.name',
+            'student_lectures.country',
+            'student_lectures.city',
+            'student_lectures.university',
+            'student_lectures.faculty',
+            'student_lectures.chair',
+            'student_lectures.date_last_update',
+            'student_user_settings.first_name',
+            'student_user_settings.last_name',
+            'student_user_settings.groups',
+            'student_user_settings.friends',
+            'student_user_settings.img_crop'
+                ], 'student_lectures',$where, [
+            'join/student_user_settings' => [
+                ['student_lectures.id_user', '=', 'student_user_settings.id']
+            ]
+                ], false, false, ['student_lectures.date_last_update', 'DESC'], [$current, $offset]);
+
+        
+        $count = APP::Module('DB')->Select(
+                'auto', [ 'fetch', PDO::FETCH_COLUMN], [
+            'count(id)'
+                ], 'student_lectures', [
+            ['privacy_view', '!=', 3, PDO::PARAM_INT]
+        ]);
+
 
         $out = [];
         $rows = [];
 
         foreach ($list as $item => $value) {
-            $list_name = $list[$item]['name'];
-
-            if ($_POST['searchPhrase'] != '') {
-                if (($_POST['searchPhrase']) && (preg_match('/^.*' . $_POST['searchPhrase'] . '.*/', $list_name) === 0))
-                    continue;
-            }
-            if ($_POST['university'] != '') {
-                if (($_POST['university']) && (preg_match('/^.*' . $_POST['university'] . '.*/', $list[$item]['university']) === 0))
-                    continue;
-            }
-            if ($_POST['faculty'] != '') {
-                if (($_POST['faculty']) && (preg_match('/^.*' . $_POST['faculty'] . '.*/', $list[$item]['faculty']) === 0))
-                    continue;
-            }
-            if ($_POST['chair'] != '') {
-                if (($_POST['chair']) && (preg_match('/^.*' . $_POST['chair'] . '.*/', $list[$item]['chair']) === 0))
-                    continue;
-            }
             
-           
-            
-            if(($_POST['id_user_hash'] == 'default') && ($list['item']['privacy_view'] != 0)) {
+            /*
+            if (($_POST['id_user_hash'] == 'default') && ($list['item']['privacy_view'] != 0)) {
                 continue;
             }
-            
-            if($list[$item]['privacy_view'] == 1) {
-                if(!(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']),$list[$item]['id_user'],'university'))) {
+
+            if ($list[$item]['privacy_view'] == 1) {
+                if (!(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'university'))) {
                     continue;
                 }
-            } 
-            elseif($list[$item]['privacy_view'] == 2) {
-                if(!(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']),$list[$item]['id_user'],'classmates')) ||
-                   !(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']),$list[$item]['id_user'],'university'))) {
+            } elseif (($list[$item]['privacy_view'] == 2) && (APP::Module('Crypt')->Decode($_POST['id_user_hash']) != $list[$item]['id_user'])) {
+                if (!(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'classmates')) ||
+                        !(APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'university'))) {
                     continue;
                 }
-            } 
+            }
             
-            if($list[$item]['privacy_edit'] == 1) {
-                if((APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']),$list[$item]['id_user'],'university'))) {
-                   $list[$item]['edit'] = 1;
+             */
+
+            if ($list[$item]['privacy_edit'] == 1) {
+                if ((APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'university'))) {
+                    $list[$item]['edit'] = 1;
                 }
-            } 
-            elseif($list[$item]['privacy_edit'] == 2) {
-                if((APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']),$list[$item]['id_user'],'classmates')) ||
-                   (APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']),$list[$item]['id_user'],'university'))) {
+            } elseif ($list[$item]['privacy_edit'] == 2) {
+                if ((APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'classmates')) ||
+                        (APP::Module('Student')->Relations(APP::Module('Crypt')->Decode($_POST['id_user_hash']), $list[$item]['id_user'], 'university'))) {
                     $list[$item]['edit'] = 1;
                 }
             } else {
                 $list[$item]['edit'] = 0;
             }
-            
-            
-            
-           $out[$item] = [
+
+            if (APP::Module('Crypt')->Decode($_POST['id_user_hash']) == $list[$item]['id_user']) {
+                $list[$item]['edit'] = 1;
+            }
+
+
+
+            $out[$item] = [
                 'id' => $list[$item]['id'],
                 'id_hash' => APP::Module('Crypt')->Encode($list[$item]['id']),
                 'country' => $list[$item]['country'],
@@ -363,28 +403,21 @@ class Student {
                 'faculty' => $list[$item]['faculty'],
                 'chair' => $list[$item]['chair'],
                 'name' => $list[$item]['name'],
-                'date' => $list[$item]['date'],
-                'edit' => isset($list[$item]['edit'])?$list[$item]['edit']:0
+                'date' => $list[$item]['date_last_update'],
+                'img' => $list[$item]['img_crop'],
+                'user' => $list[$item]['first_name'] . ' ' . $list[$item]['last_name'],
+                'edit' => isset($list[$item]['edit']) ? $list[$item]['edit'] : 0
             ];
-   
         }
-        
-      
 
         // sort desc
-        rsort($out);
-
-        for ($x = ($_POST['current'] - 1) * $_POST['rowCount']; $x < $_POST['rowCount'] * $_POST['current']; $x ++) {
-            if (!isset($out[$x]))
-                continue;
-            array_push($rows, $out[$x]);
-        }
+        // rsort($out);
 
         echo json_encode([
             'current' => $_POST['current'],
             'rowCount' => $_POST['rowCount'],
-            'rows' => $rows,
-            'total' => count($out)
+            'rows' => $out,
+            'total' => $count
         ]);
         exit;
     }
@@ -409,28 +442,27 @@ class Student {
         }
         return $result;
     }
-    
-    public function GetLecture($item,$id_hash = 0) {
-        
+
+    public function GetLecture($item, $id_hash = 0) {
+
         switch ($item) {
             case 'body':
                 return APP::Module('DB')->Select(
                                 'auto', [ 'fetch', PDO::FETCH_ASSOC], ['*'], 'student_lectures', [
                             ['id', '=', APP::Module('Crypt')->Decode($id_hash), PDO::PARAM_INT]
-                        ]);
+                ]);
             case 'owner':
-                
+
                 $id_user = APP::Module('DB')->Select(
                         'auto', [ 'fetch', PDO::FETCH_COLUMN], ['id_user'], 'student_lectures', [
                     ['id', '=', APP::Module('Crypt')->Decode($id_hash), PDO::PARAM_INT]
                 ]);
-                
+
                 return APP::Module('DB')->Select(
-                                'auto', [ 'fetch', PDO::FETCH_ASSOC], ['first_name','last_name','img_crop','about'], 'student_user_settings', [
+                                'auto', [ 'fetch', PDO::FETCH_ASSOC], ['first_name', 'last_name', 'img_crop', 'about'], 'student_user_settings', [
                             ['id', '=', $id_user, PDO::PARAM_INT]
-                        ]);                             
+                ]);
         }
-                         
     }
 
     public function APIBlockDelete() {
@@ -674,7 +706,7 @@ class Student {
                 exit();
 
             case 'image-full':
-                 
+
                 APP::Module('DB')->Update(
                         'auto', 'student_user_settings', [
                     'img_full' => $_POST['data']
@@ -687,12 +719,14 @@ class Student {
                 exit();
 
             case 'main-info':
-                
-                 if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) === false) {
-                    echo json_encode(['status' => 'error', 'error' => 1]); exit();
-                } else if ((APP::Module('DB')->Select('auto', ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) && 
+
+                if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) === false) {
+                    echo json_encode(['status' => 'error', 'error' => 1]);
+                    exit();
+                } else if ((APP::Module('DB')->Select('auto', ['fetchColumn', 0], ['id'], 'users', [['email', '=', $_POST['email'], PDO::PARAM_STR]])) &&
                         (!APP::Module('DB')->Select('auto', ['fetchColumn', 0], ['id'], 'student_user_settings', [['email', '=', $_POST['email'], PDO::PARAM_STR]]))) {
-                    echo json_encode(['status' => 'error', 'error' => 2]); exit();
+                    echo json_encode(['status' => 'error', 'error' => 2]);
+                    exit();
                 }
 
                 foreach ($_POST as &$item) {
@@ -841,14 +875,14 @@ class Student {
                     'name' => $item['title'],
                 ]);
             }
-            
-            if(count($out) == 0) {
-                 foreach ($respond['response'] as $item) {
-                     array_push($out, [
-                    'id' => $item['cid'],
-                    'name' => $item['title'],
-                ]);
-                 }
+
+            if (count($out) == 0) {
+                foreach ($respond['response'] as $item) {
+                    array_push($out, [
+                        'id' => $item['cid'],
+                        'name' => $item['title'],
+                    ]);
+                }
             }
 
             echo json_encode($out);

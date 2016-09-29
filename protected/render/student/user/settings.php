@@ -391,7 +391,7 @@
 		$('#upload-result').on('click', function (ev) {
 			$uploadCrop.croppie('result', {
 				type: 'canvas',
-				size: [200,200]
+				size: 'viewport'
 			}).then(function (resp) {
                                                      
                            var data = {
