@@ -934,6 +934,29 @@ class Student {
             echo json_encode($out);
             exit();
         }
+        if ($_POST['set'] == 'school') {
+
+            // https://oauth.vk.com/blank.html#access_token=d0e0fac62d036ee96976aafbde310260a60d7da8c2c4bf2ad30c2e6ed73275815105f06a2d4f064b9c55a&expires_in=0&user_id=382123010&secret=d347e095991f6de90b
+
+
+            $url = $baseUrl . 'database.getSchools?&country_id=' . $_POST['id_country'] . '&city_id=' . $_POST['id_city'] . '&q=' . $_POST['search'] . '&lang=' . $lang;
+            $respond = json_decode(file_get_contents($url), true);
+
+            $out = [];
+
+            foreach ($respond['response'] as $item) {
+
+                //  if (($_POST['search']) && (preg_match('/^' . $_POST['search'] . '/i', $item['title']) === 0)) continue;
+
+                array_push($out, [
+                    'id' => $item['id'],
+                    'name' => $item['title'],
+                ]);
+            }
+
+            echo json_encode($out);
+            exit();
+        }
 
         if ($_POST['set'] == 'faculty') {
 
