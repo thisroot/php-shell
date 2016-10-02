@@ -333,6 +333,11 @@ if (isset($_POST['action'])) {
                 <input type="text" id="module_users_tmp_dir" name="settings[tmp_dir]" value="/tmp">
                 <br><br>
                 
+                <label for="module_users_profile_picture">Profile picture</label>
+                <br>
+                <input type="text" id="module_users_profile_picture" name="settings[profile_picture]" value="public/ui/img/profile-pics/default.png">
+                <br><br>
+                
                 <input type="submit" value="Next">
             </form>
             
@@ -350,6 +355,7 @@ if (isset($_POST['action'])) {
                     var module_users_timeout_email = $(this).find('#module_users_timeout_email');
                     var module_users_timeout_activation = $(this).find('#module_users_timeout_activation');
                     var module_users_tmp_dir = $(this).find('#module_users_tmp_dir');
+                    var module_users_profile_picture = $(this).find('#module_users_profile_picture');
 
                     module_users_auth_token.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
                     module_users_check_rules.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
@@ -363,6 +369,7 @@ if (isset($_POST['action'])) {
                     module_users_timeout_email.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
                     module_users_timeout_activation.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
                     module_users_tmp_dir.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
+                    module_users_profile_picture.removeClass('has-error').nextAll('.error').eq(0).removeClass('is-visible').empty();
                     
                     if (module_users_auth_token.val() === '') { module_users_auth_token.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); event.preventDefault(); }
                     if (module_users_check_rules.val() === '') { module_users_check_rules.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); event.preventDefault(); }
@@ -376,6 +383,7 @@ if (isset($_POST['action'])) {
                     if (module_users_timeout_email.val() === '') { module_users_timeout_email.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); event.preventDefault(); }
                     if (module_users_timeout_activation.val() === '') { module_users_timeout_activation.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); event.preventDefault(); }
                     if (module_users_tmp_dir.val() === '') { module_users_tmp_dir.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); event.preventDefault(); }
+                    if (module_users_profile_picture.val() === '') { module_users_profile_picture.addClass('has-error').nextAll('.error').eq(0).addClass('is-visible').html('Not specified'); event.preventDefault(); }
                 });
             </script>
             <?
@@ -400,13 +408,9 @@ $data->extractTo(ROOT);
 $input = $_SESSION['core']['install']['users'];
 $db = APP::Module('DB')->Open($input['db_connection']);
 
-$db->query('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
-$db->query('SET time_zone = "+00:00";');
-
 $db->query("
-    --
-    -- Table structure for table `users`
-    --
+    SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+    SET time_zone = '+00:00';
 
     CREATE TABLE `users` (
       `id` int(10) UNSIGNED NOT NULL,
@@ -416,12 +420,8 @@ $db->query("
       `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `last_visit` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `users_accounts`
-    --
+    
+    INSERT INTO `users` (`id`, `email`, `password`, `role`, `reg_date`, `last_visit`) VALUES (0, '', '', 'default', NOW(), NOW());
 
     CREATE TABLE `users_accounts` (
       `id` int(11) UNSIGNED NOT NULL,
@@ -430,66 +430,41 @@ $db->query("
       `extra` varchar(250) CHARACTER SET utf8 NOT NULL,
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+    
+    CREATE TABLE `users_about` (
+      `id` bigint(20) UNSIGNED NOT NULL,
+      `user` int(10) UNSIGNED NOT NULL,
+      `item` enum('username','mobile_phone','twitter','skype') COLLATE utf8_unicode_ci NOT NULL,
+      `value` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+      `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-    --
-    -- Indexes for dumped tables
-    --
-
-    --
-    -- Indexes for table `users`
-    --
     ALTER TABLE `users`
       ADD PRIMARY KEY (`id`),
-      ADD KEY `user_id` (`email`,`password`,`role`) USING BTREE;
+      ADD UNIQUE KEY `email` (`email`) USING BTREE,
+      ADD KEY `email_password` (`email`,`password`) USING BTREE,
+      ADD KEY `role_reg_date` (`role`,`reg_date`) USING BTREE;
 
-    --
-    -- Indexes for table `users_accounts`
-    --
     ALTER TABLE `users_accounts`
       ADD PRIMARY KEY (`id`),
-      ADD KEY `user_id` (`user_id`);
-
-    --
-    -- AUTO_INCREMENT for dumped tables
-    --
-
-    --
-    -- AUTO_INCREMENT for table `users`
-    --
-    ALTER TABLE `users`
-      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `users_accounts`
-    --
-    ALTER TABLE `users_accounts`
-      MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- Constraints for dumped tables
-    --
-
-    --
-    -- Constraints for table `users_accounts`
-    --
-    ALTER TABLE `users_accounts`
-      ADD CONSTRAINT `users_accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+      ADD KEY `user_id` (`user_id`),
+      ADD KEY `service` (`service`);
       
-    --
-    -- Constraints for table `mail_events`
-    --
-    ALTER TABLE `mail_events`
-      ADD CONSTRAINT `mail_events_ibfk_2` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-      
-    --
-    -- Constraints for table `mail_log`
-    --
-    ALTER TABLE `mail_log`
-      ADD CONSTRAINT `mail_log_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-      
-    --
-    -- Constraints for table `mail_queue`
-    --
-    ALTER TABLE `mail_queue`
-      ADD CONSTRAINT `mail_queue_ibfk_2` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ALTER TABLE `users_about`
+      ADD PRIMARY KEY (`id`),
+      ADD KEY `user` (`user`),
+      ADD KEY `user_item` (`user`,`item`) USING BTREE;
+
+    ALTER TABLE `users` MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+    ALTER TABLE `users_accounts` MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+    ALTER TABLE `users_about` MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+    ALTER TABLE `users_accounts` ADD CONSTRAINT `users_accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ALTER TABLE `users_about` ADD CONSTRAINT `users_about_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;   
+
+    ALTER TABLE `mail_events` ADD CONSTRAINT `mail_events_ibfk_2` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ALTER TABLE `mail_log` ADD CONSTRAINT `mail_log_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ALTER TABLE `mail_queue` ADD CONSTRAINT `mail_queue_ibfk_2` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ");
 
 $db->query('INSERT INTO `users` (`id`, `email`, `password`, `role`, `reg_date`, `last_visit`) VALUES (NULL, "' . $input['admin']['email'] . '", "' . APP::Module('Crypt')->Encode($input['admin']['password']) . '", "admin", NOW(), NOW())');
@@ -517,6 +492,7 @@ $sub_id_admin = APP::Module('Registry')->Add('module_users_role', 'admin');
 
 APP::Module('Registry')->Add('module_users_rule', '["users\\\/actions\\\/change-password(.*)","users\/actions\/login"]', $sub_id_default);
 APP::Module('Registry')->Add('module_users_rule', '["users\\\/profile","users\/actions\/login"]', $sub_id_default);
+APP::Module('Registry')->Add('module_users_rule', '["users\\\/api\\\/about\\\/update\\\.json","users\/actions\/login"]', $sub_id_default);
 APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/actions\/login"]', $sub_id_default);
 APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/actions\/login"]', $sub_id_new);
 APP::Module('Registry')->Add('module_users_rule', '["admin(.*)","users\/actions\/login"]', $sub_id_user);
@@ -543,6 +519,7 @@ APP::Module('Registry')->Add('module_users_timeout_activation', $input['settings
 APP::Module('Registry')->Add('module_users_timeout_email', $input['settings']['timeout_email']);
 APP::Module('Registry')->Add('module_users_timeout_token', $input['settings']['timeout_token']);
 APP::Module('Registry')->Add('module_users_tmp_dir', $input['settings']['tmp_dir']);
+APP::Module('Registry')->Add('module_users_profile_picture', $input['settings']['profile_picture']);
 
 APP::Module('Cron')->Add($input['ssh_connection'], ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php Users NewUsersGC []']);
 
@@ -556,6 +533,7 @@ APP::Module('Triggers')->Register('register_user', 'Users', 'Register');
 APP::Module('Triggers')->Register('reset_user_password', 'Users', 'Reset password');
 APP::Module('Triggers')->Register('change_user_password', 'Users', 'Change password');
 APP::Module('Triggers')->Register('update_user', 'Users', 'Update');
+APP::Module('Triggers')->Register('update_about_user', 'Users', 'Update about');
 
 APP::Module('Triggers')->Register('add_user_role', 'Users / Roles', 'Add');
 APP::Module('Triggers')->Register('remove_user_role', 'Users / Roles', 'Remove');

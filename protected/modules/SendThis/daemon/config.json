@@ -1,0 +1,16 @@
+{
+	"threads":"4",
+	"delay":"1",
+	"retries":"5",
+	"pack_size":"100",
+	"api":{
+		"url":"http://sendthis.ru/api/2.0/test.php",
+		"key":"0000000000000000000000000000000000000000000000000000000000000000"
+	},
+	"db":{
+		"host":"127.0.0.1",
+		"database":"phpshell",
+		"user":"root",
+		"password":""
+	}
+}

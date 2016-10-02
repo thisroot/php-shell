@@ -24,7 +24,7 @@ class Mail {
     }
     
     
-    public function Send($recepient, $letter, $params = false) {
+    public function Send($recepient, $letter, $params = []) {
         if (!filter_var($recepient, FILTER_VALIDATE_EMAIL)) return ['error', 1];
         
         if (!APP::Module('DB')->Select(
@@ -41,15 +41,34 @@ class Mail {
             [['id', '=', $letter, PDO::PARAM_INT]]
         );
         
-        // [encode][/encode]
+        $letter['subject'] = APP::Render($letter['subject'], 'eval', $params);
         $letter['html'] = APP::Render($letter['html'], 'eval', $params);
         $letter['plaintext'] = APP::Render($letter['plaintext'], 'eval', $params);
-
+        
+        // [user_email]
+        $letter['subject'] = str_replace('[user_email]', $recepient, $letter['subject']);
+        $letter['html'] = str_replace('[user_email]', $recepient, $letter['html']);
+        $letter['plaintext'] = str_replace('[user_email]', $recepient, $letter['plaintext']);
+        //
+        
+        // [encode][/encode]
+        preg_match_all('/\[encode\](.*)\[\/encode\]/i', $letter['subject'], $subject_matches);
         preg_match_all('/\[encode\](.*)\[\/encode\]/i', $letter['html'], $html_matches);
         preg_match_all('/\[encode\](.*)\[\/encode\]/i', $letter['plaintext'], $plaintext_matches);
 
+        foreach ($subject_matches[0] as $key => $pattern) $letter['subject'] = str_replace($pattern, APP::Module('Crypt')->Encode($subject_matches[1][$key]), $letter['subject']);
         foreach ($html_matches[0] as $key => $pattern) $letter['html'] = str_replace($pattern, APP::Module('Crypt')->Encode($html_matches[1][$key]), $letter['html']);
         foreach ($plaintext_matches[0] as $key => $pattern) $letter['plaintext'] = str_replace($pattern, APP::Module('Crypt')->Encode($plaintext_matches[1][$key]), $letter['plaintext']);
+        //
+        
+        // [decode][/decode]
+        preg_match_all('/\[decode\](.*)\[\/decode\]/i', $letter['subject'], $subject_matches);
+        preg_match_all('/\[decode\](.*)\[\/decode\]/i', $letter['html'], $html_matches);
+        preg_match_all('/\[decode\](.*)\[\/decode\]/i', $letter['plaintext'], $plaintext_matches);
+
+        foreach ($subject_matches[0] as $key => $pattern) $letter['subject'] = str_replace($pattern, APP::Module('Crypt')->Decode($subject_matches[1][$key]), $letter['subject']);
+        foreach ($html_matches[0] as $key => $pattern) $letter['html'] = str_replace($pattern, APP::Module('Crypt')->Decode($html_matches[1][$key]), $letter['html']);
+        foreach ($plaintext_matches[0] as $key => $pattern) $letter['plaintext'] = str_replace($pattern, APP::Module('Crypt')->Decode($plaintext_matches[1][$key]), $letter['plaintext']);
         //
         
         extract(APP::Module('Triggers')->Exec('before_mail_send_letter', [
@@ -77,6 +96,59 @@ class Mail {
     }
 
     private function Transport($recepient, $letter, $params) {
+        $id = false;
+        
+        if (isset(APP::$modules['Users'])) {
+            $user = (int) APP::Module('DB')->Select(
+                APP::Module('Users')->settings['module_users_db_connection'], ['fetchColumn', 0], 
+                ['id'], 'users', [['email', '=', $recepient, PDO::PARAM_STR]]
+            );
+            
+            if ($user) {
+                $letter['subject'] = str_replace('[user_id]', $user, $letter['subject']);
+                $letter['html'] = str_replace('[user_id]', $user, $letter['html']);
+                $letter['plaintext'] = str_replace('[user_id]', $user, $letter['plaintext']);
+                
+                $id = APP::Module('DB')->Insert(
+                    $this->settings['module_mail_db_connection'], 'mail_log',
+                    [
+                        'id' => 'NULL',
+                        'user' => [$user, PDO::PARAM_INT],
+                        'letter' => [$letter['id'], PDO::PARAM_INT],
+                        'sender' => [$letter['sender'], PDO::PARAM_INT],
+                        'transport' => [$letter['transport'], PDO::PARAM_INT],
+                        'state' => ['wait', PDO::PARAM_STR],
+                        'result' => 'NULL',
+                        'retries' => 0,
+                        'ping' => 0,
+                        'cr_date' => 'NOW()'
+                    ]
+                );
+                
+                if ($id) {
+                    $letter_hash = APP::Module('Crypt')->Encode($id);
+                    
+                    $letter['subject'] = str_replace('[letter_hash]', $letter_hash, $letter['subject']);
+                    $letter['html'] = str_replace('[letter_hash]', $letter_hash, $letter['html']);
+                    $letter['plaintext'] = str_replace('[letter_hash]', $letter_hash, $letter['plaintext']);
+
+                    if ($this->settings['module_mail_save_sent_email']) {
+                        APP::Module('DB')->Insert(
+                            $this->settings['module_mail_db_connection'], 'mail_copies',
+                            [
+                                'id' => 'NULL',
+                                'log' => [$id, PDO::PARAM_INT],
+                                'subject' => [$letter['subject'], PDO::PARAM_STR],
+                                'html' => [$letter['html'], PDO::PARAM_STR],
+                                'plaintext' => [$letter['plaintext'], PDO::PARAM_STR],
+                                'cr_date' => 'NOW()'
+                            ]
+                        );
+                    }
+                }
+            }
+        }
+
         $sender = APP::Module('DB')->Select(
             $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
             ['name', 'email'], 'mail_senders',
@@ -120,48 +192,18 @@ class Mail {
             implode("\r\n", $headers), 
             '-fbounce-' . md5($recepient) . '@' . APP::$conf['location'][1]
         );
-
-        $id = false;
         
-        if (isset(APP::$modules['Users'])) {
-            if ((int) $user = APP::Module('DB')->Select(
-                APP::Module('Users')->settings['module_users_db_connection'], ['fetchColumn', 0], 
-                ['id'], 'users',
-                [['email', '=', $recepient, PDO::PARAM_STR]]
-            )) {
-                $id = APP::Module('DB')->Insert(
-                    $this->settings['module_mail_db_connection'], 'mail_log',
-                    Array(
-                        'id' => 'NULL',
-                        'queue' => [0, PDO::PARAM_INT],
-                        'user' => [$user, PDO::PARAM_INT],
-                        'letter' => [$letter['id'], PDO::PARAM_INT],
-                        'sender' => [$letter['sender'], PDO::PARAM_INT],
-                        'transport' => [$letter['transport'], PDO::PARAM_INT],
-                        'state' => [$result ? 'success' : 'error', PDO::PARAM_STR],
-                        'result' => [$result, PDO::PARAM_STR],
-                        'retries' => [1, PDO::PARAM_INT],
-                        'ping' => [0, PDO::PARAM_INT],
-                        'cr_date' => 'NOW()'
-                    )
-                );
-                
-                if (($this->settings['module_mail_save_sent_email']) && ($id)) {
-                    APP::Module('DB')->Insert(
-                        $this->settings['module_mail_db_connection'], 'mail_copies',
-                        Array(
-                            'id' => 'NULL',
-                            'log' => [$id, PDO::PARAM_INT],
-                            'subject' => [$letter['subject'], PDO::PARAM_STR],
-                            'html' => [$letter['html'], PDO::PARAM_STR],
-                            'plaintext' => [$letter['plaintext'], PDO::PARAM_STR],
-                            'cr_date' => 'NOW()'
-                        )
-                    );
-                }
-            }
+        if ($id) {
+            APP::Module('DB')->Update(
+                $this->settings['module_mail_db_connection'], 'mail_log', 
+                [
+                    'state' => $result ? 'success' : 'error',
+                    'retries' => 1
+                ], 
+                [['id', '=', $id, PDO::PARAM_INT]]
+            );
         }
-        
+
         return [
             'result' => $result, 
             'id' => $id
@@ -560,6 +602,38 @@ class Mail {
             $this->settings['module_mail_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
             ['module', 'method', 'settings'], 'mail_transport',
             [['id', '=', $transport_id, PDO::PARAM_INT]]
+        ));
+    }
+    
+    public function ManageLog() {
+        APP::Render('mail/admin/log');
+    }
+    
+    public function ManageQueue() {
+        APP::Render('mail/admin/queue');
+    }
+    
+    public function ViewCopies() {
+        if (!isset(APP::Module('Routing')->get['letter_id_hash'])) {
+            header('HTTP/1.0 404 Not Found');
+            exit;
+        }
+        
+        $letter_id = APP::Module('Crypt')->Decode(APP::Module('Routing')->get['letter_id_hash']);
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_copies',
+            [['log', '=', $letter_id, PDO::PARAM_INT]]
+        )) {
+            header('HTTP/1.0 404 Not Found');
+            exit;
+        }
+        
+        APP::Render('mail/admin/copy', 'include', APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            [APP::Module('Routing')->get['version']], 'mail_copies',
+            [['log', '=', $letter_id, PDO::PARAM_INT]]
         ));
     }
 
@@ -1361,6 +1435,207 @@ class Mail {
         header('Content-Type: application/json');
         
         echo json_encode($out);
+        exit;
+    }
+    
+    public function APIListLog() {
+        $rows = [];
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            [
+                'mail_log.id', 
+                'mail_log.user', 
+                'mail_log.letter', 
+                'mail_log.sender', 
+                'mail_log.transport', 
+                'mail_log.state', 
+                'mail_log.result', 
+                'mail_log.retries', 
+                'mail_log.ping',
+                'mail_log.cr_date',
+                'users.email',
+                'mail_letters.subject',
+                'mail_letters.group_id AS letter_group',
+                'mail_senders.group_id AS sender_group',
+                'mail_senders.name AS sender_name',
+                'mail_senders.email AS sender_email',
+                'mail_transport.module AS transport_module',
+                'mail_transport.method AS transport_method',
+                'mail_transport.settings AS transport_settings',
+                'COUNT(mail_events.id) AS events',
+                'COUNT(mail_copies.id) AS copies'
+            ], 'mail_log',
+            $_POST['searchPhrase'] ? [['user', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
+            [
+                'join/users' => [['mail_log.user', '=', 'users.id']],
+                'join/mail_letters' => [['mail_log.letter', '=', 'mail_letters.id']],
+                'join/mail_senders' => [['mail_log.sender', '=', 'mail_senders.id']],
+                'join/mail_transport' => [['mail_log.transport', '=', 'mail_transport.id']],
+                'left join/mail_events' => [['mail_log.id', '=', 'mail_events.log']],
+                'left join/mail_copies' => [['mail_log.id', '=', 'mail_copies.log']]
+            ],
+            ['mail_log.id'], 
+            false,
+            [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
+            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+        ) as $row) {
+            $row['id_token'] = APP::Module('Crypt')->Encode($row['id']);
+            $row['user_token'] = APP::Module('Crypt')->Encode($row['user']);
+            $row['letter'] = [$row['letter'], APP::Module('Crypt')->Encode($row['letter'])];
+            $row['sender'] = [$row['sender'], APP::Module('Crypt')->Encode($row['sender'])];
+            $row['letter_group'] = [$row['letter_group'], $row['letter_group'] ? APP::Module('Crypt')->Encode($row['letter_group']) : 0];
+            $row['sender_group'] = [$row['sender_group'], $row['sender_group'] ? APP::Module('Crypt')->Encode($row['sender_group']) : 0];
+            
+            array_push($rows, $row);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => APP::Module('DB')->Select($this->settings['module_mail_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'mail_log', $_POST['searchPhrase'] ? [['user', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
+        ]);
+        exit;
+    }
+    
+    public function APIRemoveLogEntry() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_log',
+            [['id', '=', $_POST['id'], PDO::PARAM_INT]]
+        )) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if ($out['status'] == 'success') {
+            $out['count'] = APP::Module('DB')->Delete($this->settings['module_mail_db_connection'], 'mail_log', [['id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            APP::Module('Triggers')->Exec('mail_remove_log_entry', ['id' => $_POST['id'], 'result' => $out['count']]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
+    public function APIListQueue() {
+        $rows = [];
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            [
+                'mail_queue.id', 
+                'mail_queue.log',
+                'mail_queue.user', 
+                'mail_queue.letter', 
+                'mail_queue.sender', 
+                'mail_queue.transport',
+                'mail_queue.result', 
+                'mail_queue.retries', 
+                'mail_queue.ping',
+                'mail_queue.priority',
+                'mail_queue.token',
+                'mail_queue.execute',
+                'mail_queue.subject',
+                'mail_queue.sender_name',
+                'mail_queue.sender_email',
+                'mail_queue.recepient',
+                'mail_letters.group_id AS letter_group',
+                'mail_senders.group_id AS sender_group',
+                'mail_transport.module AS transport_module',
+                'mail_transport.method AS transport_method',
+                'mail_transport.settings AS transport_settings',
+                'COUNT(mail_copies.id) AS copies'
+            ], 'mail_queue',
+            $_POST['searchPhrase'] ? [['user', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
+            [
+                'join/mail_letters' => [['mail_queue.letter', '=', 'mail_letters.id']],
+                'join/mail_senders' => [['mail_queue.sender', '=', 'mail_senders.id']],
+                'join/mail_transport' => [['mail_queue.transport', '=', 'mail_transport.id']],
+                'left join/mail_copies' => [['mail_queue.log', '=', 'mail_copies.log']]
+            ],
+            ['mail_queue.id'], 
+            false,
+            [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
+            [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
+        ) as $row) {
+            $row['id_token'] = APP::Module('Crypt')->Encode($row['id']);
+            $row['log_token'] = APP::Module('Crypt')->Encode($row['log']);
+            $row['user_token'] = APP::Module('Crypt')->Encode($row['user']);
+            $row['letter'] = [$row['letter'], APP::Module('Crypt')->Encode($row['letter'])];
+            $row['sender'] = [$row['sender'], APP::Module('Crypt')->Encode($row['sender'])];
+            $row['letter_group'] = [$row['letter_group'], $row['letter_group'] ? APP::Module('Crypt')->Encode($row['letter_group']) : 0];
+            $row['sender_group'] = [$row['sender_group'], $row['sender_group'] ? APP::Module('Crypt')->Encode($row['sender_group']) : 0];
+            
+            array_push($rows, $row);
+        }
+        
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode([
+            'current' => $_POST['current'],
+            'rowCount' => $_POST['rowCount'],
+            'rows' => $rows,
+            'total' => APP::Module('DB')->Select($this->settings['module_mail_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'mail_queue', $_POST['searchPhrase'] ? [['recepient', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
+        ]);
+        exit;
+    }
+    
+    public function APIRemoveQueueEntry() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'mail_queue',
+            [['id', '=', $_POST['id'], PDO::PARAM_INT]]
+        )) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+        
+        if ($out['status'] == 'success') {
+            $out['count'] = APP::Module('DB')->Delete($this->settings['module_mail_db_connection'], 'mail_queue', [['id', '=', $_POST['id'], PDO::PARAM_INT]]);
+            APP::Module('Triggers')->Exec('mail_remove_queue_entry', ['id' => $_POST['id'], 'result' => $out['count']]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
+    public function APIListEvents() {
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode(APP::Module('DB')->Select(
+            $this->settings['module_mail_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['*'], 'mail_events',
+            [['log', '=', APP::Module('Crypt')->Decode($_POST['token']), PDO::PARAM_INT]],
+            false, false, false, 
+            ['id', 'desc']
+        ));
         exit;
     }
     

@@ -7,6 +7,7 @@ APP::Module('Cron')->Remove($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/
 
 APP::Module('DB')->Open($users_db)->query('DROP TABLE users');
 APP::Module('DB')->Open($users_db)->query('DROP TABLE users_accounts');
+APP::Module('DB')->Open($users_db)->query('DROP TABLE users_about');
 
 $group_id = APP::Module('DB')->Select($mail_db, ['fetchColumn', 0], ['id'], 'mail_letters_groups', [['name', '=', 'Users', PDO::PARAM_STR]]);
 
@@ -41,7 +42,8 @@ APP::Module('Registry')->Delete([['item', 'IN', [
     'module_users_timeout_activation', 
     'module_users_timeout_email',
     'module_users_timeout_token',
-    'module_users_tmp_dir'
+    'module_users_tmp_dir',
+    'module_users_profile_picture'
 ]]]);
 
 APP::Module('Triggers')->Unregister([
@@ -55,6 +57,7 @@ APP::Module('Triggers')->Unregister([
     'reset_user_password',
     'change_user_password',
     'update_user',
+    'update_about_user',
     'add_user_role',
     'remove_user_role',
     'add_user_rule',

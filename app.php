@@ -4,6 +4,11 @@ class APP {
     public static $conf = [];
     public static $modules = [];
     public static $handlers = [];
+    public static $out = [];
+    public static $insert = [];
+    public static $css = [];
+    public static $js = [];
+    public static $console = false;
 
     public static function Init($conf, $argv) {
         define('RUNTIME', microtime(true));
@@ -13,16 +18,19 @@ class APP {
         date_default_timezone_set($conf['timezone']);
         error_reporting($conf['error_reporting']);
         
-        set_error_handler('APP::ErrorHandler', E_ALL & ~E_NOTICE);
+        set_error_handler('APP::ErrorHandler', E_ALL);
         set_exception_handler('APP::ExceptionHandler');
         register_shutdown_function('APP::ShutdownHandler');
 
         self::$conf = $conf;
+        self::$console = (bool) count($argv);
         
         if (!file_exists($conf['logs'])) {
             mkdir($conf['logs']);
         }
         
+        ob_start(['self', 'Out']);
+
         if (($conf['install']) && (!count($argv))) {
             session_start();
             
@@ -37,35 +45,13 @@ class APP {
         foreach (glob(ROOT . '/protected/modules/*') as $path) self::LoadModule($path);
         foreach (self::$modules as $module) self::InitModule($module);
 
-        if (count($argv)) {
-            $args = [];
-            
-            for ($x = array_search('init.php', (array) $argv) + 1; $x < count($argv); $x ++) {
-                $args[] = $argv[$x];
-            }
-            
-            switch ($args[0]) {
-                case 'test':
-                    foreach (glob(ROOT . '/protected/modules/*') as $path) self::LoadModuleTest($path);
-                    
-                    $module = $args[1];
-                    $method = $args[2];
-                    
-                    unset($args[0], $args[1], $args[2]);
-                    break;
-                default:
-                    $module = $args[0];
-                    $method = $args[1];
-                    
-                    unset($args[0], $args[1]);
-                    break;
-            }
-            
-            call_user_func_array([self::$modules[$module], $method], $args);
-            exit;
+        if (self::$console) {
+            if (strripos($argv[0], 'init.php') !== false) call_user_func_array([self::Module($argv[1]), $argv[2]], json_decode($argv[3], true));
         } else {
             foreach (self::$handlers as $handler) self::Module($handler[0])->{$handler[1]}($handler[2]);
         }
+
+        ob_end_flush();
     }
     
     
@@ -105,8 +91,10 @@ class APP {
                     break;
                 case 'import_modules':
                     foreach (explode(' ', $_SESSION['core']['import']['modules']) as $module) {
-                        $module_src = file_get_contents($_SESSION['core']['import']['server'] . '/public/export/' . $module . '.zip');
-                        file_put_contents(ROOT . '/protected/import/' . $module . '.zip', $module_src);
+                        file_put_contents(
+                            ROOT . '/protected/import/' . $module . '.zip', 
+                            file_get_contents($_SESSION['core']['import']['server'] . '/public/export/modules/' . $module . '.zip')
+                        );
                     }
                     
                     self::Render($tpl, 'include', ['action' => 'import_modules']);
@@ -282,14 +270,14 @@ class APP {
         $conf = $path . '/conf.php';
 
         if (!file_exists($class)) {
-            self::Error('core/error', 3, $name);
+            throw new Exception('Module class "' . $name . '" not found');
         }
 
         if (!array_key_exists($name, self::$modules)) {
             include_once $class;
 
             if (!class_exists($name)) {
-                self::Error('core/error', 4, $name);
+                throw new Exception('Invalid module "' . $name . '" class name');
             }
 
             $conf_data = array_replace_recursive(['init' => false], file_exists($conf) ? require_once $conf : []);
@@ -298,28 +286,6 @@ class APP {
             self::$modules[$name]->conf = $conf_data;
         }
         
-        return self::$modules[$name];
-    }
-    
-    public static function LoadModuleTest($path) {
-        $name = basename($path) . 'Test';
-        $class = $path . '/test.php';
-
-        if (!file_exists($class)) {
-            self::Error('core/error', 6, $name);
-        }
-        
-        if (!array_key_exists($name, self::$modules)) {
-            include_once $class;
-
-            if (!class_exists($name)) {
-                self::Error('core/error', 7, $name);
-            }
-
-            self::$modules[$name] = new $name();
-            self::$modules[$name]->conf = ['init' => false];
-        }
-
         return self::$modules[$name];
     }
     
@@ -364,7 +330,7 @@ class APP {
     public static function Render($src, $mode = 'include', $data = null, $ext = '.php') {
         if ($mode != 'eval') {
             $file = ROOT . '/protected/render/' . $src . '.php';
-            if (!file_exists($file)) self::Error('core/error', 5, $src);
+            if (!file_exists($file)) throw new Exception('Can\'t render file "' . $src . '"');
         }
 
         switch ($mode) {
@@ -385,17 +351,67 @@ class APP {
         }
     }
     
-    public static function Error($view, $code, $details = null) {
+    private static function Error($view, $code, $details = null) {
         if (self::$conf['logs']) {
             file_put_contents(
                 self::$conf['logs'] . '/php-errors-' . date('d-m-Y', time()) . '.log',
-                json_encode([date('H:i:s', time()), $code, $details]) . "\n",
-                FILE_APPEND
+                json_encode([date('H:i:s', time()), $code, $details], JSON_PARTIAL_OUTPUT_ON_ERROR) . "\n",
+                FILE_APPEND | LOCK_EX
             );
         }
         
         self::Render($view, 'include', [$code, $details]);
         die();
+    }
+    
+    private static function Out($buffer) {
+        foreach (self::$out as $value) {
+            switch ($value[0]) {
+                case 'module': $buffer = self::Module($value[1])->{$value[2]}($buffer); break;
+                case 'function': $buffer = $value[1]($buffer, isset($value[2]) ? $value[2] : false); break;
+            }
+        }
+        
+        foreach (self::$insert as $value) {
+            $string = false;
+            
+            switch ($value[0]) {
+                case 'js': 
+                    switch ($value[1]) {
+                        case 'file': 
+                            if (array_search($value[4], self::$js) === false) {
+                                self::$js[] = $value[4];
+                                $string = '<script src="' . $value[4] . '"></script>';
+                            } else {
+                                continue;
+                            }
+                            break;
+                        case 'code': $string = $value[4]; break;
+                    }
+                    break;
+                case 'css': 
+                    switch ($value[1]) {
+                        case 'file': 
+                            if (array_search($value[4], self::$css) === false) {
+                                self::$css[] = $value[4];
+                                $string = '<link href="' . $value[4] . '" rel="stylesheet">';
+                            } else {
+                                continue;
+                            }
+                            break;
+                        case 'code': $string = $value[4]; break;
+                    }
+                    break;
+                case 'html': $string = $value[4]; break;
+            }
+            
+            switch ($value[2]) {
+                case 'before': $buffer = str_replace($value[3], $string . $value[3], $buffer); break;
+                case 'after': $buffer = str_replace($value[3], $value[3] . $string, $buffer); break;
+            }
+        }
+        
+        return $buffer;
     }
     
 }

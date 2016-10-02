@@ -1,6 +1,6 @@
 <?
-$db = APP::Module('TaskManager')->settings['module_mail_db_connection'];
-$ssh = APP::Module('TaskManager')->settings['module_mail_ssh_connection'];
+$db = APP::Module('Mail')->settings['module_mail_db_connection'];
+$ssh = APP::Module('Mail')->settings['module_mail_ssh_connection'];
 
 APP::Module('Cron')->Remove($ssh, ['*/1', '*', '*', '*', '*', 'php ' . ROOT . '/init.php Mail CopiesGC []']);
 
@@ -41,6 +41,17 @@ APP::Module('Triggers')->Unregister([
     'mail_remove_transport',
     'mail_update_transport',
     'mail_update_settings',
+    'mail_remove_log_entry',
+    'mail_remove_queue_entry',
     'before_mail_send_letter',
-    'after_mail_send_letter'
+    'after_mail_send_letter',
+    'mail_event_processed',
+    'mail_event_delivered',
+    'mail_event_deferred',
+    'mail_event_bounce_hard',
+    'mail_event_bounce_soft',
+    'mail_event_unsubscribe',
+    'mail_event_spamreport',
+    'mail_event_open',
+    'mail_event_click'
 ]);

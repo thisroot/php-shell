@@ -243,11 +243,11 @@
                   
                     <div class="col-md-9 col-sm-7 col-xs-6">
                         <div class="row">
-                    <div id="unit-block-int" class="col-md-12 "></div>
-                    <div id="unit-block-sert" class="col-md-12 "></div>
-                    <div id="unit-block-cour" class="col-md-12 "></div>
-                    <div id="unit-block-high" class="col-md-12 "></div>
-                    <div id="unit-block-base" class="col-md-12 "></div>
+                    <div id="unit-block-internal" class="col-md-12 "></div>
+                    <div id="unit-block-sertification" class="col-md-12 "></div>
+                    <div id="unit-block-courses" class="col-md-12 "></div>
+                    <div id="unit-block-school" class="col-md-12 "></div>
+                    <div id="unit-block-university" class="col-md-12 "></div>
                         </div>
                     </div>
                 </div>
@@ -297,7 +297,7 @@
          
         $('.unit-add').on('click',function(){
           var unit_name = $(this).data('unit');
-          var unit_id = $('#unit-block').find('.card').size();
+          var unit_id = $('#unit-block-'+unit_name).find('.card').size();
           
           
    
@@ -445,19 +445,15 @@
             '<div class="input-group"><span class="input-group-addon"><i class="zmdi zmdi-balance"></i></span><div class="fg-line">'+                
         '<input id="organisation-'+unit_id+'" class="form-control" value="" placeholder="organisation" type="text">'+
             '</div> </div></div></div>'+
-            '<div class="col-md-6"><div class="form-group">'+                
+            '<div class="col-md-8"><div class="form-group">'+                
             '<div class="input-group"><span class="input-group-addon"><i class="zmdi zmdi-flag"></i></span><div class="fg-line">'+                
-        '<input id="specialisation-'+unit_id+'" class="form-control" value="" placeholder="specialisation" type="text">'+
+        '<input id="specialisation-'+unit_id+'" class="form-control" value="" placeholder="subject" type="text">'+
             '</div> </div></div></div>'+
-            '<div class="col-md-6"><div class="form-group">'+                
-            '<div class="input-group"><span class="input-group-addon"><i class="zmdi zmdi-receipt"></i></span><div class="fg-line">'+                
-        '<input id="number-'+unit_id+'" class="form-control" value="" placeholder="sertificate number" type="text">'+
-            '</div> </div></div></div>'+
-            '<div class="col-sm-3"><div class="input-group form-group"><span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span><div class="dtp-container fg-line">'+
-        '<input id="start-'+unit_id+'" type="text" class="form-control date-picker" placeholder="Start date...">'+                          
+            '<div class="col-sm-2"><div class="input-group form-group"><span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span><div class="dtp-container fg-line">'+
+        '<input id="start-'+unit_id+'" type="text" class="form-control date-picker" placeholder="Start">'+                          
             '</div></div></div>'+
-            '<div class="col-sm-3"><div class="input-group form-group"><span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span><div class="dtp-container fg-line">'+
-        '<input id="graduation-'+unit_id+'" type="text" class="form-control date-picker" placeholder="Graduation date...">'+                          
+            '<div class="col-sm-2"><div class="input-group form-group"><span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span><div class="dtp-container fg-line">'+
+        '<input id="graduation-'+unit_id+'" type="text" class="form-control date-picker" placeholder="End">'+                          
             '</div></div></div>'+                                                                  
         '</div></div></div>').addClass('animated bounceIn');
     
@@ -465,7 +461,7 @@
         switch (unit_name) {
             case 'university':
                 unit = unit_university;
-                $('#unit-block-high').prepend(unit);
+                $('#unit-block-university').prepend(unit);
                  $('#graduation-'+unit_id).datetimepicker({
                     viewMode: 'years',
                     format: 'YYYY'
@@ -473,7 +469,7 @@
                 break;
             case 'school':
                 unit = unit_school;
-                $('#unit-block-base').prepend(unit);
+                $('#unit-block-school').prepend(unit);
                 $('#graduation-'+unit_id).datetimepicker({
                     viewMode: 'years',
                     format: 'YYYY'
@@ -481,14 +477,14 @@
                 break;
             case 'sertification':
                 unit = unit_sertification;
-                $('#unit-block-sert').prepend(unit);
+                $('#unit-block-sertification').prepend(unit);
                 $('#graduation-'+unit_id).datetimepicker({                    
                      format: 'MM/YYYY'
                 });
                 break;
             case 'courses':
                 unit = unit_courses;
-                $('#unit-block-cour').prepend(unit);
+                $('#unit-block-courses').prepend(unit);
                 $('#start-'+unit_id).datetimepicker({                   
                     format: 'MM/YYYY'
                 });
@@ -498,10 +494,12 @@
                 break;
             case 'internal':
                 unit = unit_internal;
-                $('#unit-block-int').prepend(unit);
+                $('#unit-block-internal').prepend(unit);
+                $('#start-'+unit_id).datetimepicker({
+                    format: 'MM/YYYY'
+                });
                 $('#graduation-'+unit_id).datetimepicker({
-                    viewMode: 'years',
-                    format: 'YYYY'
+                    format: 'MM/YYYY'
                 });
                 break;
        }       

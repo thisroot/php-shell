@@ -43,12 +43,15 @@ User management system
         │   ├── passwords.php
         │   ├── services.php
         │   ├── timeouts.php
-        │   └── settings.php
+        │   ├── settings.php
+        │   └── profile.php
+        ├── /profiles
+        │   ├── public.php
+        │   └── private.php
         ├── actions.php
         ├── activate.php
         ├── double_login.php
-        ├── errors.php
-        └── profile.php
+        └── errors.php
 ```
 
 ### Properties
@@ -95,6 +98,7 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 - Update passwords settings
 - Update timeouts settings 
 - Update other settings 
+- Update about user
 
 ### WEB interfaces
 ```
@@ -105,10 +109,13 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /users/login/ya                                             // Login via Yandex
 /users/login/double/<return_hash>                           // Double login form
 /users/activate/<user_id_hash>/<params>                     // User activation
-/users/profile                                              // User profile
+/users/profile                                              // Private user profile
+/users/profile/<user_id_hash>                               // Public user profile
+
 /users/logout                                               // Logout
 
 /admin/users                                                // Manage users
+/admin/users/profile/<user_id>                              // Admin user profile
 /admin/users/add                                            // Add user
 /admin/users/edit/<user_id_hash>                            // Edit user
 /admin/users/oauth/clients                                  // Setup OAuth clients
@@ -130,6 +137,7 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /users/api/register.json                                    // [API] Register
 /users/api/reset-password.json                              // [API] Reset password
 /users/api/change-password.json                             // [API] Change password
+/users/api/about/update.json                                // [API] Update about current user
 
 /admin/users/api/add.json                                   // [API] Add user
 /admin/users/api/remove.json                                // [API] Remove user
@@ -148,4 +156,5 @@ string APP::Module('Users')->GeneratePassword(int $length[, bool $letters = true
 /admin/users/api/passwords/update.json                      // [API] Update passwords settings
 /admin/users/api/timeouts/update.json                       // [API] Update timeouts settings
 /admin/users/api/settings/update.json                       // [API] Update other settings
+/admin/users/api/about/update.json                          // [API] Update about any users
 ```

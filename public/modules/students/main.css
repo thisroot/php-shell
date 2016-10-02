@@ -15,10 +15,18 @@ and open the template in the editor.
 }
 */
 
+html {
+    background-image: none;
+}
+
 body:before {
        background-image: url("https://nebesa.me/public/modules/students/img/9.jpg");
        background-position: left center;
        height: 300px;
+}
+
+header.media {
+    margin-top: 0px;
 }
 
 #s-main-menu, .sub-menu > a::before, .sub-menu > a::after {

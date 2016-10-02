@@ -56,8 +56,8 @@ class TaskManager {
                 ]);
                 
                 APP::Module('DB')->Update($this->settings['module_taskmanager_db_connection'], 'task_manager', [
-                    'complete_date' => date('Y-m-d H:i:s', time()),
-                    'state' => 'complete'
+                    'state' => 'complete',
+                    'complete_date' => date('Y-m-d H:i:s', time())
                 ], [['id', '=', $task['id'], PDO::PARAM_INT]]);
             }
         } else {

@@ -179,7 +179,7 @@ $return = $data['return'] ? $data['return'] : APP::Module('Routing')->root . 'us
                 ?>
                 <div class="l-block" id="l-change-password">
                     <div class="lb-header palette-Blue bg">
-                        <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . 'public/ui/img/profile-pics/default.png') ?>&t=<?= time() ?>" class="avatar-img">
+                        <img src="<?= APP::$conf['location'][0] ?>://www.gravatar.com/avatar/<?= md5(APP::Module('Users')->user['email']) ?>?s=40&d=<?= urlencode(APP::Module('Routing')->root . APP::Module('Users')->settings['module_users_profile_picture']) ?>&t=<?= time() ?>" class="avatar-img">
                         Change Password
                     </div>
 

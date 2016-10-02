@@ -183,7 +183,7 @@
                             $('#update-settings').find('[type="submit"]').html('Save changes').attr('disabled', false);
                         }
                     });
-                  });
+                });
             });
         </script>
     </body>

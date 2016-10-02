@@ -143,28 +143,18 @@ $data->extractTo(ROOT);
 
 $db = APP::Module('DB')->Open($_SESSION['core']['install']['mail']['db_connection']);
 
-$db->query('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
-$db->query('SET time_zone = "+00:00";');
-
 $db->query("
-    --
-    -- Table structure for table `mail_copies`
-    --
+    SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+    SET time_zone = '+00:00';
 
     CREATE TABLE `mail_copies` (
       `id` bigint(20) UNSIGNED NOT NULL,
       `log` bigint(20) UNSIGNED NOT NULL,
       `subject` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-      `html` longtext COLLATE utf8_unicode_ci NOT NULL,
-      `plaintext` longtext COLLATE utf8_unicode_ci NOT NULL,
+      `html` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+      `plaintext` mediumtext COLLATE utf8_unicode_ci NOT NULL,
       `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_events`
-    --
 
     CREATE TABLE `mail_events` (
       `id` bigint(20) UNSIGNED NOT NULL,
@@ -172,34 +162,22 @@ $db->query("
       `user` int(11) UNSIGNED NOT NULL,
       `letter` smallint(6) UNSIGNED NOT NULL,
       `event` enum('delivered','processed','open','click','deferred','bounce','unsubscribe','dropped','spamreport') COLLATE utf8_unicode_ci NOT NULL,
-      `details` text COLLATE utf8_unicode_ci NOT NULL,
-      `token` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-      `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      `details` text COLLATE utf8_unicode_ci,
+      `token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+      `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_letters`
-    --
 
     CREATE TABLE `mail_letters` (
       `id` smallint(5) UNSIGNED NOT NULL,
       `group_id` smallint(5) UNSIGNED NOT NULL,
       `sender` smallint(5) UNSIGNED NOT NULL,
       `subject` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-      `html` longtext COLLATE utf8_unicode_ci NOT NULL,
-      `plaintext` longtext COLLATE utf8_unicode_ci NOT NULL,
+      `html` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+      `plaintext` mediumtext COLLATE utf8_unicode_ci NOT NULL,
       `transport` smallint(5) UNSIGNED NOT NULL,
       `priority` smallint(5) NOT NULL DEFAULT '0',
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_letters_groups`
-    --
 
     CREATE TABLE `mail_letters_groups` (
       `id` smallint(5) UNSIGNED NOT NULL,
@@ -208,54 +186,39 @@ $db->query("
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_log`
-    --
-
     CREATE TABLE `mail_log` (
       `id` bigint(20) UNSIGNED NOT NULL,
-      `queue` bigint(20) UNSIGNED NOT NULL,
       `user` int(10) UNSIGNED NOT NULL,
       `letter` smallint(5) UNSIGNED NOT NULL,
       `sender` smallint(5) UNSIGNED NOT NULL,
       `transport` smallint(5) UNSIGNED NOT NULL,
       `state` enum('wait','error','success') COLLATE utf8_unicode_ci NOT NULL,
-      `result` text COLLATE utf8_unicode_ci NOT NULL,
+      `result` text COLLATE utf8_unicode_ci,
       `retries` tinyint(3) UNSIGNED NOT NULL,
       `ping` double UNSIGNED NOT NULL,
       `cr_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_queue`
-    --
-
     CREATE TABLE `mail_queue` (
       `id` bigint(20) UNSIGNED NOT NULL,
-      `log` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+      `log` bigint(20) UNSIGNED NOT NULL,
       `user` int(10) UNSIGNED NOT NULL,
       `letter` smallint(5) UNSIGNED NOT NULL,
       `sender` smallint(5) UNSIGNED NOT NULL,
       `transport` smallint(5) UNSIGNED NOT NULL,
-      `html` longtext COLLATE utf8_unicode_ci NOT NULL,
-      `plaintext` longtext COLLATE utf8_unicode_ci NOT NULL,
+      `sender_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+      `sender_email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+      `recepient` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+      `subject` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+      `html` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+      `plaintext` mediumtext COLLATE utf8_unicode_ci NOT NULL,
       `retries` tinyint(3) UNSIGNED NOT NULL,
       `ping` double UNSIGNED NOT NULL,
       `execute` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      `state` enum('prepare','init','wait','success','error') COLLATE utf8_unicode_ci NOT NULL,
       `priority` smallint(6) NOT NULL,
-      `result` text COLLATE utf8_unicode_ci NOT NULL
+      `result` text COLLATE utf8_unicode_ci,
+      `token` varchar(50) COLLATE utf8_unicode_ci NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_senders`
-    --
 
     CREATE TABLE `mail_senders` (
       `id` smallint(5) UNSIGNED NOT NULL,
@@ -265,24 +228,12 @@ $db->query("
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_senders_groups`
-    --
-
     CREATE TABLE `mail_senders_groups` (
       `id` smallint(5) UNSIGNED NOT NULL,
       `sub_id` smallint(5) NOT NULL DEFAULT '0',
       `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    -- --------------------------------------------------------
-
-    --
-    -- Table structure for table `mail_transport`
-    --
 
     CREATE TABLE `mail_transport` (
       `id` smallint(5) UNSIGNED NOT NULL,
@@ -292,180 +243,99 @@ $db->query("
       `up_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-    --
-    -- Indexes for dumped tables
-    --
 
-    --
-    -- Indexes for table `mail_copies`
-    --
     ALTER TABLE `mail_copies`
       ADD PRIMARY KEY (`id`),
-      ADD KEY `log` (`log`);
+      ADD KEY `log` (`log`),
+      ADD KEY `cr_date` (`cr_date`);
 
-    --
-    -- Indexes for table `mail_events`
-    --
     ALTER TABLE `mail_events`
       ADD PRIMARY KEY (`id`),
       ADD KEY `log` (`log`),
       ADD KEY `user` (`user`),
       ADD KEY `letter` (`letter`);
 
-    --
-    -- Indexes for table `mail_letters`
-    --
     ALTER TABLE `mail_letters`
       ADD PRIMARY KEY (`id`),
-      ADD KEY `group_id` (`group_id`,`sender`),
-      ADD KEY `group_id_2` (`group_id`),
       ADD KEY `sender` (`sender`),
-      ADD KEY `transport` (`transport`);
+      ADD KEY `transport` (`transport`),
+      ADD KEY `group_id` (`group_id`) USING BTREE;
 
-    --
-    -- Indexes for table `mail_letters_groups`
-    --
     ALTER TABLE `mail_letters_groups`
       ADD PRIMARY KEY (`id`),
       ADD KEY `sub_id` (`sub_id`);
 
-    --
-    -- Indexes for table `mail_log`
-    --
     ALTER TABLE `mail_log`
       ADD PRIMARY KEY (`id`),
-      ADD KEY `user` (`user`,`letter`,`sender`,`state`),
-      ADD KEY `cr_date` (`cr_date`),
       ADD KEY `transport` (`transport`),
-      ADD KEY `queue` (`queue`),
       ADD KEY `letter` (`letter`),
-      ADD KEY `sender` (`sender`);
+      ADD KEY `sender` (`sender`),
+      ADD KEY `user` (`user`) USING BTREE;
 
-    --
-    -- Indexes for table `mail_queue`
-    --
     ALTER TABLE `mail_queue`
       ADD PRIMARY KEY (`id`),
       ADD KEY `log` (`log`),
       ADD KEY `user` (`user`),
       ADD KEY `letter` (`letter`),
       ADD KEY `sender` (`sender`),
-      ADD KEY `transport` (`transport`);
+      ADD KEY `transport` (`transport`),
+      ADD KEY `execute_token_priority` (`execute`,`token`,`priority`) USING BTREE;
 
-    --
-    -- Indexes for table `mail_senders`
-    --
     ALTER TABLE `mail_senders`
       ADD PRIMARY KEY (`id`),
       ADD KEY `group_id` (`group_id`);
 
-    --
-    -- Indexes for table `mail_senders_groups`
-    --
     ALTER TABLE `mail_senders_groups`
       ADD PRIMARY KEY (`id`),
       ADD KEY `sub_id` (`sub_id`);
 
-    --
-    -- Indexes for table `mail_transport`
-    --
     ALTER TABLE `mail_transport`
-      ADD PRIMARY KEY (`id`);
+      ADD PRIMARY KEY (`id`),
+      ADD KEY `module_method` (`module`,`method`) USING BTREE;
 
-    --
-    -- AUTO_INCREMENT for dumped tables
-    --
 
-    --
-    -- AUTO_INCREMENT for table `mail_copies`
-    --
     ALTER TABLE `mail_copies`
       MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_events`
-    --
     ALTER TABLE `mail_events`
       MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_letters`
-    --
     ALTER TABLE `mail_letters`
       MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_letters_groups`
-    --
     ALTER TABLE `mail_letters_groups`
       MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_log`
-    --
     ALTER TABLE `mail_log`
       MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_queue`
-    --
     ALTER TABLE `mail_queue`
       MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_senders`
-    --
     ALTER TABLE `mail_senders`
       MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_senders_groups`
-    --
     ALTER TABLE `mail_senders_groups`
       MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- AUTO_INCREMENT for table `mail_transport`
-    --
     ALTER TABLE `mail_transport`
       MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-    --
-    -- Constraints for dumped tables
-    --
 
-    --
-    -- Constraints for table `mail_copies`
-    --
     ALTER TABLE `mail_copies`
       ADD CONSTRAINT `mail_copies_ibfk_1` FOREIGN KEY (`log`) REFERENCES `mail_log` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-    --
-    -- Constraints for table `mail_events`
-    --
     ALTER TABLE `mail_events`
       ADD CONSTRAINT `mail_events_ibfk_1` FOREIGN KEY (`log`) REFERENCES `mail_log` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_events_ibfk_3` FOREIGN KEY (`letter`) REFERENCES `mail_letters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-    --
-    -- Constraints for table `mail_letters`
-    --
     ALTER TABLE `mail_letters`
       ADD CONSTRAINT `mail_letters_ibfk_1` FOREIGN KEY (`sender`) REFERENCES `mail_senders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_letters_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `mail_letters_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_letters_ibfk_3` FOREIGN KEY (`transport`) REFERENCES `mail_transport` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-    --
-    -- Constraints for table `mail_log`
-    --
     ALTER TABLE `mail_log`
       ADD CONSTRAINT `mail_log_ibfk_2` FOREIGN KEY (`transport`) REFERENCES `mail_transport` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_log_ibfk_3` FOREIGN KEY (`letter`) REFERENCES `mail_letters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_log_ibfk_4` FOREIGN KEY (`sender`) REFERENCES `mail_senders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-    --
-    -- Constraints for table `mail_queue`
-    --
     ALTER TABLE `mail_queue`
-      ADD CONSTRAINT `mail_queue_ibfk_1` FOREIGN KEY (`log`) REFERENCES `mail_log` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_queue_ibfk_3` FOREIGN KEY (`letter`) REFERENCES `mail_letters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
       ADD CONSTRAINT `mail_queue_ibfk_4` FOREIGN KEY (`sender`) REFERENCES `mail_senders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-      ADD CONSTRAINT `mail_queue_ibfk_5` FOREIGN KEY (`transport`) REFERENCES `mail_transport` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+      ADD CONSTRAINT `mail_queue_ibfk_5` FOREIGN KEY (`transport`) REFERENCES `mail_transport` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+      ADD CONSTRAINT `mail_queue_ibfk_6` FOREIGN KEY (`log`) REFERENCES `mail_log` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-    --
-    -- Constraints for table `mail_senders`
-    --
     ALTER TABLE `mail_senders`
       ADD CONSTRAINT `mail_senders_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `mail_senders_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ");
@@ -504,6 +374,18 @@ APP::Module('Triggers')->Register('mail_remove_transport', 'Mail / Transport', '
 APP::Module('Triggers')->Register('mail_update_transport', 'Mail / Transport', 'Update');
 
 APP::Module('Triggers')->Register('mail_update_settings', 'Mail', 'Update settings');
+APP::Module('Triggers')->Register('mail_remove_log_entry', 'Mail', 'Remove log entry');
+APP::Module('Triggers')->Register('mail_remove_queue_entry', 'Mail', 'Remove queue entry');
 
 APP::Module('Triggers')->Register('before_mail_send_letter', 'Mail', 'Send mail (before)');
 APP::Module('Triggers')->Register('after_mail_send_letter', 'Mail', 'Send mail (after)');
+
+APP::Module('Triggers')->Register('mail_event_processed', 'Mail / Events', 'Processed');
+APP::Module('Triggers')->Register('mail_event_delivered', 'Mail / Events', 'Delivered');
+APP::Module('Triggers')->Register('mail_event_deferred', 'Mail / Events', 'Deferred');
+APP::Module('Triggers')->Register('mail_event_bounce_hard', 'Mail / Events', 'Bounce (hard)');
+APP::Module('Triggers')->Register('mail_event_bounce_soft', 'Mail / Events', 'Bounce (soft)');
+APP::Module('Triggers')->Register('mail_event_unsubscribe', 'Mail / Events', 'Unsubscribe');
+APP::Module('Triggers')->Register('mail_event_spamreport', 'Mail / Events', 'Spamreport');
+APP::Module('Triggers')->Register('mail_event_open', 'Mail / Events', 'Open');
+APP::Module('Triggers')->Register('mail_event_click', 'Mail / Events', 'Click');

@@ -3,6 +3,12 @@ class Users {
 
     public $settings;
     public $user = [];
+    public $about = [
+        'username',
+        'mobile_phone',
+        'twitter',
+        'skype'
+    ];
     
     function __construct($conf) {
         foreach ($conf['routes'] as $route) APP::Module('Routing')->Add($route[0], $route[1], $route[2]);
@@ -37,7 +43,8 @@ class Users {
             'module_users_timeout_activation', 
             'module_users_timeout_email',
             'module_users_timeout_token',
-            'module_users_tmp_dir'
+            'module_users_tmp_dir',
+            'module_users_profile_picture'
         ]);
         
         $this->user = &APP::Module('Sessions')->session['modules']['users']['user'];
@@ -47,7 +54,10 @@ class Users {
         }
         
         if (!$this->user) {
-            $this->user['role'] = 'default';
+            $this->user = [
+                'id' => 0,
+                'role' => 'default'
+            ];
         }
 
         if (isset($_COOKIE['modules']['users']['token'])) {
@@ -64,6 +74,14 @@ class Users {
                     $this->user = $this->Auth($user, true, true);
                 }
             }
+        }
+        
+        if ($this->user['id']) {
+            APP::Module('DB')->Update(
+                $this->settings['module_users_db_connection'], 'users', 
+                ['last_visit' => date('Y-m-d H:i:s')], 
+                [['id', '=', $this->user['id'], PDO::PARAM_INT]]
+            );
         }
 
         if ((int) $this->settings['module_users_check_rules']) {
@@ -316,20 +334,7 @@ class Users {
             APP::Render('users/activate', 'include', $result);
         }
     }
-    
-    public function Profile() {
-        APP::Render(
-            'users/profile', 'include', 
-            [
-                'social-profiles' => APP::Module('DB')->Select(
-                    $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
-                    ['service', 'extra'], 'users_accounts',
-                    [['user_id', '=', $this->user['id'], PDO::PARAM_INT]]
-                )
-            ]
-        );
-    }
-    
+
     public function ManageRoles() {
         APP::Render('users/admin/roles/index');
     }
@@ -405,13 +410,176 @@ class Users {
     }
     
     
+    public function PublicProfile() {
+        if (!isset(APP::Module('Routing')->get['user_id_hash'])) {
+            header('HTTP/1.0 404 Not Found');
+            exit;
+        }
+        
+        $user_id = (int) APP::Module('Crypt')->Decode(APP::Module('Routing')->get['user_id_hash']);
+        $about = [];
+        $comments = false;
+        
+        if ((!APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'users',
+            [['id', '=', $user_id, PDO::PARAM_INT]]
+        )) || (!$user_id)) {
+            header('HTTP/1.0 404 Not Found');
+            exit;
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['item', 'value'], 'users_about',
+            [['user', '=', $user_id, PDO::PARAM_INT]]
+        ) as $value) {
+            $about[$value['item']] = $value['value'];
+        }
+
+        APP::Render(
+            'users/profiles/public', 'include', 
+            [
+                'user' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
+                    [['id', '=', $user_id, PDO::PARAM_INT]]
+                ),
+                'social-profiles' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                    ['service', 'extra'], 'users_accounts',
+                    [['user_id', '=', $user_id, PDO::PARAM_INT]]
+                ),
+                'about' => $about,
+            ]
+        );
+    }
+    
+    public function PrivateProfile() {
+        $about = [];
+        $comments = false;
+        $likes = false;
+
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['item', 'value'], 'users_about',
+            [['user', '=', $this->user['id'], PDO::PARAM_INT]]
+        ) as $value) {
+            $about[$value['item']] = $value['value'];
+        }
+        
+        if (isset(APP::$modules['Comments'])) {
+            $comments = APP::Module('DB')->Select(
+                APP::Module('Comments')->settings['module_comments_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                ['id', 'message', 'url', 'UNIX_TIMESTAMP(up_date) as up_date'], 'comments_messages',
+                [['user', '=', $this->user['id'], PDO::PARAM_INT]],
+                false, false, false, 
+                ['id', 'desc']
+            );
+        }
+        
+        if (isset(APP::$modules['Likes'])) {
+            $likes = APP::Module('DB')->Select(
+                APP::Module('Likes')->settings['module_likes_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                ['id', 'url', 'UNIX_TIMESTAMP(up_date) as up_date'], 'likes_list',
+                [['user', '=', $this->user['id'], PDO::PARAM_INT]],
+                false, false, false, 
+                ['id', 'desc']
+            );
+        }
+        
+        APP::Render(
+            'users/profiles/private', 'include', 
+            [
+                'user' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
+                    [['id', '=', $this->user['id'], PDO::PARAM_INT]]
+                ),
+                'social-profiles' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                    ['service', 'extra'], 'users_accounts',
+                    [['user_id', '=', $this->user['id'], PDO::PARAM_INT]]
+                ),
+                'about' => $about,
+                'comments' => $comments,
+                'likes' => $likes
+            ]
+        );
+    }
+    
+    public function AdminProfile() {
+        $user_id = APP::Module('Routing')->get['user_id'];
+        $about = [];
+        $comments = false;
+        $likes = false;
+        
+        if (!APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchColumn', 0], 
+            ['COUNT(id)'], 'users',
+            [['id', '=', $user_id, PDO::PARAM_INT]]
+        )) {
+            header('HTTP/1.0 404 Not Found');
+            exit;
+        }
+        
+        foreach (APP::Module('DB')->Select(
+            $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+            ['item', 'value'], 'users_about',
+            [['user', '=', $user_id, PDO::PARAM_INT]]
+        ) as $value) {
+            $about[$value['item']] = $value['value'];
+        }
+        
+        if (isset(APP::$modules['Comments'])) {
+            $comments = APP::Module('DB')->Select(
+                APP::Module('Comments')->settings['module_comments_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                ['id', 'message', 'url', 'UNIX_TIMESTAMP(up_date) as up_date'], 'comments_messages',
+                [['user', '=', $user_id, PDO::PARAM_INT]],
+                false, false, false, 
+                ['id', 'desc']
+            );
+        }
+        
+        if (isset(APP::$modules['Likes'])) {
+            $likes = APP::Module('DB')->Select(
+                APP::Module('Likes')->settings['module_likes_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                ['id', 'url', 'UNIX_TIMESTAMP(up_date) as up_date'], 'likes_list',
+                [['user', '=', $user_id, PDO::PARAM_INT]],
+                false, false, false, 
+                ['id', 'desc']
+            );
+        }
+        
+        APP::Render(
+            'users/admin/profile', 'include', 
+            [
+                'user' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_ASSOC], 
+                    ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
+                    [['id', '=', $user_id, PDO::PARAM_INT]]
+                ),
+                'social-profiles' => APP::Module('DB')->Select(
+                    $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
+                    ['service', 'extra'], 'users_accounts',
+                    [['user_id', '=', $user_id, PDO::PARAM_INT]]
+                ),
+                'about' => $about,
+                'comments' => $comments,
+                'likes' => $likes
+            ]
+        );
+    }
+    
+    
     public function APIListUsers() {
         $rows = [];
+        $where = [['id', '!=', 0, PDO::PARAM_INT]];
         
         foreach (APP::Module('DB')->Select(
             $this->settings['module_users_db_connection'], ['fetchAll', PDO::FETCH_ASSOC], 
             ['id', 'email', 'password', 'role', 'reg_date', 'last_visit'], 'users',
-            $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false, 
+            $_POST['searchPhrase'] ? array_merge([['email', 'LIKE', $_POST['searchPhrase'] . '%' ]], $where) : $where, 
             false, false, false,
             [array_keys($_POST['sort'])[0], array_values($_POST['sort'])[0]],
             [($_POST['current'] - 1) * $_POST['rowCount'], $_POST['rowCount']]
@@ -430,7 +598,7 @@ class Users {
             'current' => $_POST['current'],
             'rowCount' => $_POST['rowCount'],
             'rows' => $rows,
-            'total' => APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', $_POST['searchPhrase'] ? [['email', 'LIKE', $_POST['searchPhrase'] . '%' ]] : false)
+            'total' => APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', $_POST['searchPhrase'] ? array_merge([['email', 'LIKE', $_POST['searchPhrase'] . '%' ]], $where) : $where)
         ]);
         exit;
     }
@@ -1181,10 +1349,12 @@ class Users {
     public function APIUpdateOtherSettings() {
         APP::Module('Registry')->Update(['value' => $_POST['module_users_db_connection']], [['item', '=', 'module_users_db_connection', PDO::PARAM_STR]]);
         APP::Module('Registry')->Update(['value' => $_POST['module_users_tmp_dir']], [['item', '=', 'module_users_tmp_dir', PDO::PARAM_STR]]);
+        APP::Module('Registry')->Update(['value' => $_POST['module_users_profile_picture']], [['item', '=', 'module_users_profile_picture', PDO::PARAM_STR]]);
         
         APP::Module('Triggers')->Exec('update_users_other_settings', [
             'db_connection' => $_POST['module_users_db_connection'],
-            'tmp_dir' => $_POST['module_users_tmp_dir']
+            'tmp_dir' => $_POST['module_users_tmp_dir'],
+            'profile_picture' => $_POST['module_users_profile_picture']
         ]);
         
         header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
@@ -1198,6 +1368,106 @@ class Users {
         exit;
     }
 
+    public function APIUpdateAbout() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+
+        if (!isset($_POST['about'])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+
+        if ($out['status'] == 'success') {
+            APP::Module('DB')->Delete(
+                $this->settings['module_users_db_connection'], 'users_about',
+                [
+                    ['user', '=', $this->user['id'], PDO::PARAM_INT],
+                    ['item', 'IN', array_keys((array) $_POST['about'])]
+                ]
+            );
+            
+            foreach ((array) $_POST['about'] as $item => $value) {
+                if ((!empty($value)) && (array_search($item, $this->about) !== false)) {
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_users_db_connection'], ' users_about',
+                        [
+                            'id' => 'NULL',
+                            'user' => [$this->user['id'], PDO::PARAM_INT],
+                            'item' => [$item, PDO::PARAM_STR],
+                            'value' => [$value, PDO::PARAM_STR],
+                            'up_date' => 'CURRENT_TIMESTAMP'
+                        ]
+                    );
+                }
+            }
+
+            APP::Module('Triggers')->Exec('update_about_user', [
+                'user' => $this->user['id'],
+                'about' => (array) $_POST['about']
+            ]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
+    public function APIAdminUpdateAbout() {
+        $out = [
+            'status' => 'success',
+            'errors' => []
+        ];
+        
+        $user_id = APP::Module('Crypt')->Decode($_POST['user']);
+
+        if (!APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetchColumn', 0], ['COUNT(id)'], 'users', [['id', '=', $user_id, PDO::PARAM_INT]])) {
+            $out['status'] = 'error';
+            $out['errors'][] = 1;
+        }
+
+        if ($out['status'] == 'success') {
+            APP::Module('DB')->Delete(
+                $this->settings['module_users_db_connection'], 'users_about',
+                [
+                    ['user', '=', $user_id, PDO::PARAM_INT],
+                    ['item', 'IN', array_keys($_POST['about'])]
+                ]
+            );
+            
+            foreach ($_POST['about'] as $item => $value) {
+                if ((!empty($value)) && (array_search($item, $this->about) !== false)) {
+                    APP::Module('DB')->Insert(
+                        $this->settings['module_users_db_connection'], ' users_about',
+                        [
+                            'id' => 'NULL',
+                            'user' => [$user_id, PDO::PARAM_INT],
+                            'item' => [$item, PDO::PARAM_STR],
+                            'value' => [$value, PDO::PARAM_STR],
+                            'up_date' => 'CURRENT_TIMESTAMP'
+                        ]
+                    );
+                }
+            }
+
+            APP::Module('Triggers')->Exec('update_about_user', [
+                'user' => $user_id,
+                'about' => $_POST['about']
+            ]);
+        }
+
+        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
+        header('Access-Control-Allow-Origin: ' . APP::$conf['location'][1]);
+        header('Content-Type: application/json');
+        
+        echo json_encode($out);
+        exit;
+    }
+    
     
     public function LoginVK() {
         if (!(int) $this->settings['module_users_login_service']) APP::Render('users/errors', 'include', 'auth_service');
