@@ -57,7 +57,7 @@
         }
         
         #lectures-table td a {
-            padding:10px;
+            padding: 10px 0px;
             display: block;
             width: 100%;
         }

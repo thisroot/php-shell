@@ -3,7 +3,7 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
-/* 
+/*
     Created on : 20.09.2016, 21:13:15
     Author     : User
 */
@@ -15,14 +15,40 @@ and open the template in the editor.
 }
 */
 
+.form-group .select2-container {
+    position: relative;
+    z-index: 2;
+    float: left;
+    width: 100%;
+    margin-bottom: 0;
+    display: table;
+    table-layout: fixed;
+}
+
+.input-group .form-control {
+    display: table-cell;
+    color: #7e57c2;
+}
+
 html {
     background-image: none;
 }
 
+body {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
 body:before {
-       background-image: url("https://nebesa.me/public/modules/students/img/9.jpg");
-       background-position: left center;
-       height: 300px;
+    background-image: url("https://nebesa.me/public/modules/students/img/9.jpg");
+    background-position: left center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 300px;
 }
 
 header.media {
@@ -30,9 +56,8 @@ header.media {
 }
 
 #s-main-menu, .sub-menu > a::before, .sub-menu > a::after {
- /* padding-top: 40px; */
- position: fixed;
- top: 200px;
+    padding-top: 40px;
+
 }
 
 .hm-profile > a img {
@@ -62,11 +87,11 @@ header.media {
     background-color: #ab47bc;
 }
 
-#module-student .has-error .help-block, .has-error .control-label, 
-#module-student .has-error .radio, .has-error .checkbox, 
-#module-student .has-error .radio-inline, .has-error .checkbox-inline, 
-#module-student .has-error.radio label, .has-error.checkbox label, 
-#module-student .has-error.radio-inline label, 
+#module-student .has-error .help-block, .has-error .control-label,
+#module-student .has-error .radio, .has-error .checkbox,
+#module-student .has-error .radio-inline, .has-error .checkbox-inline,
+#module-student .has-error.radio label, .has-error.checkbox label,
+#module-student .has-error.radio-inline label,
 #module-student .has-error.checkbox-inline label {
     color: #ab47bc;
     position: absolute;
@@ -148,8 +173,8 @@ header.media {
     border-radius: 3px;
 }
 
-.block__list { 
-    max-width: 100%;   
+.block__list {
+    max-width: 100%;
 }
 
 /* editable */
@@ -176,11 +201,8 @@ header.media {
 
 #items .editableform {
     margin-bottom: 0;
-    position: absolute;
-    left: 60px;
-    background-color: white;
+    background-color: #fefefe;
     z-index: 1;
-    margin-top: 8px;
     width: 50%;
 
 }
@@ -196,39 +218,52 @@ header.media {
 
 .js-remove {
     position: absolute;
-    right: 20px;
+    right: -5px;
     z-index: 1;
-    margin-top: 8px;
     margin-right: 10px;
-    font: bold 20px Sans-Serif;
-    color: #7e57c2;
+    color: #939393;
     display: inline-block;
     cursor: pointer;
+    border-radius: 50%;
+    padding: 0px 2px;
+    border: 1px solid #c9c9c9;
+    background-color: #fff;
 }
 
 .js-edit, .js-save {
-    margin-top: 8px;
     position: absolute;
-    right: 100px;
+    right: 0px;
     z-index: 1;
-    margin-right: 10px;
-    font: bold 20px Sans-Serif;
-    color: #7e57c2;
+    margin-right: 35px;
+    color: #939393;
     display: inline-block;
     cursor: pointer;
+    border-radius: 50%;
+    padding: 0px 2px;
+    border: 1px solid #c9c9c9;
+    background-color: #fff;
+}
+
+.js-expand {
+    position: absolute;
+    right: 0px;
+    z-index: 1;
+    margin-right: 65px;
+    color: #939393;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 0px 2px;
+    border: 1px solid #c9c9c9;
+    background-color: #fff;
 }
 
 .block-name {
     position: absolute;
-    left: 60px;
     z-index: 1;
     margin-right: 10px;
-    font-size: 14px;
     color: #7e57c2;
     display: inline-block;
-    background-color: white;
-    padding-top: 8px;
-
 }
 
 .button-hover:hover {
@@ -243,17 +278,19 @@ header.media {
 }
 
 ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
-    width: 110px; 
+    width: 110px;
 }
 
 #module-student .card > .actions, #module-student .card-header .actions {
     top: 27px;
+    font-size: 12px;
+    color: #7e57c2;
 }
 
 #module-student #content a ,
-#module-student .card a,  
+#module-student .card a,
 #module-student .card-header h2,
-#module-student .input-group-addon {   
+#module-student .input-group-addon {
     color: #7e57c2;
 }
 
@@ -277,7 +314,7 @@ ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):n
     background-color: #d5d5d5;
 }
 
-#module-student .card .note-editor .note-toolbar > .btn-group > .active, .note-popover .note-toolbar > .btn-group > .active, 
+#module-student .card .note-editor .note-toolbar > .btn-group > .active, .note-popover .note-toolbar > .btn-group > .active,
 #module-student .card .note-editor .popover-content > .btn-group > .active, .note-popover .popover-content > .btn-group > .active {
     background: #F9F9F9;
 }
@@ -297,6 +334,13 @@ ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):n
 
 #module-student .card .actions .dropdown a.dropdown-toggle {
     color: white;
+}
+
+#module-student #content .card-header h2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 50%;
 }
 
 #lectures-table td {
@@ -329,7 +373,7 @@ ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):n
 }
 
 #upload-photo {
-    display: none; 
+    display: none;
 }
 
 #upload-photo.ready {
@@ -407,4 +451,201 @@ ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):n
 .bootgrid-table .lgi-heading {
     color: #7E57C2;
     margin-bottom: 4px;
+}
+
+
+
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+#items li.placeholder {
+    position: relative;
+    /** More li styles **/
+    color: red;
+}
+#items li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}
+
+/**
+ * Nestable
+ */
+
+.dd { position: relative; display: block; margin: 0; padding: 0;  list-style: none; font-size: 13px; line-height: 20px; }
+
+.dd-list { display: block; position: relative; margin: 0; padding: 0; list-style: none; }
+.dd-list .dd-list { padding-left: 30px; }
+.dd-collapsed .dd-list { display: none; }
+
+.dd-item,
+.dd-empty,
+.dd-placeholder { display: block; position: relative; margin: 0; padding: 0; min-height: 20px; font-size: 13px; line-height: 20px; }
+
+.dd-handle {
+    display: block;
+    height: 30px;
+    padding: 5px 10px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 3px;
+    -moz-box-sizing: border-box;
+}
+
+
+.dd-item > button { display: block; position: relative; cursor: pointer; float: left; width: 25px; height: 20px; margin: 5px 0; padding: 0; text-indent: 100%; white-space: nowrap; overflow: hidden; border: 0; background: transparent; font-size: 12px; line-height: 1; text-align: center; font-weight: bold; }
+.dd-item > button:before { content: '+'; display: block; position: absolute; width: 100%; text-align: center; text-indent: 0; }
+.dd-item > button[data-action="collapse"]:before { content: '-'; }
+
+.dd-placeholder,
+.dd-empty {
+    margin: 5px 0;
+    padding: 0;
+    min-height: 30px;
+    background: #ede7f6;
+    border: 1px dashed #b6bcbf;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.dd-empty { border: 1px dashed #bbb; min-height: 100px; background-color: #e5e5e5;
+            background-image: -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+            background-image:    -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+            background-image:         linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+}
+
+.dd-dragel { position: absolute; pointer-events: none; z-index: 9999; }
+.dd-dragel > .dd-item .dd-handle { margin-top: 0; }
+.dd-dragel .dd-handle {
+    -webkit-box-shadow: 2px 4px 6px 0 rgba(0,0,0,.1);
+    box-shadow: 2px 4px 6px 0 rgba(0,0,0,.1);
+}
+
+/**
+ * Nestable Extras
+ */
+
+.nestable-lists { display: block; clear: both; padding: 30px 0; width: 100%; border: 0; border-top: 2px solid #ddd; border-bottom: 2px solid #ddd; }
+
+#nestable-menu { padding: 0; margin: 20px 0; }
+
+#nestable-output,
+#nestable2-output { width: 100%; height: 7em; font-size: 0.75em; line-height: 1.333333em; font-family: Consolas, monospace; padding: 5px; box-sizing: border-box; -moz-box-sizing: border-box; }
+
+#nestable2 .dd-handle {
+    color: #fff;
+    border: 1px solid #999;
+    background: #bbb;
+    background: -webkit-linear-gradient(top, #bbb 0%, #999 100%);
+    background:    -moz-linear-gradient(top, #bbb 0%, #999 100%);
+    background:         linear-gradient(top, #bbb 0%, #999 100%);
+}
+#nestable2 .dd-handle:hover { background: #bbb; }
+#nestable2 .dd-item > button:before { color: #fff; }
+
+
+
+.dd-hover > .dd-handle {
+    background: #2ea8e5 !important;
+}
+
+/**
+ * Nestable Draggable Handles
+ */
+
+.dd3-content {
+    display: block;
+    height: 30px;
+    margin: 5px 0;
+    padding: 3px 1px 5px 40px;
+    color: #333;
+    text-decoration: none;
+    background: #fafafa;
+    border-radius: 2px;
+    -moz-box-sizing: border-box;
+}
+.dd3-content:hover {
+    color: #2ea8e5;
+    background: #f3f3f3;;
+    cursor: pointer;
+}
+
+.dd-dragel > .dd3-item > .dd3-content { margin: 0; }
+
+.dd3-item > button { margin-left: 30px; }
+
+.dd3-handle {
+    position: absolute;
+    margin: 0;
+    left: 0;
+    top: 0;
+    cursor: move;
+    width: 30px;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.dd3-handle:hover {
+    background: #e1e1e1;
+}
+
+.dd3-handle:before {
+    content: '\f313';
+    display: block;
+    position: absolute;
+    left: 0; top: 7px;
+    width: 100%;
+    text-align: center;
+    text-indent: 0;
+    color: #939393;
+    font-size: 20px;
+    font-weight: normal;
+    font: normal normal normal 14px/1 'Material-Design-Iconic-Font';
+}
+
+.dd3-content .editable-submit, .dd3-content  .editable-cancel {
+    font-size: 8px;
+}
+
+.dd3-content .editable-input .form-control {
+    height: 20px;
+}
+
+.dd3-content.active {
+    background-color: #efefef;
+}
+
+.block-content {
+    display: block;
+    margin: 5px 0;
+    padding: 10px 20px;
+    text-decoration: none;
+    background: #fff;
+}
+
+.editable-submit {
+    color: white !important;
+    background-color: #ab47bc;
+}
+
+.expand {
+width: 80%;
+position: absolute;
+height: 30px;
+left: 80px;
 }

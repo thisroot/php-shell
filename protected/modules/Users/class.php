@@ -61,7 +61,7 @@ class Users {
         }
 
         if (isset($_COOKIE['modules']['users']['token'])) {
-            if ($user = $this->Login($_COOKIE['modules']['users']['email'], $_COOKIE['modules']['users']['token'])) {
+            if ($user = $this->Login($_COOKIE['modules']['users']['email'], APP::Module('Crypt')->Decode($_COOKIE['modules']['users']['token']))) {
                 $this->user = $this->Auth($user);
             }
         }

@@ -57,45 +57,38 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 <? APP::Render('student/user/lectures/sidebar','include',['page' => 'lecture_edit']) ?>
 
         <section id="content">
-           
+            <div class="container">
                 <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-md-12">
                         <div class="card">
-                           
                             <div class="card-header">            
-                                <h2><a href="#" id="lecture" data-type="text" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-title=""><?= $data['name'];?></a>                            
-                                    <small><?= $data['university'] . ' / ' . $data['faculty'] ?>/ </small>
+                                <h2><a href="#" id="lecture" data-type="text" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-title=""><?= $data['name']; ?></a>
+                                    <small><?= $data['university'] . ' / ' . $data['faculty'] ?></small>
                                 </h2>
-                                
+
                                 <ul class="actions">
                                     <li>
-                                        <div class="input-group time-container p-r-5">  
+                                        <div class="input-group time-container">  
                                             <i class="zmdi zmdi-time-restore zmdi-hc-fw"></i> <span class="time"> <?= $data['date_last_update'] ?></span>
                                         </div>
                                     </li>
                                     <? if(APP::Module('Users')->user['id'] == $data['id_user'] ) {?>
                                     <li>                                              
-                                        <div class="input-group header-editable p-r-5">
-                                            <i class="zmdi zmdi-image zmdi-hc-fw"></i>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="zmdi zmdi-image"></i></span>
                                             <a href="#" id="user-priv-view" data-type="select" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-value="<?= $data['privacy_view'] ?>" data-title="privacy"></a>                                               
                                         </div>                                                                            
                                     </li>
                                     <li>    
-                                        <div class="input-group header-editable p-r-5">
-                                           <i class="zmdi zmdi-scissors zmdi-hc-fw"></i>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="zmdi zmdi-scissors"></i></span>
                                             <a href="#" id="user-priv-edit" data-type="select" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-value="<?= $data['privacy_edit'] ?>" data-title="privacy"></a>
                                         </div>                                                                                   
                                     </li>
                                     <? } ?>
-                                    <li> 
-                                       <button class="visible show-all btn btn-sm palette-Purple-400 bg btn-icon-text waves-effect m-l-5"><i class="zmdi zmdi-unfold-more"></i>Show</button>
-                                    </li>
-                                    <li> 
-                                       <button class="accordeon expand-all btn btn-sm palette-Purple-400 bg btn-icon-text waves-effect m-l-5 m-r-5"><i class="zmdi zmdi-unfold-more"></i>Expand</button>
-                                    </li>
                                     <li>
-                                        <div class="dropdown">
-                                            <a href="#" class="dropdown-toggle btn btn-sm m-r-5 palette-Purple-400 bg waves-effect" data-toggle="dropdown"><i class="zmdi zmdi-menu"></i></a>
+                                        <div class="dropdown m-l-25">
+                                            <a href="#" class="dropdown-toggle btn palette-Purple-400 bg waves-effect" data-toggle="dropdown"><i class="zmdi zmdi-menu"></i></a>
                                             <ul class="dropdown-menu pull-right dm-icon ">
                                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-share"></i>Share</a></li>
                                                 <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-copy"></i>Copy</a></li>
@@ -105,16 +98,17 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                                         </div> 
                                     </li>
                                 </ul>
-                                
+
                             </div>
-                            
-                           
                             <div class="card-body card-padding  ">
-                                
-                                <div id="items" class="dd"></div>
 
                                 <div class="panel-group" role="tablist" aria-multiselectable="true">
-                                <ol id="items1"> </ol>
+
+                                    <ul id="items">
+
+
+                                    </ul>
+
                                 </div>
 
 
@@ -146,25 +140,22 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
     <!-- Module addition Libraries -->
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js" type="text/javascript"></script>
-    
-   <!-- <script src="<?//= APP::Module('Routing')->root ?>public/plugins/sortable/Sortable.js" type="text/javascript"></script> -->
-    
+    <script src="<?= APP::Module('Routing')->root ?>public/plugins/sortable/Sortable.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/summernote/dist/summernote-updated.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/shortcuts/shortcut.js" type="text/javascript"></script>
 
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/moment/min/moment.min.js" type="text/javascript"></script>
-  <!--  <script src="<?//= APP::Module('Routing')->root ?>public/plugins/moment/locale/ru.js" type="text/javascript"></script> -->
+  <!--  <script src="<?= APP::Module('Routing')->root ?>public/plugins/moment/locale/ru.js" type="text/javascript"></script> -->
 
- <!--   <script src="<?//= APP::Module('Routing')->root ?>public/plugins/ckeditor/ckeditor.js" type="text/javascript"></script>
-    <script src="<?//= APP::Module('Routing')->root ?>public/plugins/ckeditor/adapters/jquery.js" type="text/javascript"></script> -->
+    <script src="<?= APP::Module('Routing')->root ?>public/plugins/ckeditor/ckeditor.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root ?>public/plugins/ckeditor/adapters/jquery.js" type="text/javascript"></script>
     
     <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
     <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script>
 
-  <!--  <link href="<?//= APP::Module('Routing')->root ?>public/modules/students/ckeditor.css" rel="stylesheet" type="text/css"/> -->
-   <!--  <script src="<?//= APP::Module('Routing')->root?>public/plugins/jquery-ui/jquery-ui.min.js" type="text/javascript"></script> -->
-  <!--   <script src="<?//= APP::Module('Routing')->root?>public/plugins/nestedSortable/jquery.mjs.nestedSortable.js" type="text/javascript"></script> -->
-    <script src="<?= APP::Module('Routing')->root?>public/plugins/Nestable/jquery.nestable.js" type="text/javascript"></script>
+    <link href="<?= APP::Module('Routing')->root ?>public/modules/students/ckeditor.css" rel="stylesheet" type="text/css"/>
+    
+
 <? APP::Render('core/widgets/js') ?>
 
 
@@ -174,51 +165,98 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
             var ago = moment($('.time').text()).fromNow();
             $('.time').text(ago);
 
+
             shortcut.add("Ctrl+s", function () {
                 $('.js-save').trigger('click');
             });
-            
-           var data_items;
-            
+
             function getList() {
+
                 var data = {
                     name: 'get-list',
                     pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>'
-                };
+                }
 
                 $.ajax({
                     type: 'post',
                     url: '<?= APP::Module('Routing')->root ?>students/user/api/get/list.json',
                     data: data ? data : [0],
                     success: function (result) {
-                        
-                        var list = result[0];
-                        var index = result[1];
-                        data_items = result;
-                            appendBlocks(list,index,$('#items'));    
-      
-                        $('.dd').nestable();
-                        $('.dd').nestable('collapseAll');
+
+                        $.each(result, function (i, value) {
+
+                            value.body = (value.body !== '0') ? value.body : '';
+
+                            var el = document.createElement('li');
+                            el.innerHTML =
+                                    '<span class="js-save waves-effect hidden"  data-item="' + value.id_block + '"><i class="zmdi zmdi-save zmdi-hc-fw"></i></span>' +
+                                    '<span class="js-edit waves-effect" data-item="' + value.id_block + '"><i class="zmdi zmdi-edit zmdi-hc-fw"></i></span>' +
+                                    '<span class="js-remove waves-effect"><i class="zmdi zmdi-close zmdi-hc-fw"></i></span>' +
+                                    '<span class="drag-handle"><i class="zmdi zmdi-swap-vertical zmdi-hc-fw"></i></span>' +
+                                    '<div id="block-name-' + value.id_block + '" data-name="block-edit-name" data-pk="' + value.id_block + '" data-id="' + value.id_block + '" class="block-name">' + value.name + '</div>' +
+                                    '<div class="panel panel-collapse">' +
+                                    '<div class="panel-heading" role="tab" id="heading-' + value.id_block + '">' +
+                                    '<h4 class="panel-title">' +
+                                    '<a data-toggle="collapse" data-parent="#accordion" href="#collapse-' + value.id_block + '" aria-expanded="false" aria-controls="collapse-' + value.id_block + '">' +
+                                    '.' +
+                                    '</a>' +
+                                    '</h4>' +
+                                    '</div>' +
+                                    '<div id="collapse-' + value.id_block + '" aria-expanded="false" class="collapse" role="tabpanel" aria-labelledby="heading-' + value.id_block + '">' +
+                                    '<div  class="panel-body">' +
+                                    '<div name="html-editor-' + value.id_block + '" id="html-editor-' + value.id_block + '">' +
+                                    value.body +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>';
+                            sortable.el.appendChild(el);
+
+
+                        });
                         refresh();
-                        }                                                            
-               });
+
+                    }
+                });
             }
-            
-            getList();
 
 
-            /*
+
+            var el = document.getElementById('items');
+            var sortable = Sortable.create(el, {
+                filter: '.js-remove',
+                handle: '.drag-handle',
+                animation: 150,
+                onFilter: function (evt) {
+                    var el = sortable.closest(evt.item); // get dragged item
+                    el && el.parentNode.removeChild(el);
+
+                    var item = $(el).find('.block-name').data('id');
+                    deleteBlock(item)
+
+
+                    updateStruct();
+                },
+                onEnd: function (/**Event*/evt) {
+                    evt.oldIndex;  // element's old index within parent
+                    evt.newIndex;  // element's new index within parent
+                    updateStruct();
+
+                }
+
+            });
+
             function deleteBlock(item) {
                 var data = {
                     name: 'remove-block',
                     item: item
                 }
 
-               
+                console.log(data);
 
                 $.ajax({
                     type: 'post',
-                    url: '<?//= APP::Module('Routing')->root ?>students/user/api/delete/block.json',
+                    url: '<?= APP::Module('Routing')->root ?>students/user/api/delete/block.json',
                     data: data ? data : [0],
                     success: function (result) {
                         //console.log(result);
@@ -228,8 +266,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
             }
 
             getList();
-            
-           
 
             function updateStruct() {
                 var index = [];
@@ -241,13 +277,13 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                 var data = {
                     name: 'update-index',
-                    pk: '<?//= APP::Module('Crypt')->Encode($data['id']); ?>',
+                    pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
                     index: index
                 }
 
                 $.ajax({
                     type: 'post',
-                    url: '<?//= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
+                    url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
                     data: data ? data : [0],
                     success: function (result) {
                         //console.log(result);
@@ -255,183 +291,8 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     }
                 });
             }
-            ; */
-    
-            $('.dd').on('change', function() {
-                    var data = {
-                        name: 'update-index',
-                        pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
-                        index: $(this).nestable('serialize')
-                    };
-                    
-                     $.ajax({
-                        type: 'post',
-                        url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
-                        data: data ? data : [0],
-                        success: function (result) {
-                        }
-                    });
-            });
-            
-            function refresh() {
-            
-                $('.block-name').editable({
-                    url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
-                    mode: 'inline',
-                    params: function (params) {
-                        params.lecture = '<?= APP::Module('Crypt')->Encode($data['id']); ?>';
-                        return params;
-                    },
-                    success: function (response, newValue) {
-                        if (response.status == 'error') {
-                            console.log('error update DB')
-                        }
-                    }
-                });
-                
-                $('.expand').on('click', function() {
-                   $(this).parent().find('.js-expand').trigger('click');
-                });
-                
-                $('.js-expand').on('click', function() {
-                    var id = $(this).data('id');
-                    
-                    if($('#dd3-content-'+id).hasClass('open')) {
-                       
-                         setTimeout(function(){
-                            $('#block-content-' + id).remove(); }, 150);
-                        $('#dd3-content-'+id).removeClass('open');
-                        $(this).find('.zmdi').removeClass('zmdi-chevron-down').addClass('zmdi-chevron-up');
-                   } else {
-                       $('#dd3-content-'+id).addClass('open');
-                       $(this).find('.zmdi').removeClass('zmdi-chevron-up').addClass('zmdi-chevron-down');
-                       
-                        setTimeout(function(){
-                            $('<div id="block-content-' + id+ '" data-id="' + id + '" class="block-content">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-'+id));}, 150); 
-                    }                  
-                });
-                
-                
-                $('.dd3-content').hover(function() {
-                      $.each($('.dd3-content'),function(item,value) {
-                       $(this).removeClass('active');
-                    });
-                    var id = $(this).data('id');
-                    $('#dd3-content-'+id).addClass('active');
-                });
-                
-                $('.dd3-content').on('click', function() {
-                      $.each($('.dd3-content'),function(item,value) {
-                       $(this).removeClass('active');
-                    });
-                    
-                    var id = $(this).data('id');
-                    $('#dd3-content-'+id).addClass('active');
-                });
-                
-                
-                $(document).click(function(event) { 
-                    if(!$(event.target).closest('.dd-item').length) {
-                        $.each($('.active'), function() {
-                            $(this).removeClass('active');
-                        });   
-                    } else {
-                         $.each($('.active'), function() {
-                            $(this).removeClass('active');
-                        });
-                        var id = $(event.target).closest('.dd-item').data('id');
-                        $('#dd3-content-'+id).addClass('active');
-                        console.log('privet');
-                    }
-                });
-                
+            ;
 
-                
-                $('.visible').on('click', function() {
-                    
-                    if($(this).hasClass('show-all')) {
-                         $('.dd').nestable('expandAll');
-                         $(this).removeClass('show-all');
-                         $(this).addClass('hide-all');
-                         $(this).find('.zmdi').removeClass('zmdi-unfold-more');
-                         $(this).find('.zmdi').addClass('zmdi-unfold-less');                        
-                         $(this).find('.zmdi')[0].nextSibling.nodeValue = 'Hide';
-                         $.each($('.js-expand'), function() {
-                             var id = $(this).data('id');
-                             if(!$(this).parent().hasClass('open')) {
-                                 $(this).trigger('click');
-                             }
-                         });
-                    } else {
-                         $('.dd').nestable('collapseAll');
-                         $(this).removeClass('hide-all');
-                         $(this).addClass('show-all');
-                         $(this).find('.zmdi').removeClass('zmdi-unfold-less');
-                         $(this).find('.zmdi').addClass('zmdi-unfold-more');
-                         $(this).find('.zmdi')[0].nextSibling.nodeValue = 'Show';
-                         $.each($('.js-expand'), function() {
-                              var id = $(this).data('id');
-                             if($(this).parent().hasClass('open')) {
-                                 $(this).trigger('click');
-                             }
-                            
-                         });
-                    }
-                });
-                
-                $('.dd-handle').bind('movestart', function() {
-                   console.log('priet'); 
-                });
-                
-                $('.accordeon').on('click', function() {
-                    if($(this).hasClass('expand-all')) {
-                         $('.dd').nestable('expandAll');
-                         $(this).removeClass('expand-all');
-                         $(this).addClass('collapse-all');
-                         $(this).find('.zmdi').removeClass('zmdi-unfold-more');
-                         $(this).find('.zmdi').addClass('zmdi-unfold-less');                        
-                         $(this).find('.zmdi')[0].nextSibling.nodeValue = 'Collapse';
-                         
-                    } else {
-                         $('.dd').nestable('collapseAll');
-                         $(this).removeClass('collapse-all');
-                         $(this).addClass('expand-all');
-                         $(this).find('.zmdi').removeClass('zmdi-unfold-less');
-                         $(this).find('.zmdi').addClass('zmdi-unfold-more');
-                         $(this).find('.zmdi')[0].nextSibling.nodeValue = 'Expand';
-                    }
-                });
-                
-               
-            }
-            
-            function appendBlocks(list,index,el) {
-                                var child;
-                                var ol = $('<ol class="dd-list"></ol>');
-                                $.each(index, function (i, v) {
-                                        $.each(list,function(item,value) {
-                                            
-                                            if(v.id == value.id_block) {
-                                            child = $('<li class="dd-item dd3-item" id="item-' + value.id_block + '" data-id="' + value.id_block + '"><div class="dd-handle  dd3-handle"></div><div id="dd3-content-'+ value.id_block +'" class="dd3-content" data-id="' + value.id_block + '">'+
-                                                    '<span class="js-expand waves-effect"  data-id="' + value.id_block + '"><i class="zmdi zmdi-chevron-up zmdi-hc-fw"></i></span>' +
-                                                    '<span class="js-save waves-effect hidden"  data-id="' + value.id_block + '"><i class="zmdi zmdi-save zmdi-hc-fw">fd</i></span>' +
-                                                    '<span class="js-edit waves-effect" data-id="' + value.id_block + '"><i class="zmdi zmdi-edit zmdi-hc-fw"></i></span>' +
-                                                    '<span class="js-remove waves-effect"><i class="zmdi zmdi-close zmdi-hc-fw"></i></span>' +                                                   
-                                                    '<div id="block-name-' + value.id_block + '" data-name="block-edit-name" data-pk="' + value.id_block + '" data-id="' + value.id_block + '" class="block-name">' + value.name + '</div>' +
-                                                    '<div class="expand"></div>'+
-                                                    '</div></li>');
-                                            
-                                            ol.append(child);
-                                            }                                          
-                                        });                                      
-                                     if(v.children) {                                            
-                                              appendBlocks(list,v.children,child);
-                                            }    
-                                });
-                                el.append(ol);
-                            } 
-            
-            /*
             function refresh() {
                 $('.js-edit').unbind();
 
@@ -466,13 +327,14 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                      ]
                      });
                     
+
                 });
 
                 $('.block-name').editable({
-                    url: '<?//= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
+                    url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
                     mode: 'inline',
                     params: function (params) {
-                        params.lecture = '<?//= APP::Module('Crypt')->Encode($data['id']); ?>';
+                        params.lecture = '<?= APP::Module('Crypt')->Encode($data['id']); ?>';
                         return params;
                     },
                     success: function (response, newValue) {
@@ -484,7 +346,22 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                 $('.js-save').on('click', function () {
 
-                  
+                    /*
+                    var item = $(this).data('item');
+                    var html_data = CKEDITOR.instances['html-editor-' + item].getData();
+
+                    if ((!html_data) && ($('#collapse-' + item).hasClass('in'))) {
+                        $('#heading-' + item + ' a').trigger('click');
+                    }
+
+                    CKEDITOR.instances['html-editor-' + item].destroy();
+
+
+                    $(this).addClass('hidden');
+                    $(this).next().removeClass('hidden');
+                    
+                    */
+                   
                     var item = $(this).data('item');
                     var html_data = $('#html-editor-' + item).code();
                     console.log(html_data);
@@ -502,7 +379,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                     var data = {
                         name: 'block-edit-body',
-                        pk: '<?//= APP::Module('Crypt')->Encode($data['id']); ?>',
+                        pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
                         id_block: item,
                         block_name: $('#block-name-' + item).text(),
                         data: html_data
@@ -511,7 +388,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                     $.ajax({
                         type: 'post',
-                        url: '<?//= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
+                        url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
                         data: data ? data : [0],
                         success: function (result) {
                             console.log(result);
@@ -572,7 +449,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                 var data = {
                     action: 'create-block',
-                    pk: '<?//= APP::Module('Crypt')->Encode($data['id']); ?>',
+                    pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
                     id_block: id,
                     name: $('#block-name-' + id).text(),
                     index: $('#block-name-' + id).parent().index(),
@@ -581,7 +458,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                 $.ajax({
                     type: 'post',
-                    url: '<?//= APP::Module('Routing')->root ?>students/user/api/add/block.json',
+                    url: '<?= APP::Module('Routing')->root ?>students/user/api/add/block.json',
                     data: data ? data : [0],
                     success: function (result) {
                         // console.log(result);
@@ -591,7 +468,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                 updateStruct();
                 refresh();
-            });  */
+            });
 
             //editables 
             $('#lecture').editable({
@@ -603,6 +480,8 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     }
                 }
             });
+
+
             $('#user-priv-view').editable({
                 showbuttons: false,
                 url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/lecture.json',
@@ -619,6 +498,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     {value: 3, text: 'locked'}
                 ]
             });
+
             $('#user-priv-edit').editable({
                 showbuttons: false,
                 url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/lecture.json',

@@ -1,7 +1,6 @@
 <?
 
 class Student {
-
     public $user_data;
 
     function __construct($conf) {
@@ -35,7 +34,6 @@ class Student {
     public function AddUser($id, $data) {
         APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_settings(id) VALUES(' . $data['id'] . ')');
         APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_templates(id,id_user) VALUES(NULL,' . $data['id'] . ')');
-
         return 1;
     }
 
@@ -46,10 +44,9 @@ class Student {
                     'auto', [ 'fetch', PDO::FETCH_ASSOC], ['*'], 'student_user_settings', [
                 ['id', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT]
             ]),
-            'user_template' => APP::Module('DB')->Select(
-                    'auto', [ 'fetch', PDO::FETCH_ASSOC], ['*'], 'student_user_templates', [
-                ['id_user', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT],
-                ['type', '=', 'uni', PDO::PARAM_STR]
+            'user_units' => APP::Module('DB')->Select(
+                    'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['*'], 'student_user_units', [
+                ['id_user', '=', APP::Module('Users')->user['id'], PDO::PARAM_INT]
             ])
         ];
 
@@ -519,7 +516,8 @@ class Student {
                 $index = (isset($_POST['index'])) ? $_POST['index'] : [""];
                 $id = APP::Module('Crypt')->Decode($_POST['pk']);
                 $now = (new \DateTime())->format('Y-m-d H:i:s');
-
+                
+                   
                 if (APP::Module('DB')->Select(
                                 'auto', [ 'fetch', PDO::FETCH_COLUMN], ['id_lecture'], 'student_struct_blocks', [
                             ['id_lecture', '=', $id_lecture, PDO::PARAM_INT]
@@ -542,6 +540,8 @@ class Student {
                         'date' => 'NOW()'
                     ]);
                 }
+                
+                
                 echo json_encode(['status' => 'success']);
                 break;
 
@@ -645,15 +645,23 @@ class Student {
                 'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['id_block', 'name', 'private', 'body'], 'student_lecture_blocks', [
             ['id_lecture', '=', APP::Module('Crypt')->Decode($_POST['pk']), PDO::PARAM_INT]
         ]);
+        
         $sort = json_decode($struct['struct']);
-
+        
+       /* 
         usort($blocks, function($a, $b) use ($sort) {
             $sort = array_flip($sort);
 
             return $sort[$a['id_block']] > $sort[$b['id_block']];
-        });
+        }); */
+        
+        $items = [];
+        
+        foreach ($blocks as $key => $value) {
+            $items[$value['id_block']] = $value;
+        }
 
-        echo json_encode($blocks);
+        echo json_encode([$items, $sort]);
         exit();
     }
 
@@ -664,6 +672,8 @@ class Student {
             echo json_encode(['status' => 'error', 'error' => 'does not have post data']);
             exit();
         }
+        
+        $now = (new \DateTime())->format('Y-m-d H:i:s');  
 
         $id = APP::Module('Crypt')->Decode($_POST['pk']);
 
@@ -675,14 +685,15 @@ class Student {
             'name' => [$_POST['name'], PDO::PARAM_STR],
             'private' => [0, PDO::PARAM_INT],
             'body' => ["", PDO::PARAM_STR],
-            'date' => 'NOW()'
+            'date' => $now
         ]);
 
         echo json_encode(['status' => 'success', 'message' => $status]);
         exit();
     }
 
-    public function APIUserSettingsEdit() {
+    public function APIUserSettings() {
+        
         $this->SetHeader();
 
         if (!isset($_POST)) {
@@ -772,6 +783,144 @@ class Student {
 
                 echo json_encode(['status' => $result]);
                 exit();
+            case 'unit-save':
+               $data = $_POST;
+               unset($data['id_hash']);
+               unset($data['action']);
+               
+                foreach ($_POST as &$item){if($item == 'NULL'){$item = NULL;}}
+
+                $now = (new \DateTime())->format('Y-m-d H:i:s');        
+               
+                $row = [
+                        'id' => 'NULL',         
+                        'id_user' => [$user_id, PDO::PARAM_INT],                
+                        'id_unit' => [NULL, PDO::PARAM_INT],
+                        'unit' => [NULL, PDO::PARAM_STR],
+                        'country' => [NULL, PDO::PARAM_STR],
+                        'city' => [NULL, PDO::PARAM_STR],
+                        'university' => [NULL, PDO::PARAM_STR],
+                        'faculty' => [NULL, PDO::PARAM_STR],
+                        'chair' => [NULL, PDO::PARAM_STR],
+                        'index_group' => [NULL, PDO::PARAM_STR],
+                        'school' => [NULL, PDO::PARAM_STR],
+                        'organisation' => [NULL, PDO::PARAM_STR],
+                        'specialisation' => [NULL, PDO::PARAM_STR],
+                        'sertificate' => [NULL, PDO::PARAM_STR],
+                        'hi_ed_type' => [NULL, PDO::PARAM_STR],
+                        'date_start' => ['1970-09-18 00:00:00',PDO::PARAM_STR],
+                        'date_end' => ['1970-09-18 00:00:00',PDO::PARAM_STR],
+                        'date_until_flag' => [NULL, PDO::PARAM_INT],
+                        'date_until' => ['1970-09-18 00:00:00',PDO::PARAM_STR], 
+                        'date' => [$now,PDO::PARAM_STR],
+                        'date_last_update' => [$now,PDO::PARAM_STR],
+                       'id_country' => [NULL, PDO::PARAM_INT],
+                       'id_city' => [NULL, PDO::PARAM_INT],
+                       'id_university' => [NULL, PDO::PARAM_INT],
+                       'id_faculty' => [NULL, PDO::PARAM_INT],
+                       'id_chair' => [NULL, PDO::PARAM_INT]
+                    ];
+            
+                foreach($row as $key => $value) {
+
+                    if(isset($_POST[$key])) {
+                        switch ($key) {
+                            case 'date_start':
+                                $data = explode('/',$_POST[$key]);                  
+                                $date = new DateTime();
+                                $date->setDate($data[1], $data[0], 1);
+                                $row[$key][0] =  $date->format('Y-m-d H:i:s');
+                                continue;
+                            case 'date_end':                          
+                                $data = explode('/',$_POST[$key]);                  
+                                $date = new DateTime();
+                                $date->setDate($data[1], $data[0], 1);
+                                $row[$key][0] =  $date->format('Y-m-d H:i:s');                                                      
+                                continue;
+                            case 'date_until':
+                                $data = explode('/',$_POST[$key]);                  
+                                $date = new DateTime();
+                                $date->setDate($data[1], $data[0], 1);
+                                $row[$key][0] =  $date->format('Y-m-d H:i:s');
+                                continue;
+                            default :
+                                $row[$key][0] = $_POST[$key];
+                        }                                        
+                    }
+                }
+            
+          
+                $id = APP::Module('DB')->Insert(
+                        'auto', ' student_user_units', $row
+                        );
+                    
+                echo json_encode(['status'=>'success','id' =>$id,'unit' => $row['unit'][0], 'id_unit' => $row['id_unit'][0]]); exit();
+            
+            case 'unit-delete':
+                
+                    APP::Module('DB')->Delete(
+                    'auto', 'student_user_units', [
+                        ['id_user', '=', $user_id, PDO::PARAM_INT],
+                        ['id_unit', '=', $_POST['id_unit'], PDO::PARAM_INT]                     
+                    ]
+            );
+
+            echo json_encode(['status' => 'success']);exit();
+            
+            case 'unit-edit':
+                
+               $row = $_POST;
+               unset($row['id_hash']);
+               unset($row['action']);
+               
+                $now = (new \DateTime())->format('Y-m-d H:i:s');
+                foreach ($row as &$item){if($item == 'undefined'){$item = 'NULL';}}
+               
+                foreach($row as $key => $value) {
+                             
+                        switch ($key) {
+                            case 'date_start':
+                                if($row[$key] != 'NULL') {
+                                $data = explode('/',$row[$key]);                  
+                                $date = new DateTime();
+                                $date->setDate($data[1], $data[0], 1);
+                                $row[$key] =  $date->format('Y-m-d H:i:s');}
+                                else {$row[$key] = '1970-09-18 00:00:00';}
+                                continue;
+                            case 'date_end':
+                                if($row[$key] != 'NULL') {
+                                $data = explode('/',$row[$key]);                  
+                                $date = new DateTime();
+                                $date->setDate($data[1], $data[0], 1);
+                                $row[$key] =  $date->format('Y-m-d H:i:s');} 
+                                else {$row[$key] = '1970-09-18 00:00:00';}
+                                continue;
+                            case 'date_until':
+                                if($row[$key] != 'NULL') {
+                                $data = explode('/',$row[$key]);                  
+                                $date = new DateTime();
+                                $date->setDate($data[1], $data[0], 1);
+                                $row[$key] =  $date->format('Y-m-d H:i:s');}
+                                else {$row[$key] = '1970-09-18 00:00:00';}
+                                continue;    
+                        }                                                           
+                }
+               
+             
+                
+                         
+                $result = APP::Module('DB')->Update(
+                        'auto', 'student_user_units',
+                       $row
+                        , [
+                    ['id_user', '=', $user_id, PDO::PARAM_INT],
+                    ['id_unit', '=',$row['id_unit'], PDO::PARAM_INT]
+                        ]
+                );
+               
+                echo json_encode(['status' => ($result == 1)?'success':'error']);exit();
+                
+                
         }
 
         echo json_encode(['status' => 'error', 'message' => 'action not exist']);
@@ -999,6 +1148,23 @@ class Student {
 
             echo json_encode($out);
             exit();
+        }
+    }
+
+}
+
+class StudentUnits {
+
+    public function edit() {
+        if (!isset($_POST)) {
+            echo json_encode(['status' => 'error', 'error' => 'does not have post data']);
+            exit();
+        }
+
+        $user_id = APP::Module('Crypt')->Decode($_POST['id_hash']);
+
+        switch ($_POST['action']) {
+            
         }
     }
 
