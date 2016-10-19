@@ -1349,6 +1349,8 @@ select.chosen {
   content: "\f24c";
 }
 
+
+
 .note-editor .fa.fa-undo:before,
 .note-popover .fa.fa-undo:before {
   content: "\f258";

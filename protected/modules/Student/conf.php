@@ -21,6 +21,7 @@ return [
       ['students\/user\/api\/delete\/block.json(\?.*)?',                 'Student', 'APIBlockDelete'],     // View all backups /admin
       ['students\/user\/api\/delete\/lecture.json(\?.*)?',               'Student', 'APILectureDelete'],   // View all backups /admin
       ['students\/user\/api\/get\/lectures\/list.json(\?.*)?',           'Student', 'APILectureList'],     // View all backups /admin
+      ['students\/user\/api\/upload\/image.json(\?.*)?',                 'Student',   'APIImageUpload'],     // View all backups /admin
       ['students\/api\/get\/lectures\/list.json(\?.*)?',                 'Student', 'APILectureOpenList']  // View all backups /admin
     ]
 ];

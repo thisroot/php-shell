@@ -98,10 +98,10 @@ class Student {
                     'faculty' => Array($_POST['faculty'], PDO::PARAM_STR),
                     'chair' => Array($_POST['chair'], PDO::PARAM_STR),
                     'date' => 'NOW()',
-                    'date_last_update' => 'NOW()',
+                    'date_last_update' => 'NOW()'
                         )
                 )) {
-            echo json_encode(['status' => 'error', 'message' => 'error inseet to DB']);
+            echo json_encode(['status' => 'error', 'message' => 'error insert to DB']);
             throw new Exception('error inseet to DB');
         }
         $id = APP::Module('DB')->Open('auto')->lastinsertid();
@@ -469,13 +469,15 @@ class Student {
             echo json_encode(['status' => 'error', 'error' => 'does not have post data']);
             exit();
         }
-
+        
+        $id_lecture = APP::Module('Crypt')->Decode($_POST['id_hash']);
         APP::Module('DB')->Delete(
                 'auto', 'student_lecture_blocks', [
-            ['id_block', '=', $_POST['item'], PDO::PARAM_INT]
+            ['id_block', '=', $_POST['item'], PDO::PARAM_INT],
+            ['id_lecture', '=',$id_lecture, PDO::PARAM_INT],
                 ]
         );
-
+        
         echo json_encode(['status' => 'success']);
         exit();
     }
@@ -673,7 +675,7 @@ class Student {
             exit();
         }
         
-        $now = (new \DateTime())->format('Y-m-d H:i:s');  
+        //$now = (new \DateTime())->format('Y-m-d H:i:s');  
 
         $id = APP::Module('Crypt')->Decode($_POST['pk']);
 
@@ -685,7 +687,7 @@ class Student {
             'name' => [$_POST['name'], PDO::PARAM_STR],
             'private' => [0, PDO::PARAM_INT],
             'body' => ["", PDO::PARAM_STR],
-            'date' => $now
+            'date' => 'NOW()'
         ]);
 
         echo json_encode(['status' => 'success', 'message' => $status]);
@@ -987,6 +989,55 @@ class Student {
         }
 
         echo json_encode(['status' => 'success', 'message' => 'lecture name has been updated']);
+        exit();
+    }
+    
+    public function APIImageUpload() {
+        
+        $this->SetHeader();
+        if (!isset($_POST)) {
+            echo json_encode(['status' => 'error', 'error' => 'does not have post data']);
+            exit();
+        }
+        include_once './protected/vendors/upload/upload.php';
+        $dir_dest = ROOT.'/public/modules/students/lectures';
+        $id_lecture = APP::Module('Crypt')->Decode($_POST['id_lecture']);
+        $id_block = $_POST['id_block'];
+        $files = $_FILES;
+        $url = [];
+        
+        foreach ($files as $key => $value) {
+                
+                 $add = new Upload($value);
+                 if ($add->uploaded) {
+                    $name =  sha1(mt_rand(1, 9999) . $add->file_dst_name . uniqid());
+                    $add->file_new_name_body =  $name;                                           
+                      //500XAUTO               
+                    $add->image_resize = true;
+                    $add->image_convert = 'jpg';
+                    $add->jpeg_quality = '74';
+                    $add->image_x = 500;
+                    $add->image_ratio_y = true;      
+                    /*
+                    if($add->image_dst_x > ($add->image_dst_y)) {
+                        $add->image_ratio_crop      = true;
+                        $add->image_x = 800;
+                        $add->image_ratio_y = true;
+                    } elseif ($add->image_dst_y > ($add->image_dst_x)) {
+                        $add->image_ratio_crop      = true;                
+                        $add->image_y = 800;
+                        $add->image_ratio_y = true;
+                    } */
+                    
+                    $add->file_new_name_body = $name;                  
+                    $add->process($dir_dest.'/X500Y/'.$id_lecture.'/'.$id_block.'/');
+                    $name = APP::Module('Routing')->root.'public/modules/students/lectures/X500Y/'.$id_lecture.'/'.$id_block.'/'.$name.'.jpg';
+                }
+                array_push($url, $name);
+                $add ->clean();                
+            }
+        if(count($url) == 1) {$url = $url[0];}
+        echo json_encode(['status' => 'success', 'url' => $url]);
         exit();
     }
 

@@ -23,14 +23,7 @@
 
      <? APP::Render('core/widgets/css') ?>
     <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
-    <style type="text/css">
-       
-        .main-menu {
-            padding-top: 120px;
-        }
-
-    </style>
-
+    
 
 </head>
 <body  id="module-student">

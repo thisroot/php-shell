@@ -32,10 +32,6 @@
             font-size: 14px;
         }
 
-        .main-menu {
-            padding-top: 120px;
-        }
-
         .select2-container {
             margin-top: 8px;
         }
@@ -248,10 +244,10 @@
                        privacy: function(column,row) {
                            if(row.edit == 1) {
                                return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' +
-                                       '<span class="p-10"><i class="zmdi zmdi-scissors zmdi-hc-fw f-16"></i></span></a>'
+                                       '<button class="btn palette-Deep-Purple-300 bg waves-effect"><i class="zmdi zmdi-edit"></i></button></a>'
                         } else {
                                 return '<a href="<?= APP::Module('Routing')->root ?>students/user/lecture/' + row.id_hash + '">' +
-                                        '<span class="p-10"><i class="zmdi zmdi-eye zmdi-hc-fw f-16"></i></span></a>'
+                                        '<button class="btn palette-Deep-Purple-300 bg waves-effect"><i class="zmdi zmdi-eye"></i></button></a>'
                             }
                         }                       
                         },
