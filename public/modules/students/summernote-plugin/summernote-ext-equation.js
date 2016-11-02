@@ -11,20 +11,10 @@
   // template
   var tmpl = $.summernote.renderer.getTemplate();
 
-  /**
-   * @class plugin.hello
-   *
-   * Hello Plugin
-   */
+ 
   $.summernote.addPlugin({
-    /** @property {String} name name of plugin */
+
     name: 'equation',
-    /**
-     * @property {Object} buttons
-     * @property {Function} buttons.hello   function to make button
-     * @property {Function} buttons.helloDropdown   function to make button
-     * @property {Function} buttons.helloImage   function to make button
-     */
     buttons: { // buttons
       equation: function (lang, options) {
 
@@ -36,10 +26,6 @@
       }
     },
 
-    /**
-     * @property {Object} events
-     * @property {Function} events.equation  run function when button that has a 'equation' event name  fires click
-     */
     events: { // events
       equation: function (event, editor, layoutInfo) {
                 
@@ -125,7 +111,6 @@
                 var id = Math.floor(Math.random() * (max - min + 1)) + min;
 
                 if (!$.inArray(id, items?items:0)) {
-                   
                     getUniqRandomInt(min, max, items);
                 } else {
                     return id;
@@ -134,10 +119,10 @@
            
             var uniqint = getUniqRandomInt(0, 100000,$('.equation-container'));                  
             var val = $('#equation').val();
-            var node = $('<div id="equation-'+uniqint+'" class="badge equation-container">$'+val+'$</div>');
+            var node = $('<div id="equation-'+uniqint+'" contenteditable="false" class="badge equation-container">$'+val+'$</div>');
+            
           
-           editor.insertNode($editable,node[0],true);
-               
+           editor.insertNode($editable,node[0],false);
            MathJax.Hub.Queue(["Typeset", MathJax.Hub, 'equation-'+ uniqint]);
                          
             $('#modal-equation').modal('hide');
@@ -147,8 +132,7 @@
         });
         
         $('#equation-close').on('click', function() {
-            $('#equation').val('');
-                                 
+            $('#equation').val('');       
         });
       }
     }

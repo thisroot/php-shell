@@ -55,7 +55,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 <? APP::Render('student/user/lectures/sidebar','include',['page' => 'lecture_edit']) ?>
 
         <section id="content">
-            <div class="hidden">$\sum$</div>
+            <div class="hidden"></div>
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="card p-b-30">
@@ -112,9 +112,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 <div id="modal-equation" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Equation constructor</h4>
-            </div>
+           
             <div class="modal-body">
                 <div class="p-25">
                     <div class="row text-center">
@@ -122,7 +120,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                             <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
                                 <div class="form-group">
                                     <div class="fg-line">
-                                        <input id="equation" class="form-control" placeholder="Input equation" type="text">
+                                        <textarea id="equation" class="form-control auto-size" placeholder="Input equation" type="text"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -141,6 +139,60 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
             <div class="modal-footer">
                 <button id="equation-append" type="button" class="btn btn-link">Append</button>
                 <button id="equation-close" type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-draw" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header palette-Grey-300 bg">
+
+                <ul class="ah-actions actions a-alt">
+                    <li>
+                        <div class="btn-demo">
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-edit"></i>Pencil</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-brush"></i>Brush</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-view-day"></i>Thin</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-palette"></i>Color</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-format-color-fill"></i>Fill</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-toll"></i>Erase</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-minus"></i>Line</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-circle-o"></i>Circle</button>
+                            <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-square-o"></i>Square</button>
+                        </div>
+                        
+                    </li>
+                    <li class="pull-right">
+                        <div class="btn-group-lg">
+                            <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-undo"></i></button>
+                            <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-redo"></i></button>
+                            <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-save"></i></button>
+                            <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-delete"></i></button>
+                            <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-download"></i></button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-body">
+                <div class="p-25">
+                    <div class="row text-center">
+                        <div class="col-xs-12 col-sm-12 col-md-12 pg-item">
+                            <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="draw-append" type="button" class="btn btn-link">Append</button>
+                <button id="draw-close" type="button" class="btn btn-link" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -179,19 +231,16 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
     <script src="<?= APP::Module('Routing')->root?>public/ui/vendors/bower_components/nouislider/distribute/jquery.nouislider.all.min.js"></script>
     <script src="<?= APP::Module('Routing')->root?>public/ui/vendors/bootstrap-growl/bootstrap-growl.min.js" type="text/javascript"></script>
 
-
     <!-- Module addition Libraries -->
     <script src="<?= APP::Module('Routing')->root?>public/plugins/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root?>public/plugins/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js" type="text/javascript"></script>
-
     <script src="<?= APP::Module('Routing')->root?>public/ui/vendors/summernote/dist/summernote-updated.min.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root?>public/plugins/shortcuts/shortcut.js" type="text/javascript"></script>
-
     <script src="<?= APP::Module('Routing')->root?>public/plugins/moment/min/moment.min.js" type="text/javascript"></script>
-  <!--  <script src="<?//= APP::Module('Routing')->root ?>public/plugins/moment/locale/ru.js" type="text/javascript"></script> -->
+    <script src="<?= APP::Module('Routing')->root?>public/ui/vendors/bower_components/autosize/dist/autosize.min.js" type="text/javascript"></script>
 
-
-    <script type="text/x-mathjax-config">
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+     <script type="text/x-mathjax-config">
          MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
     jax: ["input/TeX", "output/HTML-CSS"],
@@ -206,21 +255,93 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
     }
   });
     </script>
-    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-
     <script src="<?= APP::Module('Routing')->root?>public/plugins/Nestable/jquery.nestable.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root?>public/plugins/jquery.event.move/js/jquery.event.move.js" type="text/javascript"></script>
-
-     <script src="<?= APP::Module('Routing')->root?>public/plugins/caret/dist/jquery.caret-1.5.2.min.js" type="text/javascript"></script>
-     <script src="<?= APP::Module('Routing')->root?>public/modules/students/summernote-plugin/summernote-ext-equation.js" type="text/javascript"></script>
-     <script src="<?= APP::Module('Routing')->root?>public/modules/students/main.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root?>public/plugins/caret/dist/jquery.caret-1.5.2.min.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root?>public/modules/students/summernote-plugin/summernote-ext-equation.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root?>public/modules/students/summernote-plugin/summernote-ext-draw.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root?>public/plugins/socketio/socket.io-1.2.0.js" type="text/javascript"></script>
+    <script src="<?= APP::Module('Routing')->root?>public/modules/students/main.js" type="text/javascript"></script>
 
 <? APP::Render('core/widgets/js') ?>
 
 
     <script>
         $(document).ready(function () {
+            
+            
+
+             var socket = io.connect('https://back.nebesa.me');
+
+             $(document).on('click moveend',function(e) {
+                 var data = {};
+              //  console.log(e.currentTarget);
+                var $this = e.target;
+                if($($this).is('.js-expand, .button-expand, .button-collapse, .zmdi-chevron-up, .zmdi-chevron-down, .zmdi-edit, .zmdi-save, .zmdi-close, .dd-handle, .editable-submit')) {
+                 var item_id = $($this).closest('.dd-item').data('id');
+                 if($($this).hasClass('js-expand')) {
+                     data = {action: ($('#dd3-content-'+item_id).hasClass('open'))?'expand-item':'collape-item'};
+                 } else if($($this).hasClass('button-expand')) {
+                     data = {action: 'expand-list'};
+                 } else if($($this).hasClass('button-collapse')) {
+                     data = {action: 'collapse-list'};
+                 } else if($($this).hasClass('zmdi-chevron-up')) {
+                     data = {action: 'collapse-item'};
+                 } else if($($this).hasClass('zmdi-chevron-down')) {
+                     data = {action: 'expand-item'};
+                 } else if($($this).hasClass('zmdi-edit')) {
+                     data = {action: 'edit-item'};
+                 } else if($($this).hasClass('zmdi-save')) {
+                     data = {action: 'save-item'};
+                 } else if($($this).hasClass('zmdi-close')) {
+                     data = {action: 'delete-item'};
+                 } else if($($this).hasClass('dd-handle')) {
+                     data = {action: 'move-item'};
+                 } else if($($this).hasClass('editable-submit')) {
+                     data = {action: 'edit-name-item'};
+                 } else {
+                     data = {acrion:'none'};
+                 }
+
+                 $.extend(data,
+                 {
+                     id_block: <?= $data['id']; ?>,
+                     id_user: <?= $data['id_user'] ?>,
+                     id_owner: <?= APP::Module('Users')->user['id'] ?>,
+                     id_item: item_id
+                 });
+
+                socket.emit('struct message',data);
+                return false;
+                }
+                });
+
+                socket.on('struct message', function(data){
+                        console.log(data);
+                   });
+
+
+
+//                socket.emit('get-struct message', function(){
+//
+//                    var opened_items = '';
+//
+//                    var data = {
+//                        id_block: <?//= $data['id']; ?>,
+//                        id_user: <?//= $data['id_user'] ?>,
+//                        id_owner: <?//= APP::Module('Users')->user['id'] ?>,
+//                        struct: $('.dd').nestable('serialize')?$('.dd').nestable('serialize'):[""],
+//                        opened_items: '',
+//                        opened_list: ''
+//                    };
+//                    return data;
+//                });
+//
+//                socket.on('get-struct message', function(data){
+//                        console.log(data);
+//                   });
+
+
 
             $('#scrolling').mCustomScrollbar();
 
@@ -245,8 +366,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                  $('.active').find('.js-remove').trigger('click');
             });
 
-
-
             $(document).click(function(event) {
                     if(!$(event.target).closest('.dd-item').length) {
                         $.each($('.active'), function() {
@@ -258,6 +377,8 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                         });
                         var id = $(event.target).closest('.dd-item').data('id');
                         $('#dd3-content-'+id).addClass('active');
+                        $('#dd3-content-'+id).prev().addClass('active');
+
                     }
                 });
 
@@ -288,7 +409,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                              if($(this).parent().hasClass('open')) {
                                  $(this).trigger('click');
                              }
-
                          });
                     }
                 });
@@ -333,8 +453,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                                 });
                                 return $htmlData.html();
                     }
-
-
 
             function getList() {
                 var data = {
@@ -407,7 +525,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     }
                 });
 
-               /* swal({
+                swal({
                             title: 'Are you sure?',
                             text: 'You will not be able to recover this block',
                             type: 'warning',
@@ -422,11 +540,11 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                         }, function(isConfirm){
                             if (isConfirm) {
-                                $.post('<?//= APP::Module('Routing')->root ?>students/user/api/delete/block.json', data, function() {
+                                $.post('<?= APP::Module('Routing')->root ?>students/user/api/delete/block.json', data, function() {
                                     swal('Deleted!', 'Block has been deleted', 'success');
                                 });
                             }
-                        }); */
+                        });
             }
 
 
@@ -459,7 +577,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
               $('.js-delete').unbind();
               $('.dd3-content').unbind();
 
-
                 $('.block-name').editable({
                     highlight:' #673ab7',
                     url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
@@ -475,7 +592,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     }
                 });
 
-
                 $('.expand').on('click', function() {
                    $(this).parent().find('.js-expand').trigger('click');
                 });
@@ -483,9 +599,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 $('.js-expand').on('click', function() {
 
                     var id = $(this).data('id');
-
                     if($('#dd3-content-'+id).hasClass('open')) {
-
                          setTimeout(function(){
                             $('#block-content-' + id).remove(); }, 150);
                         $('#dd3-content-'+id).removeClass('open');
@@ -495,7 +609,9 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                        $(this).find('.zmdi').removeClass('zmdi-chevron-up').addClass('zmdi-chevron-down');
 
                         setTimeout(function(){
-                            var body = (data_items[0][id].body != 0)?data_items[0][id].body:'<div class="body-empty"><a class="edit-empty-block" id="edit-empty-block-' + id+ '" data-id="' + id + '">edit block<a></div>';
+                          //  var body = (data_items[0][id].body != 0)?data_items[0][id].body:'<div class="body-empty"><a class="edit-empty-block" id="edit-empty-block-' + id+ '" data-id="' + id + '">edit block<a></div>';
+                            var body = (data_items[0][id].body != 0)?data_items[0][id].body:'';
+
                             $('<div id="block-content-' + id+ '" data-id="' + id + '" class="block-content">' + body + '</div>').insertAfter($('#dd3-content-'+id));
                             MathJax.Hub.Queue(
                                     ["resetEquationNumbers",MathJax.InputJax.TeX],
@@ -503,7 +619,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                                     ["Reprocess",MathJax.Hub]
                                   );
                         }, 150);
-
                     }
                 });
 
@@ -523,27 +638,27 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     // use mathJaxReload function
                     data_items[0][id].body = mathJaxReload(body);
 
-
                     $('<div id="html-editor-' + id +'" data-id="'+ id +'">'+data_items[0][id].body+'</div>').insertAfter($('#dd3-content-'+id));
 
-
                      $('#html-editor-' + id).summernote({
+                            placeholder: 'write here...',
                             height: 400, // set editor height
                             minHeight: null, // set minimum height of editor
                             maxHeight: null, // set maximum height of editor
                             focus: true, // set focus to editable area after initializing summernote
-                            fontNames: ['Arial', 'Arial Black', 'Play', 'Tahoma'],
+                          //  fontNames: ['noto-sans'],
                             toolbar: [
-                            ['insert', ['equation']],
-                            ['para', ['ul', 'ol', 'paragraph', 'leftButton', 'centerButton', 'rightButton', 'justifyButton', 'outdentButton', 'indentButton']],
+                            ['insert', ['equation','draw']],
+                            ['para', ['ul', 'ol', 'paragraph']],
                             ['style', ['style', 'bold', 'italic', 'underline', 'strikethrough', 'clear', 'superscript', 'subscript']],
-                            ['fonts', ['fontsize', 'fontname']],
+                            ['fonts', ['fontsize']],
                             ['color', ['color']],
                             ['undo', ['undo', 'redo']],
                             ['ckMedia', ['ckImageUploader', 'ckVideoEmbeeder']],
                             ['misc', ['link', 'picture', 'table', 'hr', 'codeview', 'fullscreen']],
                             ['height', ['lineheight']]
                             ],
+                            disableDragAndDrop: true,
                             onImageUpload: function(files, editor, welEditable) {
                                var id = $(this).data('id');
                                sendFile(files[0], editor, welEditable,id);
@@ -564,7 +679,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                     if (html_data == '<br>') {
                         $('#html-editor-' + id).code();
-                        html_data = $('#html-editor-' + id).code()
+                        html_data = '';
                     }
                     if ((!html_data) && ($('#dd3-content-'+id).hasClass('open'))) {
                         $('#expand-'+id).trigger('click');
@@ -642,47 +757,24 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 $('.dd3-content').hover(function() {
                       $.each($('.dd3-content'),function(item,value) {
                        $(this).removeClass('active');
+                       $(this).prev().removeClass('active');
                     });
                     var id = $(this).data('id');
                     $('#dd3-content-'+id).addClass('active');
+                    $('#dd3-content-'+id).prev().addClass('active');
                 });
 
                 $('.dd3-content').on('click', function() {
                       $.each($('.dd3-content'),function(item,value) {
                        $(this).removeClass('active');
+                       $(this).prev().removeClass('active');
                     });
 
                     var id = $(this).data('id');
                     $('#dd3-content-'+id).addClass('active');
+                    $('#dd3-content-'+id).prev().addClass('active');
                 });
             }
-
-            function appendBlocks2(list,index,el) {
-                                var child;
-                                var ol = $('#dd-list');
-                                if(!index) {console.log('no data');}
-
-                                $.each(index, function (i, v) {
-                                        $.each(list,function(item,value) {
-                                            if(v.id == value.id_block) {
-                                            child = $('<li class="dd-item dd3-item" id="item-' + value.id_block + '" data-id="' + value.id_block + '"><div class="dd-handle  dd3-handle"></div><div id="dd3-content-'+ value.id_block +'" class="dd3-content" data-id="' + value.id_block + '">'+
-                                                    '<span class="js-expand waves-effect"  data-id="' + value.id_block + '"><i class="zmdi zmdi-chevron-up zmdi-hc-fw"></i></span>' +
-                                                    '<span class="js-save waves-effect hidden"  data-id="' + value.id_block + '"><i class="zmdi zmdi-save zmdi-hc-fw"></i></span>' +
-                                                    '<span class="js-edit waves-effect" data-id="' + value.id_block + '"><i class="zmdi zmdi-edit zmdi-hc-fw"></i></span>' +
-                                                    '<span class="js-remove waves-effect"><i class="zmdi zmdi-close zmdi-hc-fw"></i></span>' +
-                                                    '<div id="block-name-' + value.id_block + '" data-name="block-edit-name" data-pk="' + value.id_block + '" data-id="' + value.id_block + '" class="block-name">' + value.name + '</div>' +
-                                                    '<div id="expand-' + value.id_block + '" class="expand"></div>'+
-                                                    '</div></li>');
-                                            ol.append(child);
-                                            }
-                                        });
-                                     if(v.children) {
-                                              appendBlocks(list,v.children,child);
-                                            }
-                                });
-
-                                el.append(ol);
-                            }
 
             function appendBlocks(list,index,el) {
 

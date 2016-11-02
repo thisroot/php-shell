@@ -326,6 +326,12 @@ header.media {
     color: white;
 }
 
+.dd-item > .dd-item {
+    margin-top: -5px;
+}
+
+
+
 .expand-view {
      margin-right: 10px;
 }
@@ -355,6 +361,7 @@ header.media {
 
 .note-editor .note-toolbar {
     padding: 0px;
+    padding-bottom: 5px;
 }
 
 ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
@@ -377,6 +384,7 @@ ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):n
 
 #module-student .card .editable-click, a.editable-click, a.editable-click:hover {
     text-decoration: none;
+    margin-left: 10px;
     border-bottom: dashed 1px #7e57c2;
 }
 
@@ -391,6 +399,11 @@ ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):n
 #module-student .note-editor .card .input-group-addon,  #module-student .note-editor .btn-default   {
     color: #7e57c2;
     background-color: #d5d5d5;
+    margin: 3px;
+}
+
+#module-student .note-editor .fa, .note-popover .fa {
+    font-size: 17px;
 }
 
 #module-student .card .note-editor .note-toolbar > .btn-group > .active, .note-popover .note-toolbar > .btn-group > .active,
@@ -674,11 +687,16 @@ body.dragging, body.dragging * {
     background: #fcf7fe;
     border-radius: 2px;
     -moz-box-sizing: border-box;
+    /* transition:all 0.3s ease;*/
 }
 .dd3-content:hover {
     color: #2ea8e5;
     background: #f3f3f3;;
     cursor: pointer;
+}
+
+.dd3-content {
+    margin-bottom: 0px;
 }
 
 .dd-dragel > .dd3-item > .dd3-content { margin: 0; }
@@ -705,6 +723,13 @@ body.dragging, body.dragging * {
 
 .dd3-handle:hover {
     background: #b690e0;
+}
+
+.dd3-handle.active {
+    background: #b690e0;
+}
+.dd3-handle.active:before {
+    color: white;
 }
 
 .dd3-handle:before {
@@ -741,13 +766,15 @@ body.dragging, body.dragging * {
 #module-student .card .dd3-content.active .editable-click {
     color: white;
     border-bottom: dashed 1px white;
+    transition: background-color 400ms;
+   
 }
 
 
 
 .block-content {
     display: block;
-    margin: 5px 0;
+    margin: 0px 0px;
     padding: 0px 20px;
     text-decoration: none;
     background: #fff;
@@ -804,3 +831,38 @@ left: 80px;
 .note-editor .fa.fa-equation::before, .note-popover .fa.fa-equation::before {
     content: "\f16e";
 }
+
+.note-editor .fa.fa-draw::before, .note-popover .fa.fa-draw::before {
+    content: "\f11f";
+}
+
+.note-editor .fa.fa-trash-o::before, .note-popover .fa.fa-trash-o::before {
+    content: "\f154";
+}
+
+
+
+@media (min-width: 768px) {
+  .modal-xlg {
+    width: 100%;
+    padding: 0px;
+    border-radius: 0px;
+  }
+}
+
+@media (min-width: 992px) {
+  .modal-xlg {
+    width: 80%;
+  }
+}
+
+
+.modal.fade.in[style] {
+    padding-right: 0px !important;
+}
+
+.btn-demo .btn {
+    display: inline-block;
+    margin: 0 5px 7px 0;
+}
+
