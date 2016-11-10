@@ -214,7 +214,7 @@
                     delay: 500,
                     characters: 3
                     },
-                    rowCount: [10,15,30],
+                    rowCount: [10,30,60],
                     ajax: true,
                     ajaxSettings: {
                         method: 'POST',

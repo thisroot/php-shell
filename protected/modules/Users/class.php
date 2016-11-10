@@ -132,7 +132,7 @@ class Users {
         );
     }
     
-    public function Auth($id, $set_cookie = true, $save_password = false) {
+    public function Auth($id, $set_cookie = true, $save_password = true) {
         $user = APP::Module('DB')->Select($this->settings['module_users_db_connection'], ['fetch', PDO::FETCH_ASSOC], ['*'], 'users', [['id', '=', $id, PDO::PARAM_INT]]);
         
         if ($set_cookie) {

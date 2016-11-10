@@ -97,7 +97,7 @@
             $(document).ready(function() {
                 
                 var connections_table = $("#lectures-table").bootgrid({
-                    rowCount: [4,10,20],
+                    rowCount: [10,30,60],
                     ajax: true,
                     ajaxSettings: {
                         method: 'POST',

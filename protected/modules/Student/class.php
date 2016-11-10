@@ -1,5 +1,4 @@
 <?
-
 class Student {
     public $user_data;
 
@@ -512,7 +511,7 @@ class Student {
 
         $id_lecture = APP::Module('Crypt')->Decode($_POST['pk']);
 
-        switch ($_POST['name']) {
+        switch ($_POST['name']) {    
             case 'update-index':
 
                 $index = (isset($_POST['index'])) ? $_POST['index'] : [""];
@@ -644,7 +643,7 @@ class Student {
         ]);
 
         $blocks = APP::Module('DB')->Select(
-                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['id_block', 'name', 'private', 'body'], 'student_lecture_blocks', [
+                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['id_block', 'name','state', 'private', 'body'], 'student_lecture_blocks', [
             ['id_lecture', '=', APP::Module('Crypt')->Decode($_POST['pk']), PDO::PARAM_INT]
         ]);
         
@@ -658,12 +657,17 @@ class Student {
         }); */
         
         $items = [];
+        $list = [];
         
         foreach ($blocks as $key => $value) {
+            // внимание - лишняя операция, надо на этапе внесения в базу заводить.
+            if($value['state'] == NULL) { $value['state'] = [0,0,0] ;} else  {
+                $value['state'] = json_decode($value['state']);
+            }
             $items[$value['id_block']] = $value;
         }
 
-        echo json_encode([$items, $sort]);
+        echo json_encode([$items,$sort]);
         exit();
     }
 
