@@ -46,6 +46,45 @@
 
 </head>
 <body  id="module-student">
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-63396844-3', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter36066965 = new Ya.Metrika({
+                    id:36066965,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true,
+                    webvisor:true,
+                    trackHash:true
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/36066965" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
     <!-- Render Header -->
     <?
     APP::Render('student/widgets/header', 'include', [
@@ -233,7 +272,7 @@
                                     <div class="col-md-1">
                                         <div class="form-group pull-right">
                                             <div class="input-group">
-                                                <button  class="btn palette-Teal bg btn-icon-text waves-effect"><i class="zmdi zmdi-save "></i> Save</button>
+                                                <button id="submit-save"  class="btn palette-Teal bg btn-icon-text waves-effect"><i class="zmdi zmdi-save "></i> Save</button>
                                             </div>
                                         </div>
                                     </div>
@@ -249,7 +288,7 @@
                             <div id="unit-block-sertification" class="col-md-12 "></div>
                             <div id="unit-block-courses" class="col-md-12 "></div>
                             <div id="unit-block-university" class="col-md-12 "></div>
-                            <div id="unit-block-school" class="col-md-12 "></div>       
+                            <div id="unit-block-school" class="col-md-12 "></div>
                         </div>
                     </div>
                 </div>
@@ -294,14 +333,14 @@
         $(document).ready(function () {
             function getUnits() {
                 var data = <?= json_encode($data['user_units']); ?>;
-                
+
                 $.each(data, function (index, value) {
-                    $.each(value, function(i,v) {                     
+                    $.each(value, function(i,v) {
                         if (i != 'id_unit'){if ((v == 0) || (v == '1970-09-18 00:00:00')) {value[i] = '';}}
-                    });                 
+                    });
                     switch (value['unit']) {
                         case 'university':
-                            var id_unit = value['id_unit'];                            
+                            var id_unit = value['id_unit'];
                             var unit_university = $('<div id="unit-' + id_unit + '" data-unit="university" data-item="' + id_unit + '" class="card"><div class="card-header">' +
                                     '<h2>High school</h2><ul class="ah-actions actions a-alt"><li><div class="btn-group">' +
                                     '<button id="save-' + id_unit + '" data-action="edit" data-id="' + id_unit + '"   class="save btn palette-Purple-400 bg btn-icon-text waves-effect"><i class="zmdi zmdi-save"></i>Save</button>' +
@@ -509,7 +548,7 @@
                             });
                             break;
                     }
-                    
+
                      $('#unit-' + id_unit).find('.save').on('click', function () {
                     //console.log('privet');
                     var id = $(this).data('id');
@@ -517,7 +556,7 @@
                     var unit = $(this).parents('.card');
                     var id_unit = id;
                     var unit_name = unit.data('unit');
-                    
+
 
                     switch (unit_name) {
                         case 'university':
@@ -547,7 +586,7 @@
                                 id_country: ((unit.find('#country-' + id + ' :selected').val() || (unit.find('#country-' + id + ' :selected').val() =='NULL' ))) ? unit.find('#country-' + id + ' :selected').val() : 0,
                                 country: unit.find('#country-' + id + ' :selected').text() ? unit.find('#country-' + id + ' :selected').text() : '0',
                                 id_city: ((unit.find('#city-' + id + ' :selected').val() || (unit.find('#city-' + id + ' :selected').val() =='NULL' ))) ? unit.find('#city-' + id + ' :selected').val() : 0,
-                                city: unit.find('#city-' + id + ' :selected').text() ? unit.find('#city-' + id + ' :selected').text() : '0',                             
+                                city: unit.find('#city-' + id + ' :selected').text() ? unit.find('#city-' + id + ' :selected').text() : '0',
                                 school: unit.find('#school-' + id + ' :selected').text() ? unit.find('#school-' + id + ' :selected').text() : '0',
                                 index_group: unit.find('#group-' + id).val() ? unit.find('#group-' + id).val() : '0',
                                 date_end: unit.find('#graduation-' + id).val() ? '01/' + unit.find('#graduation-' + id).val() : 'NULL'
@@ -599,7 +638,7 @@
                             break;
                     }
 
-                    
+
                     $.extend(data, {action: 'unit-' + action, id_hash: '<?= APP::Module('Crypt')->Encode(APP::Module('Users')->user['id']) ?>'});
                     $.ajax({
                         type: 'post',
@@ -607,20 +646,20 @@
                         data: data ? data : [0],
                         success: function (result) {
                             switch (result.status) {
-                                case 'success':                                   
+                                case 'success':
                                     $('#save-' + result.id_unit).attr('data-action', 'edit');
                                     $('#save-' + result.id_unit).data('action', 'edit');
-                                    notify('Has been updated','inverse');     
+                                    notify('Has been updated','inverse');
                                     break;
                                 case 'error':
-                                    notify(result.message,'inverse');     
+                                    notify(result.message,'inverse');
                                     break;
                             }
                         }
                     });
 
                 });
-                    
+
                     $.each($(unit).find('.select2'), function () {
 
                     if ((def_value !== '') || (def_value !== 0)) {
@@ -721,7 +760,7 @@
             }
 
             getUnits();
-            
+
             $('.delete').on('click',function(){
                 var id = $(this).data('id');
                 $('#unit-'+id).addClass('animated fadeOutDown');
@@ -729,12 +768,12 @@
                 $('#unit-'+id).remove();
                 }, 400);
                 if ($(this).prev().prev().data('action') == 'edit') {
-                    
+
                     var data = {
                         action: 'unit-delete',
                         id_hash: '<?= APP::Module('Crypt')->Encode($data['user']['id'])?>',
                         id_unit: id
-                        
+
                     };
                     $.ajax({
                         type: 'post',
@@ -743,7 +782,7 @@
                         success: function (result) {
                             switch (result.status) {
                                 case 'success':
-                                   
+
                                     $('#save-' + result.id_unit).attr('data-action', 'edit');
                                     $('#save-' + result.id_unit).data('action', 'edit');
                                     notify('Has been deleted','inverse');
@@ -751,19 +790,19 @@
                                 case 'error':
                                     notify('oops...error','inverse');
                                     break;
-                                    
+
                             }
                         }
                     });
                 };
             });
-            
+
              $('.reset').on('click',function(){
-                var id = $(this).data('id'); 
+                var id = $(this).data('id');
                 $.each($('#unit-'+id).find('.select2'), function () {
                     $(this).val('').trigger('change');
                 });
-                
+
                  $.each($('#unit-'+id).find('input'),function() {
                      $(this).val('');
                  });
@@ -1088,7 +1127,7 @@
                         data: data ? data : [0],
                         success: function (result) {
                             switch (result.status) {
-                                case 'success':                               
+                                case 'success':
                                     $('#save-' + result.id_unit).attr('data-action', 'edit');
                                     $('#save-' + result.id_unit).data('action', 'edit');
                                     notify('Has been saved','inverse');
@@ -1096,7 +1135,7 @@
                                 case 'error':
                                     notify('oops...error','inverse');
                                     break;
-                                    
+
                             }
                         }
                     });
@@ -1250,6 +1289,7 @@
                     readFile(this);
                 });
 
+             
                 $('#upload-result').on('click', function (ev) {
                     $uploadCrop.croppie('result', {
                         type: 'canvas',
@@ -1260,10 +1300,9 @@
                             id_hash: '<?= APP::Module('Crypt')->Encode($data['user']['id'])?>',
                             action: 'image-crop',
                             data: resp
-                        }
+                        };
 
-                        var img_crop = data.data;
-
+                       
                         $.ajax({
                             type: 'post',
                             url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/settings.json',
@@ -1271,7 +1310,7 @@
                             success: function (result) {
 
 
-                                $('#default-photo img').attr('src', img_crop).removeAttr('style');
+                                $('#default-photo img').attr('src', resp).removeAttr('style');
                                 $('#default-photo').removeClass('hidden');
                                 $('#upload-photo').removeClass('ready');
                                 $('#upload-buttons').addClass('hidden');
@@ -1282,29 +1321,29 @@
                                  type: 'canvas',
                                  size: 'original'
                                  }).then(function (resp) {
-                                 
+
                                  var data = {
                                  id_hash: '<? //= APP::Module('Crypt')->Encode(APP::Module('Users')->user['id'])   ?>',
                                  action: 'image-full',
                                  data: resp
                                  }
-                                 
+
                                  var img_full = data.data;
-                                 
+
                                  $.ajax({
                                  type: 'post',
                                  url: '<? //= APP::Module('Routing')->root   ?>students/user/api/edit/settings.json',
                                  data: data ? data : [0],
                                  success: function (result) {
-                                 
+
                                  $('#default-photo img').attr('src',img_full).removeAttr('style');
                                  $('#default-photo').removeClass('hidden');
                                  $('#upload-photo').removeClass('ready');
                                  $('#upload-buttons').addClass('hidden');
-                                 
+
                                  }
                                  });
-                                 
+
                                  });
                                  */
                             }
@@ -1363,13 +1402,6 @@
                 var email = $('#user_email');
                 var phone = $('#user_phone');
                 var about = $('#user_about');
-                var lecture = $('#lecture');
-                var country = $('#country :selected');
-                var city = $('#city :selected');
-                var university = $('#university :selected');
-                var faculty = $('#faculty :selected');
-                var chair = $('#chair :selected');
-
                 var priv_view = ($('#user_priv_view'))[0]['value'];
                 var priv_edit = ($('#user_priv_edit'))[0]['value'];
                 var lang = $('#lang:checked');
@@ -1408,17 +1440,6 @@
                     email: email.val() ? email.val() : 'NULL',
                     phone: phone.val() ? phone.val() : 'NULL',
                     about: about.val() ? about.val() : 'NULL',
-                    lecture: lecture.val() ? lecture.val() : 'NULL',
-                    id_country: country.val() ? country.val() : 'NULL',
-                    country: country.text() ? country.text() : 'NULL',
-                    id_city: city.val() ? city.val() : 'NULL',
-                    city: city.text() ? city.text() : 'NULL',
-                    id_university: university.val() ? university.val() : 'NULL',
-                    university: university.text() ? university.text() : 'NULL',
-                    id_faculty: faculty.val() ? faculty.val() : 'NULL',
-                    faculty: faculty.text() ? faculty.text() : 'NULL',
-                    id_chair: chair.val() ? chair.val() : 'NULL',
-                    chair: chair.text() ? chair.text() : 'NULL',
                     priv_view: priv_view,
                     priv_edit: priv_edit,
                     lang: lang.val() ? 1 : 0
@@ -1430,25 +1451,18 @@
                     data: data,
                     success: function (result) {
                         switch (result.status) {
-                            case 'success':
-
+                            case 1:
                                 swal({
                                     title: 'Done!',
-                                    text: 'Sessions settings has been updated',
+                                    text: 'Settings has been updated',
                                     type: 'success',
                                     showCancelButton: false,
                                     confirmButtonText: 'Ok',
                                     closeOnConfirm: true
                                 });
-
                                 break;
-                            case 'error':
-                                switch (result.error) {
-                                    case 2:
-                                        email.closest('.form-group').addClass('has-error has-feedback').find('.input-group').append('<span class="zmdi zmdi-close form-control-feedback"></span><small class="help-block">Already registered</small>');
-                                        break;
-                                }
-
+                            case 0:
+                                notify('nothing to change...','inverse');
                                 break;
                         }
                     }
@@ -1464,8 +1478,8 @@
              var def_id = $(this).data('def_id');
              $(this).find('option').attr('value', def_id).text(def_value);
              }
-             
-             
+
+
              $(this).select2({
              placeholder: $(this).attr('id'),
              minimumInputLength: 3,
@@ -1486,9 +1500,9 @@
              }
              return query;
              },
-             url: '<?= APP::Module('Routing')->root ?>students/user/api/get/vkdata.json',
+             url: '<?//=APP::Module('Routing')->root ?>students/user/api/get/vkdata.json',
              delay: 500,
-             
+
              processResults: function (data) {
              return {
              results: $.map(data, function (item) {
@@ -1501,7 +1515,7 @@
              },
              },
              width: '100%'
-             
+
              });
              });
              */

@@ -31,8 +31,10 @@ class Student {
     }
 
     public function AddUser($id, $data) {
-        APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_settings(id) VALUES(' . $data['id'] . ')');
-        APP::Module('DB')->Open('auto')->query('INSERT INTO student_user_templates(id,id_user) VALUES(NULL,' . $data['id'] . ')');
+       
+        $query = 'INSERT INTO student_user_settings(id,email) VALUES('.$data['id'].',\''.$data['email'].'\')';
+        echo json_encode($query);
+        APP::Module('DB')->Open('auto')->query($query);
         return 1;
     }
 
@@ -689,11 +691,12 @@ class Student {
             'id_lecture' => [$id, PDO::PARAM_INT],
             'id_block' => [$_POST['id_block'], PDO::PARAM_INT],
             'name' => [$_POST['name'], PDO::PARAM_STR],
+            'state' => ['[0,0,0]',PDO::PARAM_STR],
             'private' => [0, PDO::PARAM_INT],
             'body' => ["", PDO::PARAM_STR],
             'date' => 'NOW()'
         ]);
-
+        
         echo json_encode(['status' => 'success', 'message' => $status]);
         exit();
     }
@@ -711,14 +714,28 @@ class Student {
 
         switch ($_POST['action']) {
             case 'image-crop':
+                
+                $dir_dest = ROOT.'/public/modules/students/profiles/'.$_POST['id_hash'];
+ 
+                $data = base64_decode(explode(',', $_POST['data'])[1]);
+                if (!is_dir($dir_dest)) {
+                    mkdir($dir_dest, 0755, true);
+                }
+                $file = fopen($dir_dest.'/avatar-cropped.png', "wb");
+                fwrite($file, $data);
+                fclose($file);
+                 
+                $avatar_path = APP::Module('Routing')->root.'public/modules/students/profiles/'.$_POST['id_hash'].'/avatar-cropped.png';
+                               
                 APP::Module('DB')->Update(
                         'auto', 'student_user_settings', [
-                    'img_crop' => $_POST['data']
+                    'img_crop' => $avatar_path
                         ], [
                     ['id', '=', $user_id, PDO::PARAM_INT]
                         ]
                 );
 
+                
                 echo json_encode(['status' => 'success']);
                 exit();
 
@@ -766,29 +783,9 @@ class Student {
                     ['id', '=', $user_id, PDO::PARAM_INT]
                         ]
                 );
-
-                $result = APP::Module('DB')->Update(
-                        'auto', 'student_user_templates', [
-
-                    'country' => $_POST['country'],
-                    'id_country' => $_POST['id_country'],
-                    'city' => $_POST['city'],
-                    'id_city' => $_POST['id_city'],
-                    'university' => $_POST['university'],
-                    'id_university' => $_POST['id_university'],
-                    'faculty' => $_POST['faculty'],
-                    'id_faculty' => $_POST['id_faculty'],
-                    'chair' => $_POST['chair'],
-                    'id_chair' => $_POST['id_chair'],
-                    'name' => $_POST['lecture']
-                        ], [
-                    ['id', '=', $user_id, PDO::PARAM_INT],
-                    ['type', '=', 'uni', PDO::PARAM_STR]
-                        ]
-                );
-
                 echo json_encode(['status' => $result]);
                 exit();
+                
             case 'unit-save':
                $data = $_POST;
                unset($data['id_hash']);
@@ -1119,6 +1116,7 @@ class Student {
 
             // https://oauth.vk.com/blank.html#access_token=d0e0fac62d036ee96976aafbde310260a60d7da8c2c4bf2ad30c2e6ed73275815105f06a2d4f064b9c55a&expires_in=0&user_id=382123010&secret=d347e095991f6de90b
 
+			// https://oauth.vk.com/access_token?client_id=1&client_secret=H2Pk8htyFD8024mZaPHm&code=7a6fa4dff77a228eeda56603b8f53806c883f011c40b72630bb50df056f6479e52a&redirect_uri=http://mysite.ru
 
             $url = $baseUrl . 'database.getUniversities?&country_id=' . $_POST['id_country'] . '&city_id=' . $_POST['id_city'] . '&q=' . $_POST['search'] . '&lang=' . $lang;
             $respond = json_decode(file_get_contents($url), true);

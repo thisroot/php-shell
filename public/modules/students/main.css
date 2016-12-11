@@ -61,7 +61,7 @@ and open the template in the editor.
     border-top: 1px solid rgb(230, 230, 230);
 }
 
-.equation-container {
+.badge.equation-container {
     background-color: #F3F3F3;;
     color: #050505;
     padding: 15px;
@@ -268,14 +268,14 @@ header.media {
 /* Dragging */
 .drag-handle {
     margin-top: 8px;
-    position: absolute;
+    position: absolute !important;
     right: 60px;
     color: #7e57c2;
     z-index: 1;
 }
 
 .js-remove {
-    position: absolute;
+    position: absolute !important;
     right: -5px;
     z-index: 1;
     margin-right: 10px;
@@ -289,7 +289,7 @@ header.media {
 }
 
 .js-edit, .js-save {
-    position: absolute;
+    position: absolute !important;
     right: 0px;
     z-index: 1;
     margin-right: 35px;
@@ -303,7 +303,7 @@ header.media {
 }
 
 .js-expand {
-    position: absolute;
+    position: absolute !important;
     right: 0px;
     z-index: 1;
     margin-right: 65px;
@@ -690,8 +690,7 @@ body.dragging, body.dragging * {
     /* transition:all 0.3s ease;*/
 }
 .dd3-content:hover {
-    color: #2ea8e5;
-    background: #f3f3f3;;
+    background: #efe6fa;
     cursor: pointer;
 }
 
@@ -820,7 +819,6 @@ left: 80px;
     background: white;
     border: 1px solid #FFF;
 }
-
 
 #module-student .card-lecture {
     min-height: 450px;

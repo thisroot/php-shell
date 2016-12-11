@@ -17,6 +17,11 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="title" content="Предмет: <?= $data['name'].
+        ' / '.$data['university'] . ' / ' . $data['faculty'] ?>
+          " />
+    <link rel="image_src" href="<?= APP::Module('Routing')->root ?>public/modules/students/img/logo-students-tool-ful.png" />
+
     <title>Student's tool</title>
 
     <!-- Vendor CSS -->
@@ -40,6 +45,45 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
 </head>
 <body  id="module-student">
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-63396844-3', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter36066965 = new Ya.Metrika({
+                    id:36066965,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true,
+                    webvisor:true,
+                    trackHash:true
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/36066965" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
 
     <!-- Render Header -->
     <?
@@ -87,16 +131,14 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                                         </div>
                                     </li>
 <? } ?>
+                               
                                 <li>
-                                    <button class="visible show-all btn btn-sm palette-Purple-400 bg btn-icon-text waves-effect m-l-5"><i class="zmdi zmdi-unfold-more"></i>Show</button>
-                                </li>
-                                <li>
-                                    <button class="accordeon expand-all btn btn-sm palette-Purple-400 bg btn-icon-text waves-effect m-l-5 m-r-5"><i class="zmdi zmdi-unfold-more"></i>Expand</button>
-                                </li>
-                                <li>
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle btn btn-sm m-r-5 palette-Purple-400 bg waves-effect" data-toggle="dropdown"><i class="zmdi zmdi-menu"></i></a>
+                                    <div class="dropdown m-r-10">
+                                        <a href="#" class="dropdown-toggle btn palette-Purple-400 bg waves-effect" data-toggle="dropdown"><i class="zmdi zmdi-more-vert"></i></a>
                                         <ul class="dropdown-menu pull-right dm-icon ">
+                                            <li role="presentation"><a class="visible show-all" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-unfold-more"></i>Show</a></li>
+                                            <li role="presentation"><a class="accordeon expand-all" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-unfold-more"></i>Expand</a></li>
+                                            <li class="divider"></li>
                                             <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-share"></i>Share</a></li>
                                             <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-copy"></i>Copy</a></li>
                                             <li class="divider"></li>
@@ -246,7 +288,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
         MathJax.Hub.Config({
         extensions: ["tex2jax.js","mml2jax.js"],
         jax: ["input/TeX", "output/HTML-CSS"],
-        tex2jax: {    
+        tex2jax: {
         inlineMath: [
         ["$", "$"],
         ["\\(", "\\)"]
@@ -260,7 +302,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
         }
         });
     </script>
-    
+
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/Nestable/jquery.nestable.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/jquery.event.move/js/jquery.event.move.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/caret/dist/jquery.caret-1.5.2.min.js" type="text/javascript"></script>
@@ -274,6 +316,12 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
     <script>
 $(document).ready(function () {
+    
+    var app_data = {
+        master: false,
+        struct_update: true
+        };
+
     var socket = io.connect('https://back.nebesa.me');
 
     var doc = {
@@ -289,7 +337,7 @@ $(document).ready(function () {
         // set structure
         console.log(data);
     });
-    
+
     function getList() {
         var data = {
             name: 'get-list',
@@ -306,10 +354,10 @@ $(document).ready(function () {
                 var index = result[1];
                 data_items = result;
                 appendBlocks(list, index, $('#items'));
-
                 $('.dd').nestable();
                 $('.dd').nestable('collapseAll');
                 refresh();
+                apendState(list, index, $('#items'));
             }
         });
     }
@@ -325,6 +373,7 @@ $(document).ready(function () {
             opened_items: '',
             opened_list: ''
         };
+        console.log(data);
         return data;
     });
 
@@ -334,9 +383,14 @@ $(document).ready(function () {
         //  console.log(e.currentTarget);
         var $this = e.target;
         // format state [open,expand,edited]
-        
-        if (($($this).is('.js-expand, .button-expand, .button-collapse, .zmdi-chevron-up, .zmdi-chevron-down, .zmdi-edit, .zmdi-save, .zmdi-close, .dd-handle')) || ($(params).is('.editable-click'))) {
-            var item_id = $($this).closest('.dd-item').data('id');
+
+        if ((app_data.struct_update === true) &&($($this).is('.js-expand, .button-expand, .button-collapse, .zmdi-chevron-up, .zmdi-chevron-down, .zmdi-edit, .zmdi-save, .zmdi-close, .dd-handle')) || ($(params).is('.editable-click'))) {
+            if($(params).is('.editable-click')) {
+                var item_id = $(params).data('id');
+            } else {
+                 var item_id = $($this).closest('.dd-item').data('id');
+            }
+
             if ($($this).hasClass('js-expand')) {
                 data = {action: ($('#dd3-content-' + item_id).hasClass('open')) ? 'expand-item' : 'collape-item'};
                 if(data.action == 'expand-item') {
@@ -371,13 +425,14 @@ $(document).ready(function () {
             } else {
                 data = {acrion: 'none'};
             }
+
             $.extend(data,
                     {
                         id_block: <?= $data['id']; ?>,
                         id_user: <?= $data['id_user'] ?>,
                         id_owner: <?= APP::Module('Users')->user['id'] ?>,
                         id_item: item_id,
-                        state: data_items[0][item_id]['state']?data_items[0][item_id]['state']:''
+                        state: (data_items[0][item_id]['state'] != 'undefined')?data_items[0][item_id]['state']:''
                     });
             socket.emit('struct message', data);
             return false;
@@ -385,7 +440,16 @@ $(document).ready(function () {
     });
 
     socket.on('struct message', function (data) {
-        console.log(data);
+        switch(data.action) {
+            case 'collapse-list':
+                console.log(data.id_item);
+              //  $("#item-" + data.id_item ).find('.button-expand').trigger('click');
+                break;
+            case 'expand-list':
+                console.log(data.id_item);
+              //  $("#item-" + data.id_item ).find('.button-expand').trigger('click');
+                break;
+        }
     });
 
     $('#scrolling').mCustomScrollbar();
@@ -499,7 +563,7 @@ $(document).ready(function () {
         return $htmlData.html();
     }
 
-    
+
 
     function sendFile(file, editor, welEditable, id) {
 
@@ -523,7 +587,7 @@ $(document).ready(function () {
         });
     }
 
-    getList();
+
 
 
     function deleteBlock(item) {
@@ -577,31 +641,31 @@ $(document).ready(function () {
             pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
             index: $('.dd').nestable('serialize') ? $('.dd').nestable('serialize') : [""]
         };
-        
-        
-       
+
+
+
        // собираем параметры блоков
      /*   var list_struct = {};
         $.each(data_items[2],function(i,v) {
-            
+
             list_struct[v] = [];
-            
+
             el = $('#item-'+v);
-            
+
             if($(el).children().attr('style') === 'display: block;') {
                 list_struct[v].push(1);
             } else {
                 list_struct[v].push(0);
             }
-            
+
             if($(el).find('.dd3-content').hasClass('open')) {
                 list_struct[v].push(1);
             } else {
                 list_struct[v].push(0);
             }
         }); */
-        
-       
+
+
         $.ajax({
             type: 'post',
             url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
@@ -619,11 +683,11 @@ $(document).ready(function () {
         $('.js-edit').unbind();
         $('.js-delete').unbind();
         $('.dd3-content').unbind();
-        
+
         $('.block-name').on('save', function(e, params) {
             $(document).trigger('click',[this]);
         });
-        
+
         $('.block-name').editable({
             highlight: ' #673ab7',
             url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/block.json',
@@ -639,12 +703,11 @@ $(document).ready(function () {
             }
         });
 
-        $('.expand').on('click', function () {
+        $('.expand').on('dblclick', function () {
             $(this).parent().find('.js-expand').trigger('click');
         });
 
         $('.js-expand').on('click', function () {
-
             var id = $(this).data('id');
             if ($('#dd3-content-' + id).hasClass('open')) {
                 setTimeout(function () {
@@ -661,11 +724,18 @@ $(document).ready(function () {
                     var body = (data_items[0][id].body != 0) ? data_items[0][id].body : '';
 
                     $('<div id="block-content-' + id + '" data-id="' + id + '" class="block-content">' + body + '</div>').insertAfter($('#dd3-content-' + id));
-                    MathJax.Hub.Queue(
-                            ["resetEquationNumbers", MathJax.InputJax.TeX],
-                            ["PreProcess", MathJax.Hub],
-                            ["Reprocess", MathJax.Hub]
-                            );
+
+                       var math = document.getElementById('block-content-' + id);
+                       MathJax.Hub.Queue(["Typeset",MathJax.Hub,math]);
+
+//                MathJax.Hub.Queue(
+//                    ["resetEquationNumbers", MathJax.InputJax.TeX],
+//                    ["PreProcess", MathJax.Hub],
+//                    ["Reprocess", MathJax.Hub]
+//                    );
+
+                $('block-content-' + id).find('')
+
                 }, 150);
             }
         });
@@ -673,6 +743,7 @@ $(document).ready(function () {
 
         $('.js-edit').on('click', function () {
             var id = $(this).data('id');
+            $('#block-content-' + id).remove();
 
             if ($('#dd3-content-' + id).hasClass('open')) {
                 $('#expand-' + id).trigger('click');
@@ -712,13 +783,17 @@ $(document).ready(function () {
                     sendFile(files[0], editor, welEditable, id);
                 }
             });
+
+
+//             var math = document.getElementById('html-editor-' + id);
+//             MathJax.Hub.Queue(["Typeset",MathJax.Hub,math]);
+
             MathJax.Hub.Queue(
                     ["resetEquationNumbers", MathJax.InputJax.TeX],
                     ["PreProcess", MathJax.Hub],
                     ["Reprocess", MathJax.Hub]
                     );
-
-        });
+       });
 
         $('.js-save').on('click', function () {
 
@@ -730,7 +805,7 @@ $(document).ready(function () {
                 html_data = '';
             }
             if ((!html_data) && ($('#dd3-content-' + id).hasClass('open'))) {
-                $('#expand-' + id).trigger('click');
+                $('#expand-' + id).dblclick();
             }
 
 
@@ -738,7 +813,7 @@ $(document).ready(function () {
 
             $('#html-editor-' + id).destroy();
             $('#html-editor-' + id).remove();
-            $('#expand-' + id).trigger('click');
+            $('#expand-' + id).dblclick();
 
             $('#dd3-content-' + id).removeClass('edit');
             $(this).addClass('hidden');
@@ -782,10 +857,10 @@ $(document).ready(function () {
 
                     var id = $this.prev().data('id');
                     var item = $('#item-' + id);
-                    var blocks = $(item).find('.dd-item');
-
+                    
                     $.each($(item).find('.dd-item'), function (i, v) {
-                        var id = $this.data('id');
+                        var id = $(v).data('id');
+                       
                         deleteBlock(id);
                     });
 
@@ -802,7 +877,7 @@ $(document).ready(function () {
         });
 
 
-        $('.dd3-content').hover(function () {
+        $('.dd3-content').on('click', function () {
             $.each($('.dd3-content'), function (item, value) {
                 $(this).removeClass('active');
                 $(this).prev().removeClass('active');
@@ -812,7 +887,7 @@ $(document).ready(function () {
             $('#dd3-content-' + id).prev().addClass('active');
         });
 
-        $('.dd3-content').on('click', function () {
+        $('.dd3-content').on('dblclick', function () {
             $.each($('.dd3-content'), function (item, value) {
                 $(this).removeClass('active');
                 $(this).prev().removeClass('active');
@@ -823,6 +898,28 @@ $(document).ready(function () {
             $('#dd3-content-' + id).prev().addClass('active');
         });
     }
+
+    function apendState(list,index,el) {
+        app_data.struct_update = false;
+        
+        $.each(list, function (item, value) {
+            // format state [open,expand,edited]
+            
+            var state = value['state'];
+            
+            if(state[0]) {
+                $("#item-" + value.id_block ).find('.js-expand').trigger('click');
+            }
+            if(state[1]) {
+                $("#item-" + value.id_block ).find('.button-expand').trigger('click');
+            }
+            if(state[2]) {
+               $("#item-" + value.id_block ).find('.js-edit').trigger('click');
+            }
+        });
+        app_data.struct_update = true;
+        
+    };
 
     function appendBlocks(list, index, el) {
 
@@ -844,10 +941,8 @@ $(document).ready(function () {
                 });
                 html.append(ol);
             }
-
             return html;
-        }
-        ;
+        };
 
         var parent_ol = $('#dd-list');
         $.each(index, function (item, value) {
@@ -856,9 +951,9 @@ $(document).ready(function () {
             }
         });
         el.append(parent_ol);
+    };
 
-    }
-    ;
+
 
     // использование Math.round() даст неравномерное распределение!
     function getUniqRandomInt(min, max, items) {
@@ -871,10 +966,9 @@ $(document).ready(function () {
             return id;
         }
     };
+    
+    $('#add-block').on('click', function addBlock() {
 
-
-    $('#add-block').on('click', function () {
-        
         var items = [];
         $('.js-edit').each(function () {
             items.push($(this).data('id'));
@@ -894,12 +988,8 @@ $(document).ready(function () {
         }
 
         data_items[0][id_block] = {};
+        data_items[0][id_block]['state'] = [0,0,0];
         var str = id_block.toString();
-       // data_items[2].push(str);
-
-//        data_items[0][id_block] = {
-//            body: 'please write here...'
-//        }
 
         var child = $('<li class="dd-item dd3-item" id="item-' + id_block + '" data-id="' + id_block + '"><div class="dd-handle  dd3-handle"></div><div id="dd3-content-' + id_block + '" class="dd3-content" data-id="' + id_block + '">' +
                 '<span class="js-expand waves-effect"  data-id="' + id_block + '"><i class="zmdi zmdi-chevron-up zmdi-hc-fw"></i></span>' +
@@ -984,7 +1074,10 @@ $(document).ready(function () {
         ]
     });
 
+    getList();
+
 });
+
     </script>
 
 

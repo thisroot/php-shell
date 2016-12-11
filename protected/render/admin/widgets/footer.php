@@ -1,5 +1,5 @@
 <footer id="footer">
-    Copyright &copy; <?= date('Y') ?> php-shell
+    Copyright &copy; <?= date('Y') ?> nebesa.me
 
     <ul class="f-menu">
         <li><a href="https://php-shell.com">Home</a></li>
