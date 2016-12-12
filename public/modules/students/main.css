@@ -45,18 +45,31 @@ and open the template in the editor.
     border-radius: 0px;
 }
 
-#modal-equation .badge {
+.eq-insert-block {
+    position: relative;
+    top: 20px;
+    left: -30px;
+    float: left;
+    background-color: white;
+    padding: 15px 0px 15px 8px;
+    font-size: 24px;
+    color: #7e57c2;
+    cursor:pointer;
+}
+
+
+.eq-panel .badge {
     background: none;
     margin: 3px;
     color: #7e57c2;
     cursor: pointer;
 }
 
-#modal-equation .panel-group {
+.eq-panel .panel-group {
     padding-right: 15px;
 }
 
-#modal-equation .collapse.in {
+.eq-panel .collapse.in {
     border-bottom: 1px solid rgb(230, 230, 230);
     border-top: 1px solid rgb(230, 230, 230);
 }
@@ -67,7 +80,7 @@ and open the template in the editor.
     padding: 15px;
 }
 
-#modal-equation .badge:hover { 
+.eq-panel .badge:hover { 
     background-color: #7e57c2;
     margin: 3px;
     color: white;

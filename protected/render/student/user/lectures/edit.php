@@ -153,7 +153,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
                         <div class="card-body card-padding card-lecture paper">
 
-                            <div id="modal-equation" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+<!--                            <div id="modal-equation" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
 
@@ -186,7 +186,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <div id="modal-draw" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog modal-xlg">
@@ -293,9 +293,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
         ["$", "$"],
         ["\\(", "\\)"]
         ]
-        },
-        mml2jax: {
-            preview: [["img",{src: "https://nebesa.me/public/ui/img/icons/weather/2.png"}]]
         },
         "HTML-CSS": {
         linebreaks: { automatic: true }
@@ -452,7 +449,7 @@ $(document).ready(function () {
         }
     });
 
-    $('#scrolling').mCustomScrollbar();
+    
 
     var ago = moment($('.time').text()).fromNow();
     $('.time').text(ago);
