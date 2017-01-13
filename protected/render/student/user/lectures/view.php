@@ -310,6 +310,26 @@ if (APP::Module('Users')->user['role'] != 'default') {
                         }
                });
             }
+            
+            function getBlockBody(id_block, callback) {
+                var data = {
+                    name: 'get-block-body',
+                    pk: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
+                    id_block: id_block
+                };
+
+                $.ajax({
+                    type: 'post',
+                    url: '<?= APP::Module('Routing')->root ?>students/user/api/get/block/body.json',
+                    data: data ? data : [0],
+                    success: function (result) {
+                        callback(result);
+                    },
+                    error: function (result) {
+                        callback(result);
+                    }
+                });
+            };
 
             getList();
 
@@ -343,12 +363,29 @@ if (APP::Module('Users')->user['role'] != 'default') {
                        $('#dd3-content-'+id).addClass('open');
                        $(this).find('.zmdi').removeClass('zmdi-chevron-up').addClass('zmdi-chevron-down');
 
-                        setTimeout(function(){
-                            var body = (data_items[0][id].body != 0)?data_items[0][id].body:'<div class="body-empty"><a class="edit-empty-block" id="edit-empty-block-' + id+ '" data-id="' + id + '">edit block<a></div>';
-                            $('<div id="block-content-' + id+ '" data-id="' + id + '" class="block-content">' + body + '</div>').insertAfter($('#dd3-content-'+id));}, 150);
+                        setTimeout(function () {
+                                //  var body = (data_items[0][id].body != 0)?data_items[0][id].body:'<div class="body-empty"><a class="edit-empty-block" id="edit-empty-block-' + id+ '" data-id="' + id + '">edit block<a></div>';
+                                var body;
+                                //   console.log(data_items[0][id].body);
+                               
+                                if (typeof data_items[0][id].body == 'undefined') {
+                                    
+                                    getBlockBody(id, function (data) {
+                                        data_items[0][id].body = data[0].body != 0?data[0].body:'';
+                                        $('<div id="block-content-' + id + '" data-id="' + id + '" class="block-content">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-' + id));
+                                    });
+
+                                } else {                                  
+                                    $('<div id="block-content-' + id + '" data-id="' + id + '" class="block-content">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-' + id));
+                                }
+
+                                var math = document.getElementById('block-content-' + id);
+                                MathJax.Hub.Queue(["Typeset", MathJax.Hub, math]);
+                                $('block-content-' + id).find('')
+
+                            }, 150);
                     }
                 });
-
 
                 $('.dd3-content').hover(function() {
                       $.each($('.dd3-content'),function(item,value) {

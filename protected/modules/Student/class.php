@@ -645,7 +645,7 @@ class Student {
         ]);
 
         $blocks = APP::Module('DB')->Select(
-                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['id_block', 'name','state', 'private', 'body'], 'student_lecture_blocks', [
+                'auto', [ 'fetchAll', PDO::FETCH_ASSOC], ['id_block', 'name','state', 'private'], 'student_lecture_blocks', [
             ['id_lecture', '=', APP::Module('Crypt')->Decode($_POST['pk']), PDO::PARAM_INT]
         ]);
         
@@ -670,6 +670,24 @@ class Student {
         }
 
         echo json_encode([$items,$sort]);
+        exit();
+    }
+    
+    
+    public function APIBlockBody() {
+        
+        $this->SetHeader();
+        if (!isset($_POST)) {
+            echo json_encode(['status' => 'error', 'error' => 'does not have post data']);
+            exit();
+        }
+        $block = APP::Module('DB')->Select(
+                'auto', [ 'fetch', PDO::FETCH_ASSOC], ['body'], 'student_lecture_blocks', [
+            ['id_lecture', '=', APP::Module('Crypt')->Decode($_POST['pk']), PDO::PARAM_INT],
+            ['id_block', '=',$_POST['id_block'],PDO::PARAM_INT]
+        ]);
+        
+        echo json_encode([$block]);
         exit();
     }
 

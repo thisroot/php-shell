@@ -80,7 +80,7 @@ and open the template in the editor.
     padding: 15px;
 }
 
-.eq-panel .badge:hover { 
+.eq-panel .badge:hover {
     background-color: #7e57c2;
     margin: 3px;
     color: white;
@@ -113,7 +113,7 @@ body {
 }
 
 body:before {
-    background-image: url("https://nebesa.me/public/modules/students/img/9.jpg");
+    background-image: url("./img/9.jpg");
     background-position: left center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -299,6 +299,7 @@ header.media {
     padding: 0px 2px;
     border: 1px solid #c9c9c9;
     background-color: #fff;
+    
 }
 
 .js-edit, .js-save {
@@ -313,6 +314,7 @@ header.media {
     padding: 0px 2px;
     border: 1px solid #c9c9c9;
     background-color: #fff;
+    
 }
 
 .js-expand {
@@ -327,8 +329,8 @@ header.media {
     padding: 0px 2px;
     border: 1px solid #c9c9c9;
     background-color: #fff;
+    
 }
-
 
 .dd3-content.active .js-expand,
 .dd3-content.active .js-save,
@@ -351,10 +353,17 @@ header.media {
 
 .block-name {
     position: absolute;
-    z-index: 1;
-    margin-right: 10px;
-    color: #7e57c2;
-    display: inline-block;
+z-index: 1;
+margin-right: 10px;
+color: #7e57c2;
+display: inline-block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 60%;
+    border-bottom: none !important;
+
 }
 
 .dd3-content.active .block-name {
@@ -375,6 +384,15 @@ header.media {
 .note-editor .note-toolbar {
     padding: 0px;
     padding-bottom: 5px;
+
+}
+
+.note-editor {
+    border-radius: 0px !important;
+}
+
+ul.actions {
+     margin-top: 5px;
 }
 
 ul.actions .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
@@ -584,16 +602,16 @@ body.dragging, body.dragging * {
  * Nestable
  */
 
-.dd { 
-    position: relative; 
-    display: block; 
-    margin: 0; 
-    padding: 0;  
-    list-style: none; 
-    font-size: 13px; 
+.dd {
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
     line-height: 20px;
     padding-top: 2px;
-   
+
 }
 
 .dd-list { display: block; position: relative; margin: 0; padding: 0; list-style: none;}
@@ -602,15 +620,15 @@ body.dragging, body.dragging * {
 
 .dd-item,
 .dd-empty,
-.dd-placeholder { 
-    display: block; 
-    position: relative; 
-    margin: 0; 
-    padding: 0; 
-    min-height: 20px; 
-    font-size: 13px; 
-    line-height: 20px; 
-    background-color: white; 
+.dd-placeholder {
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    min-height: 20px;
+    font-size: 13px;
+    line-height: 20px;
+    background-color: white;
 }
 
 .dd-handle {
@@ -680,7 +698,6 @@ body.dragging, body.dragging * {
 #nestable2 .dd-item > button:before { color: #fff; }
 
 
-
 .dd-hover > .dd-handle {
     background: #2ea8e5 !important;
 }
@@ -698,7 +715,7 @@ body.dragging, body.dragging * {
     text-decoration: none;
     /* background: #fafafa; */
     background: #fcf7fe;
-    border-radius: 2px;
+    border-radius: 0px;
     -moz-box-sizing: border-box;
     /* transition:all 0.3s ease;*/
 }
@@ -727,6 +744,7 @@ body.dragging, body.dragging * {
     overflow: hidden;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    border-radius: 0px;
 }
 
 .dd3-handle:hover {
@@ -758,12 +776,21 @@ body.dragging, body.dragging * {
     font: normal normal normal 14px/1 'Material-Design-Iconic-Font';
 }
 
- .dd3-handle:hover:before { 
+ .dd3-handle:hover:before {
     color: white;
 }
 
 .dd3-content .editable-submit, .dd3-content  .editable-cancel {
     font-size: 8px;
+}
+
+.dd3-content .editable-submit {
+    color: white !important;
+    background-color: #753ab6;
+}
+.dd3-content .editable-submit:hover {
+    color: white !important;
+    background-color: #753ab6 !important;
 }
 
 .dd3-content .editable-input .form-control {
@@ -779,15 +806,13 @@ body.dragging, body.dragging * {
     color: white;
     border-bottom: dashed 1px white;
     transition: background-color 400ms;
-   
+
 }
-
-
 
 .block-content {
     display: block;
     margin: 0px 0px;
-    padding: 0px 20px;
+    padding: 10px;
     text-decoration: none;
     background: #fff;
     overflow: hidden;
@@ -816,7 +841,7 @@ left: 80px;
 
 
 .paper {
-   
+
     background: white;
     background: -webkit-linear-gradient(top, #DFE8EC 0%, white 8%) 0 57px;
     background: -moz-linear-gradient(top, #DFE8EC 0%, white 8%) 0 57px;
@@ -826,7 +851,7 @@ left: 80px;
     -ms-background-size: 100% 35px;
     background-size: 100% 35px;
 }
-.paper::before {    
+.paper::before {
     content: '';
     z-index: -1;
     background: white;
@@ -877,3 +902,102 @@ left: 80px;
     margin: 0 5px 7px 0;
 }
 
+/*==================================================
+=            Bootstrap 3 Media Queries             =
+==================================================*/
+
+
+
+
+    /*==========  Mobile First Method  ==========*/
+
+    /* Custom, iPhone Retina */
+    @media only screen and (min-width : 320px) {
+
+    }
+
+    /* Extra Small Devices, Phones */
+    @media only screen and (min-width : 480px) {
+
+    }
+
+    /* Small Devices, Tablets */
+    @media only screen and (min-width : 768px) {
+
+    }
+
+    /* Medium Devices, Desktops */
+    @media only screen and (min-width : 992px) {
+
+    }
+
+    /* Large Devices, Wide Screens */
+    @media only screen and (min-width : 1200px) {
+
+    }
+
+
+
+    /*==========  Non-Mobile First Method  ==========*/
+
+    /* Large Devices, Wide Screens */
+    @media only screen and (max-width : 1200px) {
+
+    }
+
+    /* Medium Devices, Desktops */
+    @media only screen and (max-width : 992px) {
+
+    }
+
+    /* Small Devices, Tablets */
+    @media only screen and (max-width : 768px) {
+        .block-content {
+            padding: 0px 10px;
+        }
+
+        #module-student .card-lecture {
+            padding: 0px;
+            margin: 0px 10px;
+        }
+        
+        #module-student .card-header {  
+            padding: 30px 0px 0px 0px;
+            margin: 0px -10px 0px 15px;
+        }
+
+        .dd-list .dd-list {
+            margin-left: 10px;
+        }
+        
+         ul.actions > li:nth-child(1) {
+            display: none;
+        }
+        
+         #module-student #content .card-header h2 {
+            width: 50%;
+        }
+
+    }
+
+    /* Extra Small Devices, Phones */
+    @media only screen and (max-width : 480px) {
+         ul.actions > li:nth-child(1) {
+            display: none;
+        }
+        ul.actions > li:nth-child(2) {
+            display: none;
+        }
+        ul.actions > li:nth-child(3) {
+            display: none;
+        }
+       
+        #module-student #content .card-header h2 {
+            width: 75%;
+        }
+    }
+
+    /* Custom, iPhone Retina */
+    @media only screen and (max-width : 320px) {
+
+    }
