@@ -41,12 +41,57 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
     <link href="<?= APP::Module('Routing')->root ?>public/plugins/sortable/st/app.css" rel="stylesheet" type="text/css"/>
 <!--    <link href="<?= APP::Module('Routing')->root ?>public/ui/vendors/summernote/dist/summernote.css" rel="stylesheet" type="text/css"/>-->
     <link href="<?= APP::Module('Routing')->root ?>public/plugins/summernote/dist/summernote.css" rel="stylesheet" type="text/css"/>
-<? APP::Render('core/widgets/css') ?>
+    <? APP::Render('core/widgets/css') ?>
     <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        html:not(.ismobile) .page-loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
 
+        html:not(.ismobile) .page-loader .preloader {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+        }
+
+        .preloader.pl-xl {
+            width: 80px;
+        }
+        .preloader {
+            position: relative;
+            margin: 0px auto;
+            display: inline-block;
+        }
+
+        svg:not(:root) {
+            overflow: hidden;
+        }
+        .pl-circular {
+            animation: rotate 2s linear infinite;
+            height: 100%;
+            transform-origin: center center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
+    </style>
 
 </head>
-<body  id="module-student">
+<body  id="module-student" data-ma-header="teal" class="main-container">  
+    <? APP::Render('student/widgets/page_loader') ?>
     <script>
         (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -101,183 +146,178 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
     <!-- Render Header -->
     <?
+    
+    APP::Render('student/widgets/logo');
     if (APP::Module('Users')->user['role'] != 'default') {
-        APP::Render('student/widgets/header', 'include', [
-            'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
-        ]);
-    } else {
-        APP::Render('student/widgets/header');
+        APP::Render('student/widgets/ulogin', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+   ]);
+    } else {  
+        APP::Render('student/widgets/ulogin');
     }
     ?>
     <!-- Stop Render Header -->
 
-    <section id="main">
-<? APP::Render('student/user/lectures/sidebar', 'include', ['page' => 'lecture_edit']) ?>
 
-        <section id="content">
-            <div class="hidden"></div>
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="card p-b-30">
+    <? APP::Render('student/user/lectures/sidebar', 'include', ['page' => 'lecture_edit']) ?>
 
-                        <div class="card-header">
-                            <h2><a href="#" id="lecture" data-type="text" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-title=""><?= $data['name']; ?></a>
-                                <small><?= $data['university'] . ' / ' . $data['faculty'] ?>/  </small>
-                            </h2>
+    <section id="content" class="col-lg-10 col-md-12 col-sm-12 col-xs-12 col-lg-offset-2">
+        <div class="hidden"></div>
+        
+                <div class="card p-b-30">
 
-                            <ul class="actions">
+                    <div class="card-header">
+                        <h2><a href="#" id="lecture" data-type="text" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-title=""><?= $data['name']; ?></a>
+                            <small><?= $data['university'] . ' / ' . $data['faculty'] ?>/  </small>
+                        </h2>
+
+                        <ul class="actions">
+                            <li>
+                                <div class="input-group time-container p-r-5">
+                                    <i class="zmdi zmdi-time-restore zmdi-hc-fw"></i> <span class="time"> <?= $data['date_last_update'] ?></span>
+                                </div>
+                            </li>
+                            <? if (APP::Module('Users')->user['id'] == $data['id_user']) { ?>
                                 <li>
-                                    <div class="input-group time-container p-r-5">
-                                        <i class="zmdi zmdi-time-restore zmdi-hc-fw"></i> <span class="time"> <?= $data['date_last_update'] ?></span>
+                                    <div class="input-group header-editable p-r-5">
+                                        <i class="zmdi zmdi-image zmdi-hc-fw"></i>
+                                        <a href="#" id="user-priv-view" data-type="select" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-value="<?= $data['privacy_view'] ?>" data-title="privacy"></a>
                                     </div>
                                 </li>
-<? if (APP::Module('Users')->user['id'] == $data['id_user']) { ?>
-                                    <li>
-                                        <div class="input-group header-editable p-r-5">
-                                            <i class="zmdi zmdi-image zmdi-hc-fw"></i>
-                                            <a href="#" id="user-priv-view" data-type="select" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-value="<?= $data['privacy_view'] ?>" data-title="privacy"></a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="input-group header-editable p-r-5">
-                                            <i class="zmdi zmdi-scissors zmdi-hc-fw"></i>
-                                            <a href="#" id="user-priv-edit" data-type="select" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-value="<?= $data['privacy_edit'] ?>" data-title="privacy"></a>
-                                        </div>
-                                    </li>
-<? } ?>
-
                                 <li>
-                                    <div class="dropdown m-r-10">
-                                        <a href="#" class="dropdown-toggle btn palette-Purple-400 bg waves-effect" data-toggle="dropdown"><i class="zmdi zmdi-more-horiz"></i></a>
-                                        <ul class="dropdown-menu pull-right dm-icon ">
-                                            <li role="presentation"><a class="visible show-all" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-unfold-more"></i>Show</a></li>
-                                            <li role="presentation"><a class="accordeon expand-all" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-unfold-more"></i>Expand</a></li>
-                                            <li class="divider"></li>
-                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-share"></i>Share</a></li>
-                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-copy"></i>Copy</a></li>
-                                            <li class="divider"></li>
-                                            <li role="presentation"><a id="action-delete" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-delete"></i>Delete</a></li>
-                                        </ul>
+                                    <div class="input-group header-editable p-r-5">
+                                        <i class="zmdi zmdi-scissors zmdi-hc-fw"></i>
+                                        <a href="#" id="user-priv-edit" data-type="select" data-pk="<?= APP::Module('Crypt')->Encode($data['id']); ?>" data-value="<?= $data['privacy_edit'] ?>" data-title="privacy"></a>
                                     </div>
                                 </li>
-                            </ul>
+                            <? } ?>
 
-                        </div>
+                            <li>
+                                <div class="dropdown m-r-10">
+                                    <a href="#" class="dropdown-toggle btn palette-Purple-400 bg waves-effect" data-toggle="dropdown"><i class="zmdi zmdi-more-horiz"></i></a>
+                                    <ul class="dropdown-menu pull-right dm-icon ">
+                                        <li role="presentation"><a class="visible show-all" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-unfold-more"></i>Show</a></li>
+                                        <li role="presentation"><a class="accordeon expand-all" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-unfold-more"></i>Expand</a></li>
+                                        <li class="divider"></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-share"></i>Share</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-copy"></i>Copy</a></li>
+                                        <li class="divider"></li>
+                                        <li role="presentation"><a id="action-delete" role="menuitem" tabindex="-1" href="#"><i class="zmdi zmdi-delete"></i>Delete</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+
+                    </div>
 
 
-                        <div class="card-body card-padding card-lecture paper">
+                    <div class="card-body card-padding card-lecture paper">
 
-                            <!--                            <div id="modal-equation" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                                                            <div class="modal-dialog modal-lg">
-                                                                <div class="modal-content">
+                        <!--                            <div id="modal-equation" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg">
+                                                            <div class="modal-content">
 
-                                                                    <div class="modal-body">
-                                                                        <div class="p-25">
-                                                                            <div class="row text-center">
-                                                                                <div class="col-xs-12 col-sm-12 col-md-8 pg-item">
-                                                                                    <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
-                                                                                        <div class="form-group">
-                                                                                            <div class="fg-line">
-                                                                                                <textarea id="equation" class="form-control auto-size" placeholder="Input equation" type="text"></textarea>
-                                                                                            </div>
+                                                                <div class="modal-body">
+                                                                    <div class="p-25">
+                                                                        <div class="row text-center">
+                                                                            <div class="col-xs-12 col-sm-12 col-md-8 pg-item">
+                                                                                <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+                                                                                    <div class="form-group">
+                                                                                        <div class="fg-line">
+                                                                                            <textarea id="equation" class="form-control auto-size" placeholder="Input equation" type="text"></textarea>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
-                                                                                        <div id="equation-tex" style="font-size: 200%;"></div>
-                                                                                    </div>
                                                                                 </div>
-                                                                                <div class="col-xs-12 col-sm-12 col-md-4 pg-item">
-                                                                                    <div id="scrolling" class="media p-10">
-                                                                                        <div class="panel-group" data-collapse-color="amber" id="accordion" role="tablist" aria-multiselectable="true"></div>
-                                                                                    </div>
+                                                                                <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+                                                                                    <div id="equation-tex" style="font-size: 200%;"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-xs-12 col-sm-12 col-md-4 pg-item">
+                                                                                <div id="scrolling" class="media p-10">
+                                                                                    <div class="panel-group" data-collapse-color="amber" id="accordion" role="tablist" aria-multiselectable="true"></div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="modal-footer">
-                                                                        <button id="equation-append" type="button" class="btn btn-link">Append</button>
-                                                                        <button id="equation-close" type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button id="equation-append" type="button" class="btn btn-link">Append</button>
+                                                                    <button id="equation-close" type="button" class="btn btn-link" data-dismiss="modal">Close</button>
                                                                 </div>
                                                             </div>
-                                                        </div>-->
-
-                            <div id="modal-draw" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                                <div class="modal-dialog modal-xlg">
-                                    <div class="modal-content">
-                                        <div class="modal-header palette-Grey-300 bg">
-
-                                            <ul class="ah-actions actions a-alt">
-                                                <li>
-                                                    <div class="btn-demo">
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-edit"></i>Pencil</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-brush"></i>Brush</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-view-day"></i>Thin</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-palette"></i>Color</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-format-color-fill"></i>Fill</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-toll"></i>Erase</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-minus"></i>Line</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-circle-o"></i>Circle</button>
-                                                        <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-square-o"></i>Square</button>
-                                                    </div>
-
-                                                </li>
-                                                <li class="pull-right">
-                                                    <div class="btn-group-lg">
-                                                        <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-undo"></i></button>
-                                                        <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-redo"></i></button>
-                                                        <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-save"></i></button>
-                                                        <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-delete"></i></button>
-                                                        <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-download"></i></button>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="p-25">
-                                                <div class="row text-center">
-                                                    <div class="col-xs-12 col-sm-12 col-md-12 pg-item">
-                                                        <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
-
                                                         </div>
-                                                        <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+                                                    </div>-->
 
-                                                        </div>
-                                                    </div>
+                        <div id="modal-draw" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xlg">
+                                <div class="modal-content">
+                                    <div class="modal-header palette-Grey-300 bg">
 
+                                        <ul class="ah-actions actions a-alt">
+                                            <li>
+                                                <div class="btn-demo">
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-edit"></i>Pencil</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-brush"></i>Brush</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-view-day"></i>Thin</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-palette"></i>Color</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-format-color-fill"></i>Fill</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-toll"></i>Erase</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-minus"></i>Line</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-circle-o"></i>Circle</button>
+                                                    <button class="btn btn-default btn-icon-text waves-effect waves-effect waves-float"><i class="zmdi zmdi-square-o"></i>Square</button>
                                                 </div>
+
+                                            </li>
+                                            <li class="pull-right">
+                                                <div class="btn-group-lg">
+                                                    <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-undo"></i></button>
+                                                    <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-redo"></i></button>
+                                                    <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-save"></i></button>
+                                                    <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-delete"></i></button>
+                                                    <button class="btn palette-Deep-Purple-400 bg waves-effect"><i class="zmdi zmdi-download"></i></button>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="p-25">
+                                            <div class="row text-center">
+                                                <div class="col-xs-12 col-sm-12 col-md-12 pg-item">
+                                                    <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+
+                                                    </div>
+                                                    <div class="col-xs-12 col-sm-12 col-md-12 pg-item p-10">
+
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button id="draw-append" type="button" class="btn btn-link">Append</button>
-                                            <button id="draw-close" type="button" class="btn btn-link" data-dismiss="modal">Close</button>
-                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="draw-append" type="button" class="btn btn-link">Append</button>
+                                        <button id="draw-close" type="button" class="btn btn-link" data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
-
-                            <div id="items" class="dd">
-                                <ol id="dd-list" class="dd-list"></ol>
-                            </div>
-
-                            <div class="panel-group" role="tablist" aria-multiselectable="true">
-                                <ol id="items1"> </ol>
-                            </div>
-
-
                         </div>
+
+                        <div id="items" class="dd">
+                            <ol id="dd-list" class="dd-list"></ol>
+                        </div>
+
+                        <div class="panel-group" role="tablist" aria-multiselectable="true">
+                            <ol id="items1"> </ol>
+                        </div>
+
+
                     </div>
-
                 </div>
-            </div>
-        </section>
-
-<? APP::Render('student/widgets/footer') ?>
+            
     </section>
 
-    <? APP::Render('student/widgets/page_loader') ?>
-
-<? APP::Render('student/widgets/ie_warning') ?>
+    <? APP::Render('student/widgets/footer') ?>
+    <? APP::Render('student/widgets/ie_warning') ?>
 
     <!-- Javascript Libraries -->
     <script src="<?= APP::Module('Routing')->root ?>public/ui/vendors/bower_components/jquery/dist/jquery.min.js"></script>
@@ -323,7 +363,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
     <script src="<?= APP::Module('Routing')->root ?>public/plugins/socketio/socket.io-1.2.0.js" type="text/javascript"></script>
     <script src="<?= APP::Module('Routing')->root ?>public/modules/students/main.js" type="text/javascript"></script>
 
-<? APP::Render('core/widgets/js') ?>
+    <? APP::Render('core/widgets/js') ?>
 
 
     <script>
@@ -334,7 +374,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 struct_update: true
             };
 
-            var socket = io.connect('<?= 'back'.parse_url(APP::Module('Routing')->root, PHP_URL_HOST)?>');
+            var socket = io.connect('<?= 'back.' . parse_url(APP::Module('Routing')->root, PHP_URL_HOST) ?>');
 
             var doc = {
                 id_block: '<?= APP::Module('Crypt')->Encode($data['id']); ?>',
@@ -347,7 +387,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
 
             socket.on('get-struct message', function (data) {
                 // set structure
-               // console.log(data);
+                // console.log(data);
             });
 
             function getList() {
@@ -396,7 +436,8 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                         callback(result);
                     }
                 });
-            };
+            }
+            ;
 
             socket.emit('set-struct message', function () {
                 var opened_items = '';
@@ -477,17 +518,15 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
             socket.on('struct message', function (data) {
                 switch (data.action) {
                     case 'collapse-list':
-                       // console.log(data.id_item);
+                        // console.log(data.id_item);
                         //  $("#item-" + data.id_item ).find('.button-expand').trigger('click');
                         break;
                     case 'expand-list':
-                      //  console.log(data.id_item);
+                        //  console.log(data.id_item);
                         //  $("#item-" + data.id_item ).find('.button-expand').trigger('click');
                         break;
                 }
             });
-
-
 
             var ago = moment($('.time').text()).fromNow();
             $('.time').text(ago);
@@ -598,8 +637,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 return $htmlData.html();
             }
 
-
-
             function sendFile(file, editor, welEditable, id) {
 
                 var dimg = new FormData();
@@ -631,7 +668,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     item: item,
                     id_hash: '<?= APP::Module('Crypt')->Encode($data['id']); ?>'
                 }
-                
+
                 $.ajax({
                     type: 'post',
                     url: '<?= APP::Module('Routing')->root ?>students/user/api/delete/block.json',
@@ -680,17 +717,17 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 // собираем параметры блоков
                 /*   var list_struct = {};
                  $.each(data_items[2],function(i,v) {
-
+                 
                  list_struct[v] = [];
-
+                 
                  el = $('#item-'+v);
-
+                 
                  if($(el).children().attr('style') === 'display: block;') {
                  list_struct[v].push(1);
                  } else {
                  list_struct[v].push(0);
                  }
-
+                 
                  if($(el).find('.dd3-content').hasClass('open')) {
                  list_struct[v].push(1);
                  } else {
@@ -731,7 +768,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     },
                     success: function (response, newValue) {
                         if (response.status == 'error') {
-                          //  console.log('error update DB')
+                            //  console.log('error update DB')
                         }
                     }
                 });
@@ -761,7 +798,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                                 if (typeof data_items[0][id].body == 'undefined') {
 
                                     getBlockBody(id, function (data) {
-                                        data_items[0][id].body = data[0].body != 0?data[0].body:'';
+                                        data_items[0][id].body = data[0].body != 0 ? data[0].body : '';
                                         $('<div id="block-content-' + id + '" data-id="' + id + '" class="block-content">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-' + id));
                                     });
 
@@ -778,29 +815,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     }
                 });
 
-                $('.js-edit').on('click', function () {
-                    var id = $(this).data('id');
-
-                    $('#block-content-' + id).remove();
-
-                    $('#dd3-content-' + id).addClass('edit');
-                    $(this).addClass('hidden');
-                    $(this).prev().removeClass('hidden');
-
-                   
-                    if (typeof data_items[0][id].body == 'undefined') {
-                            getBlockBody(id, function (data) {
-                                data_items[0][id].body = data[0].body != 0?data[0].body:'';
-                                // use mathJaxReload function
-                                data_items[0][id].body = mathJaxReload(data_items[0][id].body);
-                                $('<div id="html-editor-' + id + '" data-id="' + id + '">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-' + id));
-                            });
-
-                        } else {
-                            data_items[0][id].body = '';
-                            $('<div id="html-editor-' + id + '" data-id="' + id + '">'+ data_items[0][id].body +'</div>').insertAfter($('#dd3-content-' + id));
-                        }
-
+                function runEditor(id) {
                     $('#html-editor-' + id).summernote({
                         placeholder: 'write here...',
                         height: 400, // set editor height
@@ -825,17 +840,42 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                             sendFile(files[0], editor, welEditable, id);
                         }
                     });
-
-
 //             var math = document.getElementById('html-editor-' + id);
 //             MathJax.Hub.Queue(["Typeset",MathJax.Hub,math]);
 
                     MathJax.Hub.Queue(
                             ["resetEquationNumbers", MathJax.InputJax.TeX],
                             ["PreProcess", MathJax.Hub],
-                            ["Reprocess", MathJax.Hub]
-                            );
+                            ["Reprocess", MathJax.Hub]);
+                }
+                
+
+                $('.js-edit').on('click', function () {
+                    var id = $(this).data('id');
+
+                    $('#block-content-' + id).remove();
+
+                    $('#dd3-content-' + id).addClass('edit');
+                    $(this).addClass('hidden');
+                    $(this).prev().removeClass('hidden');
+
+                    if (typeof data_items[0][id].body == 'undefined') {
+
+                        getBlockBody(id, function (data) {
+                            data_items[0][id].body = data[0].body != 0 ? data[0].body : '';
+                            // use mathJaxReload function
+                            data_items[0][id].body = mathJaxReload(data_items[0][id].body);
+                            $('<div id="html-editor-' + id + '" data-id="' + id + '">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-' + id));
+                            runEditor(id);
+                        });
+
+                    } else {
+                        $('<div id="html-editor-' + id + '" data-id="' + id + '">' + data_items[0][id].body + '</div>').insertAfter($('#dd3-content-' + id));
+                        runEditor(id);
+                    }
                 });
+
+
 
                 $('.js-save').on('click', function () {
 
@@ -961,7 +1001,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 });
                 app_data.struct_update = true;
             }
-            ;
+            
 
             function appendBlocks(list, index, el) {
                 function buildItem(list, value) {
@@ -982,7 +1022,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     }
                     return html;
                 }
-                ;
+                
 
                 var parent_ol = $('#dd-list');
                 $.each(index, function (item, value) {
@@ -992,9 +1032,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 });
                 el.append(parent_ol);
             }
-            ;
-
-
 
             // использование Math.round() даст неравномерное распределение!
             function getUniqRandomInt(min, max, items) {
@@ -1007,7 +1044,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     return id;
                 }
             }
-            ;
 
             $('#add-block').on('click', function addBlock() {
 
@@ -1058,7 +1094,6 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     data: data ? data : [0],
                     success: function (result) {
                         notify('Has been added', 'inverse', 4000);
-
                     }
                 });
 
@@ -1066,14 +1101,13 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 refresh();
 
             });
-
             //editables
             $('#lecture').editable({
                 url: '<?= APP::Module('Routing')->root ?>students/user/api/edit/lecture.json',
                 mode: 'inline',
                 success: function (response, newValue) {
                     if (response.status == 'error') {
-                       // console.log('error update DB');
+                        // console.log('error update DB');
                     } else {
                         notify('Has been saved', 'inverse', 4000);
                     }
@@ -1085,7 +1119,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 mode: 'inline',
                 success: function (response, newValue) {
                     if (response.status == 'error') {
-                       // console.log('error update DB');
+                        // console.log('error update DB');
                     } else {
                         notify('Has been saved', 'inverse', 4000);
                     }
@@ -1103,7 +1137,7 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                 mode: 'inline',
                 success: function (response, newValue) {
                     if (response.status == 'error') {
-                       // console.log('error update DB');
+                        // console.log('error update DB');
                     } else {
                         notify('Has been saved', 'inverse', 4000);
                     }
@@ -1115,12 +1149,8 @@ if ((APP::Module('Users')->user['id'] !== $data['id_user']) && ($data['privacy_e
                     {value: 3, text: 'locked'}
                 ]
             });
-
             getList();
-
         });
-
     </script>
-
 </body>
 </html>

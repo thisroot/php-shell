@@ -115,6 +115,10 @@ class Student {
     public function LectureFind() {
         return APP::Render('student/find_lectures');
     }
+    
+    public function LectureFindTest() {
+        return APP::Render('student/find_lectures_test');
+    }
 
     public function LectureView() {
         return APP::Render('student/user/lectures/view', 'include', APP::Module('DB')->Select(
@@ -422,6 +426,14 @@ class Student {
 
     public function LectureEdit() {
         return APP::Render('student/user/lectures/edit', 'include', APP::Module('DB')->Select(
+                                'auto', [ 'fetch', PDO::FETCH_ASSOC], ['*'], 'student_lectures', [
+                            ['id', '=', APP::Module('Crypt')->Decode(APP::Module('Routing')->get['hash']), PDO::PARAM_INT]
+                        ])
+        );
+    }
+    
+    public function LectureEditTest() {
+        return APP::Render('student/user/lectures/edit_test', 'include', APP::Module('DB')->Select(
                                 'auto', [ 'fetch', PDO::FETCH_ASSOC], ['*'], 'student_lectures', [
                             ['id', '=', APP::Module('Crypt')->Decode(APP::Module('Routing')->get['hash']), PDO::PARAM_INT]
                         ])
@@ -1010,6 +1022,10 @@ class Student {
         echo json_encode(['status' => 'success', 'message' => 'lecture name has been updated']);
         exit();
     }
+    
+    
+    
+    
     
     public function APIImageUpload() {
         

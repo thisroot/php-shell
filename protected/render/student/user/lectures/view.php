@@ -42,10 +42,55 @@ if (APP::Module('Users')->user['role'] != 'default') {
 
     <? APP::Render('core/widgets/css') ?>
     <link href="<?= APP::Module('Routing')->root ?>public/modules/students/main.css" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        html:not(.ismobile) .page-loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
 
+        html:not(.ismobile) .page-loader .preloader {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+        }
+
+        .preloader.pl-xl {
+            width: 80px;
+        }
+        .preloader {
+            position: relative;
+            margin: 0px auto;
+            display: inline-block;
+        }
+
+        svg:not(:root) {
+            overflow: hidden;
+        }
+        .pl-circular {
+            animation: rotate 2s linear infinite;
+            height: 100%;
+            transform-origin: center center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
+    </style>
 
 </head>
-<body  id="module-student">
+<body  id="module-student" data-ma-header="teal" class="main-container">
+    <? APP::Render('student/widgets/page_loader') ?>
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -86,23 +131,24 @@ if (APP::Module('Users')->user['role'] != 'default') {
 <noscript><div><img src="https://mc.yandex.ru/watch/36066965" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
-      <!-- Render Header -->
-   <?
-   if(APP::Module('Users')->user['role'] != 'default') {
-   APP::Render('student/widgets/header', 'include', [
-       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
-   ]); } else {
-      APP::Render('student/widgets/header');
-    } ?>
-     <!-- Stop Render Header -->
+    <!-- Render Header -->
+    <?
 
-    <section id="main">
+    APP::Render('student/widgets/logo');   
+    if (APP::Module('Users')->user['role'] != 'default') {
+        APP::Render('student/widgets/ulogin', 'include', [
+       'img' => APP::Module('Student')->user_data['user_settings']['img_crop']
+   ]);
+    } else {
+        APP::Render('student/widgets/ulogin');
+    }
+    ?>
+    <!-- Stop Render Header -->
+
+    
 <? APP::Render('student/user/lectures/sidebar','include',['page' => 'lecture_view']) ?>
 
-        <section id="content">
-
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
+        <section id="content" class="col-md-12 col-sm-12 col-xs-12 col-lg-offset-2 col-lg-10">
                         <div class="card p-b-30">
 
                             <div class="card-header">
@@ -163,15 +209,12 @@ if (APP::Module('Users')->user['role'] != 'default') {
 
                             </div>
                         </div>
-
-                    </div>
-                </div>
         </section>
 
-    <? APP::Render('student/widgets/footer') ?>
-    </section>
+   
+    
 
-    <? APP::Render('student/widgets/page_loader') ?>
+    
 
 <? APP::Render('student/widgets/ie_warning') ?>
 

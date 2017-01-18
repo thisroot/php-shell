@@ -1,0 +1,49 @@
+body:before {
+    background-image: url("../modules/students/img/9.jpg");
+    background-position: left center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 300px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    height: 100%;
+    max-height: 100%;
+}
+
+#s-main-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+    padding-top: 169px;
+}
+
+#content-right {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+    padding-top: 169px;
+}
+
+
+#content {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    padding-top: 169px;
+}
+
+#content::-webkit-scrollbar {
+    display: none;
+}

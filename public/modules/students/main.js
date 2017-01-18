@@ -1,8 +1,20 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+ /*======================================== */
+/* scrolling events                        */
+/*======================================== */
+
+    var $document = $('#content');
+    var $element = $('.h-menu, .h-logo');
+    var className = 'z-index-low';
+
+    $document.scroll(function () {
+        $element.toggleClass(className, $document.scrollTop() >= 75);
+    });
 
 
 function validateEmail(email) {
@@ -11,8 +23,8 @@ function validateEmail(email) {
 }
 
  function notify(message, type, delay){
-     
-            delay?delay:10000;    
+
+            delay?delay:10000;
             $.growl({
                 message: message
             },{
@@ -35,5 +47,5 @@ function validateEmail(email) {
                 }
             });
         };
-        
-        
+
+

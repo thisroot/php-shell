@@ -16,6 +16,7 @@ and open the template in the editor.
 */
 
 
+
 #scrolling {
     max-height: 400px;
     margin-top: 8px;
@@ -113,7 +114,7 @@ body {
 }
 
 body:before {
-    background-image: url("./img/9.jpg");
+    background-image: url("./img/3.jpg");
     background-position: left center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -299,7 +300,7 @@ header.media {
     padding: 0px 2px;
     border: 1px solid #c9c9c9;
     background-color: #fff;
-    
+
 }
 
 .js-edit, .js-save {
@@ -314,7 +315,7 @@ header.media {
     padding: 0px 2px;
     border: 1px solid #c9c9c9;
     background-color: #fff;
-    
+
 }
 
 .js-expand {
@@ -329,7 +330,7 @@ header.media {
     padding: 0px 2px;
     border: 1px solid #c9c9c9;
     background-color: #fff;
-    
+
 }
 
 .dd3-content.active .js-expand,
@@ -818,6 +819,11 @@ body.dragging, body.dragging * {
     overflow: hidden;
 }
 
+.block-content ul, .note-editor ul {
+    list-style: disc;
+    padding: 0px 0px 0px 20px;
+}
+
 .edit-empty-block {
     border-bottom: dashed 1px #989898 !important;
     cursor: pointer;
@@ -875,6 +881,64 @@ left: 80px;
 .note-editor .fa.fa-trash-o::before, .note-popover .fa.fa-trash-o::before {
     content: "\f154";
 }
+ .h-logo {
+    position: relative;
+    top:70px;
+    left: 40px;
+    z-index: 11;
+}
+
+ .h-menu {
+    position: relative;
+    top: 60px;
+    right: 60px;
+    z-index:11;
+}
+
+.z-index-low {
+    z-index: 0;
+}
+
+ #s-main-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    /* overflow: hidden;  Disable scrollbars. Set to "scroll" to enable*/
+    padding-top: 169px;
+}
+
+.find-lectures #content-right {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+    padding-top: 169px;
+}
+
+#content { 
+ position: fixed;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    padding-top: 169px;
+    z-index: 10;
+}
+
+.find-lectures #content {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    padding-top: 169px;
+}
+
+
+
+.find-lectures #content::-webkit-scrollbar {
+    display: none;
+}
 
 
 
@@ -902,12 +966,11 @@ left: 80px;
     margin: 0 5px 7px 0;
 }
 
+
+
 /*==================================================
 =            Bootstrap 3 Media Queries             =
 ==================================================*/
-
-
-
 
     /*==========  Mobile First Method  ==========*/
 
@@ -928,40 +991,43 @@ left: 80px;
 
     /* Medium Devices, Desktops */
     @media only screen and (min-width : 992px) {
-
+       .find-lectures #content {
+            padding-right: 34%;
+        }
     }
 
     /* Large Devices, Wide Screens */
     @media only screen and (min-width : 1200px) {
-
+         .find-lectures #content {
+            padding-right: 42%;
+        }
     }
-
-
 
     /*==========  Non-Mobile First Method  ==========*/
 
     /* Large Devices, Wide Screens */
-    @media only screen and (max-width : 1200px) {
-
+    @media only screen and (max-width : 1279px) {
+       
     }
-
+    
+   
     /* Medium Devices, Desktops */
     @media only screen and (max-width : 992px) {
-
+       
     }
 
     /* Small Devices, Tablets */
     @media only screen and (max-width : 768px) {
         .block-content {
-            padding: 0px 10px;
+            padding: 10px 5px 5px 5px;
         }
 
         #module-student .card-lecture {
             padding: 0px;
             margin: 0px 10px;
         }
-        
-        #module-student .card-header {  
+
+        #module-student .card-header {
             padding: 30px 0px 0px 0px;
             margin: 0px -10px 0px 15px;
         }
@@ -969,13 +1035,31 @@ left: 80px;
         .dd-list .dd-list {
             margin-left: 10px;
         }
-        
+
          ul.actions > li:nth-child(1) {
             display: none;
         }
-        
+
          #module-student #content .card-header h2 {
             width: 50%;
+        }
+
+        #lectures-table .time {
+            display: none;
+        }
+
+        #lectures-table tr td:last-child {
+            padding: 0px 0px 0px 0px !important;
+        }
+
+        .container > .row > .col-md-8 {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        #content .col-xs-12, #content .col-md-12 {
+            padding-left: 0px;
+            padding-right: 0px;
         }
 
     }
@@ -991,7 +1075,7 @@ left: 80px;
         ul.actions > li:nth-child(3) {
             display: none;
         }
-       
+
         #module-student #content .card-header h2 {
             width: 75%;
         }
@@ -1001,3 +1085,4 @@ left: 80px;
     @media only screen and (max-width : 320px) {
 
     }
+

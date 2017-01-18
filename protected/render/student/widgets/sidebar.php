@@ -1,11 +1,9 @@
 <?
-$system = APP::Module('Admin')->System();
 $modules = [];
 ?>
 
 
 <aside id="s-main-menu" class="sidebar">
-    
     <ul class="main-menu">
         
         <!-- Role Default -->

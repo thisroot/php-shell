@@ -2,14 +2,14 @@
 return [
     'routes' => [
       ['',                                                               'Student', 'LectureFind'],        // View all backups /admin
+      ['students\/test\/(?P<hash>.*)\/edit(\?.*)?',                  'Student', 'LectureEditTest'],        // View all backups /admin
       ['students\/user\/lectures\/add(\?.*)?',                           'Student', 'LectureAdd'],         // View all backups /admin
       ['students\/user\/lectures\/list(\?.*)?',                          'Student', 'LectureList'],        // View all backups /admin
       ['students\/lectures\/find(\?.*)?',                                'Student', 'LectureFind'],        // View all backups /admin
       ['students\/user\/lecture\/(?P<hash>.*)\/edit(\?.*)?',             'Student', 'LectureEdit'],        // View all backups /admin
       ['students\/user\/lecture\/(?P<hash>.*)(\?.*)?',                   'Student', 'LectureView'],        // View all backups /admin
       ['students\/user\/settings(\?.*)?',                                'Student', 'UserSettings'],       // View all backups /admin
-        
-        
+                
       ['students\/user\/api\/edit\/settings.json(\?.*)?',                'Student', 'APIUserSettings'],    // View all backups /admin
       ['students\/user\/api\/get\/vkdata.json(\?.*)?',                   'Student', 'APIGetVkData'],       // View all backups /admin
       ['students\/user\/api\/get\/filter\/lectures.json(\?.*)?',         'Student', 'APILectureFind'],     // View all backups /admin
